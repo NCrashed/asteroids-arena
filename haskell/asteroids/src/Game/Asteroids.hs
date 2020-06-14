@@ -2,5 +2,15 @@ module Game.Asteroids(
     runGame
   ) where
 
+import Control.Concurrent
+import Control.Concurrent.STM
+import Game.Asteroids.Window
+import Game.Asteroids.World
+import Game.Asteroids.World.Render
+
 runGame :: IO ()
-runGame = pure ()
+runGame = do
+  w <- initWorld
+  wRef <- newTVarIO w
+  _ <- forkIO $ simulateWorld wRef
+  renderLoop wRef
