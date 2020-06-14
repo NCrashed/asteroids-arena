@@ -3,7 +3,6 @@ module Game.Asteroids.World.Mass(
   ) where
 
 import Apecs
-import Linear
 
 newtype Mass = Mass { unMass :: Float } deriving (Show, Num)
 

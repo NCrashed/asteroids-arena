@@ -30,9 +30,12 @@ library
     Game.Asteroids
     Game.Asteroids.World
     Game.Asteroids.World.Mass
+    Game.Asteroids.World.Player
     Game.Asteroids.World.Position
-    Game.Asteroids.World.Velocity
     Game.Asteroids.World.Render
+    Game.Asteroids.World.Rotation
+    Game.Asteroids.World.Size
+    Game.Asteroids.World.Velocity
     Game.Asteroids.Render
     Game.Asteroids.Window
   build-depends:
@@ -41,11 +44,13 @@ library
     , linear          >= 1.20     && < 1.21
     , sdl2            >= 2.5      && < 2.6
     , stm             >= 2.5      && < 2.6
+    , vector          >= 0.12     && < 0.13
   default-language:    Haskell2010
   default-extensions:
     BangPatterns
     DataKinds
     DeriveGeneric
+    FlexibleContexts
     FlexibleInstances
     GADTs
     GeneralizedNewtypeDeriving

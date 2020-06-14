@@ -10,7 +10,7 @@ import Game.Asteroids.World.Render
 
 runGame :: IO ()
 runGame = do
-  w <- initWorld
+  w <- newWorld
   wRef <- newTVarIO w
   _ <- forkIO $ simulateWorld wRef
   renderLoop wRef

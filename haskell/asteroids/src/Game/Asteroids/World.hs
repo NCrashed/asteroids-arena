@@ -1,6 +1,7 @@
+{-# LANGUAGE TemplateHaskell #-}
 module Game.Asteroids.World(
     World(..)
-  , initWorld
+  , newWorld
   , simulateWorld
   ) where
 
@@ -11,30 +12,27 @@ import Control.Monad
 import Game.Asteroids.World.Mass
 import Game.Asteroids.World.Player
 import Game.Asteroids.World.Position
+import Game.Asteroids.World.Rotation
+import Game.Asteroids.World.Size
 import Game.Asteroids.World.Velocity
 
-data World = World {
-  worldWidth    :: !Int
-, worldHeight   :: !Int
-, worldMass     :: !(Storage Mass)
-, worldPlayer   :: !(Storage Player)
-, worldPosition :: !(Storage Position)
-, worldVelocity :: !(Storage Velocity)
-, worldEntities :: !(Storage EntityCounter)
-}
+makeWorld "World" [
+    ''WorldWidth
+  , ''WorldHeight
+  , ''Mass
+  , ''Player
+  , ''Position
+  , ''Rotation
+  , ''Velocity
+  ]
 
-initWorld :: IO World
-initWorld = do
-  worldMass <- explInit
-  worldPlayer <- explInit
-  worldPosition <- explInit
-  worldVelocity <- explInit
-  worldEntities <- explInit
-  pure World {
-      worldWidth  = 1400
-    , worldHeight = 1024
-    , ..
-    }
+newWorld :: IO World
+newWorld = do
+  w <- initWorld
+  runWith w $ do
+    initSizes
+    spawnPlayer
+    ask
 
 simulateWorld :: TVar World -> IO ()
 simulateWorld worldRef = forever $ do
@@ -44,19 +42,3 @@ simulateWorld worldRef = forever $ do
 
 stepWorld :: World -> IO World
 stepWorld = pure
-
-instance Has World IO Mass where
-  getStore = asks worldMass
-  {-# INLINE getStore #-}
-
-instance Has World IO Player where
-  getStore = asks worldPlayer
-  {-# INLINE getStore #-}
-
-instance Has World IO Position where
-  getStore = asks worldPosition
-  {-# INLINE getStore #-}
-
-instance Has World IO Velocity where
-  getStore = asks worldVelocity
-  {-# INLINE getStore #-}

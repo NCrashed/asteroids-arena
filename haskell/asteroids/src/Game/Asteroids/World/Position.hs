@@ -5,7 +5,7 @@ module Game.Asteroids.World.Position(
 import Apecs
 import Linear
 
-newtype Position = Position { unPosition :: V3 Float } deriving (Show, Num)
+newtype Position = Position { unPosition :: V2 Float } deriving (Show, Num)
 
 instance Component Position where
   type Storage Position = Map Position
