@@ -29,6 +29,9 @@ library
   exposed-modules:
     Game.Asteroids
     Game.Asteroids.World
+    Game.Asteroids.World.Mass
+    Game.Asteroids.World.Position
+    Game.Asteroids.World.Velocity
     Game.Asteroids.World.Render
     Game.Asteroids.Render
     Game.Asteroids.Window
@@ -45,11 +48,14 @@ library
     DeriveGeneric
     FlexibleInstances
     GADTs
+    GeneralizedNewtypeDeriving
+    MultiParamTypeClasses
     OverloadedStrings
     RankNTypes
     RecordWildCards
     ScopedTypeVariables
     TupleSections
+    TypeFamilies
     TypeOperators
 
 executable asteroids
