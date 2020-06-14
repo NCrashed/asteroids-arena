@@ -3,7 +3,7 @@ module Game.Asteroids(
   ) where
 
 import Control.Concurrent
-import Control.Concurrent.STM
+import Data.IORef
 import Game.Asteroids.Window
 import Game.Asteroids.World
 import Game.Asteroids.World.Render
@@ -11,6 +11,4 @@ import Game.Asteroids.World.Render
 runGame :: IO ()
 runGame = do
   w <- newWorld
-  wRef <- newTVarIO w
-  _ <- forkIO $ simulateWorld wRef
-  renderLoop wRef
+  renderLoop w simulateWorld

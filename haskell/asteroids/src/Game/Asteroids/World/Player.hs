@@ -39,4 +39,4 @@ spawnPlayer :: (MonadIO m
   ) => SystemT w m Entity
 spawnPlayer = do
   ws <- getWorldSize
-  newEntity (Player, Mass playerMass, Position (ws * 0.5), Rotation 0, Velocity 0)
+  newEntity (Player, Mass playerMass, Position (ws * 0.5), Rotation 0, Velocity 100)

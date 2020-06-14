@@ -6,14 +6,17 @@ module Game.Asteroids.World(
   ) where
 
 import Apecs
-import Control.Concurrent.STM
+import Data.IORef
 import Control.Monad
+import System.Clock
 
 import Game.Asteroids.World.Mass
+import Game.Asteroids.World.Physics
 import Game.Asteroids.World.Player
 import Game.Asteroids.World.Position
 import Game.Asteroids.World.Rotation
 import Game.Asteroids.World.Size
+import Game.Asteroids.World.Timer
 import Game.Asteroids.World.Velocity
 
 makeWorld "World" [
@@ -23,6 +26,7 @@ makeWorld "World" [
   , ''Player
   , ''Position
   , ''Rotation
+  , ''Timer
   , ''Velocity
   ]
 
@@ -30,15 +34,15 @@ newWorld :: IO World
 newWorld = do
   w <- initWorld
   runWith w $ do
+    initTimer
     initSizes
     spawnPlayer
     ask
 
-simulateWorld :: TVar World -> IO ()
-simulateWorld worldRef = forever $ do
-  w <- atomically . readTVar $ worldRef
-  w' <- stepWorld w
-  atomically $ writeTVar worldRef w'
-
-stepWorld :: World -> IO World
-stepWorld = pure
+simulateWorld :: World -> IO World
+simulateWorld w = do
+  t <- getTime Monotonic
+  runWith w $ do
+    setDelta t
+    applyMotion
+    ask

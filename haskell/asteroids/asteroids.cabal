@@ -30,17 +30,20 @@ library
     Game.Asteroids
     Game.Asteroids.World
     Game.Asteroids.World.Mass
+    Game.Asteroids.World.Physics
     Game.Asteroids.World.Player
     Game.Asteroids.World.Position
     Game.Asteroids.World.Render
     Game.Asteroids.World.Rotation
     Game.Asteroids.World.Size
+    Game.Asteroids.World.Timer
     Game.Asteroids.World.Velocity
     Game.Asteroids.Render
     Game.Asteroids.Window
   build-depends:
       base            >= 4.5      && < 4.14
     , apecs           >= 0.9      && < 0.10
+    , clock           >= 0.8      && < 0.9
     , linear          >= 1.20     && < 1.21
     , sdl2            >= 2.5      && < 2.6
     , stm             >= 2.5      && < 2.6
