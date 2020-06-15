@@ -30,6 +30,7 @@ library
     Game.Asteroids
     Game.Asteroids.World
     Game.Asteroids.World.Asteroid
+    Game.Asteroids.World.Event
     Game.Asteroids.World.Mass
     Game.Asteroids.World.Physics
     Game.Asteroids.World.Player

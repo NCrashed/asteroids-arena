@@ -6,11 +6,13 @@ module Game.Asteroids.World(
   ) where
 
 import Apecs
-import Data.IORef
 import Control.Monad
+import Data.Foldable (traverse_)
+import Data.IORef
 import System.Clock
 
 import Game.Asteroids.World.Asteroid
+import Game.Asteroids.World.Event
 import Game.Asteroids.World.Mass
 import Game.Asteroids.World.Physics
 import Game.Asteroids.World.Player
@@ -42,11 +44,12 @@ newWorld = do
     spawnPlayer
     ask
 
-simulateWorld :: World -> IO World
-simulateWorld w = do
+simulateWorld :: [InputEvent] -> World -> IO World
+simulateWorld es w = do
   t <- getTime Monotonic
   runWith w $ do
     setDelta t
+    traverse_ reactInputEvent es
     applyMotion
     wrapSpace
     runGC
