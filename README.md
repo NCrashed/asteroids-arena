@@ -5,7 +5,7 @@ joy of their usage.
 
 # Game concept
 
-The game is 2D. The world is wrapped around edges. You are a triangular space ship with single engine without breaks and single gun.
+The game is 2D. The world is wrapped around edges. You are a triangular space ship with single engine without breaks. The ship has single gun that fires bullets.
 The world is filled with circular asteroids that doesn't collide with each other and collide with you. On collision with the asteroid
 you die. Asteroid breaks into two smaller ones on collision with bullet, but if asteroid is smaller a threshold it is destroyed. Bullets
 don't collide with the ship. Asteroids are randomly distributed across world on start. You win if you kill all asteroids, you loose when
