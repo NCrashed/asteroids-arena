@@ -10,6 +10,7 @@ import Data.IORef
 import Control.Monad
 import System.Clock
 
+import Game.Asteroids.World.Asteroid
 import Game.Asteroids.World.Mass
 import Game.Asteroids.World.Physics
 import Game.Asteroids.World.Player
@@ -22,6 +23,7 @@ import Game.Asteroids.World.Velocity
 makeWorld "World" [
     ''WorldWidth
   , ''WorldHeight
+  , ''Asteroid
   , ''Mass
   , ''Player
   , ''Position
@@ -36,6 +38,7 @@ newWorld = do
   runWith w $ do
     initTimer
     initSizes
+    spawnAsteroids
     spawnPlayer
     ask
 

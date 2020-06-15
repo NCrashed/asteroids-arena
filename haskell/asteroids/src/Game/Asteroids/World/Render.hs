@@ -2,16 +2,18 @@
 module Game.Asteroids.World.Render(
   ) where
 
+import Apecs as A
+import Control.Monad.IO.Class
+import Foreign.C.Types
 import Game.Asteroids.Render
 import Game.Asteroids.World
+import Game.Asteroids.World.Asteroid
 import Game.Asteroids.World.Player
 import Game.Asteroids.World.Position
 import Game.Asteroids.World.Rotation
 import Game.Asteroids.World.Size
 import Linear
-import Control.Monad.IO.Class
 import SDL
-import Apecs as A
 
 import qualified Data.Vector.Storable as V
 
@@ -21,6 +23,7 @@ instance WorldRender World where
 instance CanRender World World where
   render r _ = do
     cmapM_ (renderPlayer r)
+    cmapM_ (renderAsteroid r)
     pure ()
   {-# INLINE render #-}
 
@@ -34,6 +37,22 @@ renderPlayer rd (_, Position p, Rotation r) = do
     , V2 (-dx) dy
     , V2 dx 0 ]
 {-# INLINE renderPlayer #-}
+
+renderAsteroid :: MonadIO m => Renderer -> (Asteroid, Position, Rotation) -> m ()
+renderAsteroid rd (Asteroid n r, Position p, Rotation a) = do
+  rendererDrawColor rd SDL.$= 255
+  drawCircloid rd n a (fmap round p) (round r)
+{-# INLINE renderAsteroid #-}
+
+drawCircloid :: MonadIO m => Renderer -> Int -> Float -> V2 CInt -> CInt -> m ()
+drawCircloid rd n a0 (V2 x0 y0) r = drawLines rd $ V.fromList [
+    P $ V2 (x0 + x) (y0 + y)
+  | i <- [0 .. n]
+  , let a = fromIntegral i * (2 * pi / fromIntegral n)
+  , let x = round $ fromIntegral r * (1 + sin a * 0.3) * cos (a0 + a)
+  , let y = round $ fromIntegral r * (1 + cos a * 0.3) * sin (a0 + a)
+  ]
+{-# INLINE drawCircloid #-}
 
 rotateV2 :: Float -> V2 Float -> V2 Float
 rotateV2 a (V2 x y) = V2 (x * cos a - y * sin a) (x * sin a + y * cos a)
