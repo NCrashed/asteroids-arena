@@ -8,6 +8,7 @@ import Control.Monad.IO.Class
 import Game.Asteroids.World.Player
 import Game.Asteroids.World.Rotation
 import Game.Asteroids.World.Timer
+import Game.Asteroids.World.Velocity
 
 -- | Possible inputs into simulation from player
 data InputEvent =
@@ -19,6 +20,7 @@ data InputEvent =
 reactInputEvent :: (MonadIO m
   , Has w m Player
   , Has w m Rotation
+  , Has w m Velocity
   , Has w m Timer
   ) => InputEvent -> SystemT w m ()
 reactInputEvent e = do
@@ -26,4 +28,4 @@ reactInputEvent e = do
   case e of
     InputRotateLeft -> rotatePlayer $ negate $ dt * playerRotateSpeed
     InputRotateRight -> rotatePlayer $ dt * playerRotateSpeed
-    InputThrust -> pure ()
+    InputThrust -> addPlayerVelocity $ dt * playerThrust / playerMass

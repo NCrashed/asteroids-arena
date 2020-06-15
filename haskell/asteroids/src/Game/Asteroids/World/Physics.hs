@@ -36,6 +36,8 @@ wrapSpace = do
   cmapM_ $ \(Position (V2 x y), e) -> if
     | x < 0 && y < 0 -> set e $ Position (V2 (w+x) (h+y))
     | x < 0          -> set e $ Position (V2 (w+x) y)
+    | y < 0          -> set e $ Position (V2 x (h+y))
     | x > w && y > h -> set e $ Position (V2 (x-w) (y-h))
     | x > w          -> set e $ Position (V2 (x-w) y)
+    | y > h          -> set e $ Position (V2 x (y-h))
     | otherwise      -> pure ()
