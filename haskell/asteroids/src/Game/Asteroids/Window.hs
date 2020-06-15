@@ -11,7 +11,7 @@ import SDL
 
 import Game.Asteroids.Render
 
-renderLoop :: WorldRender world => world -> (world -> IO world) -> IO ()
+renderLoop :: forall world . WorldRender world => world -> (world -> IO world) -> IO ()
 renderLoop w0 nextWorld = do
   initializeAll
   setHintWithPriority NormalPriority HintRenderVSync EnableVSync
@@ -20,22 +20,22 @@ renderLoop w0 nextWorld = do
       windowInitialSize = size
     }
   renderer <- createRenderer window (-1) defaultRenderer
-  loop w0 nextWorld renderer
-
-loop :: WorldRender world => world -> (world -> IO world) -> Renderer -> IO ()
-loop w nextWorld renderer = do
-  events <- pollEvents
-  let isEventExit event =
-        case eventPayload event of
-          WindowClosedEvent _ -> True
-          KeyboardEvent keyboardEvent ->
-            keyboardEventKeyMotion keyboardEvent == Pressed &&
-            keysymKeycode (keyboardEventKeysym keyboardEvent) == KeycodeEscape
-          _ -> False
-      exitEvent = any isEventExit events
-  rendererDrawColor renderer $= V4 0 0 0 255
-  clear renderer
-  runWith w $ render renderer w
-  present renderer
-  w' <- nextWorld w
-  unless exitEvent (loop w' nextWorld renderer)
+  let loop :: WorldRender world => world -> IO ()
+      loop w = do
+        events <- pollEvents
+        let isEventExit event =
+              case eventPayload event of
+                WindowClosedEvent _ -> True
+                KeyboardEvent keyboardEvent ->
+                  keyboardEventKeyMotion keyboardEvent == Pressed &&
+                  keysymKeycode (keyboardEventKeysym keyboardEvent) == KeycodeEscape
+                _ -> False
+            exitEvent = any isEventExit events
+        rendererDrawColor renderer $= V4 0 0 0 255
+        clear renderer
+        runWith w $ {-# SCC "renderWorld" #-} render renderer w
+        present renderer
+        w' <- {-# SCC "nextWorld" #-} nextWorld w
+        unless exitEvent (loop w')
+      {-# INLINABLE loop #-}
+  loop w0

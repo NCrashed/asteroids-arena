@@ -21,3 +21,4 @@ applyMotion = do
   dt <- getDelta
   -- traceShowM dt
   cmapM_ $ \(Position p, Velocity v, e) -> set e $ Position (p + v * V2 dt dt)
+{-# INLINE applyMotion #-}

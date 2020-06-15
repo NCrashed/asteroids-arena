@@ -45,4 +45,5 @@ simulateWorld w = do
   runWith w $ do
     setDelta t
     applyMotion
+    runGC
     ask

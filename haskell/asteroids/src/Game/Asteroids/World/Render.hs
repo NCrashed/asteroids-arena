@@ -22,6 +22,7 @@ instance CanRender World World where
   render r _ = do
     cmapM_ (renderPlayer r)
     pure ()
+  {-# INLINE render #-}
 
 renderPlayer :: MonadIO m => Renderer -> (Player, Position, Rotation) -> m ()
 renderPlayer rd (_, Position p, Rotation r) = do
@@ -32,6 +33,7 @@ renderPlayer rd (_, Position p, Rotation r) = do
     , V2 (-dx) (-dy)
     , V2 (-dx) dy
     , V2 dx 0 ]
+{-# INLINE renderPlayer #-}
 
 rotateV2 :: Float -> V2 Float -> V2 Float
 rotateV2 a (V2 x y) = V2 (x * cos a - y * sin a) (x * sin a + y * cos a)
