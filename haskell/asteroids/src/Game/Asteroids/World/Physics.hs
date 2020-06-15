@@ -2,12 +2,15 @@
 module Game.Asteroids.World.Physics(
     applyMotion
   , wrapSpace
+  , playerCollide
   ) where
 
 import Apecs
 import Control.Monad.IO.Class
 import Linear
 
+import Game.Asteroids.World.Asteroid
+import Game.Asteroids.World.Player
 import Game.Asteroids.World.Position
 import Game.Asteroids.World.Size
 import Game.Asteroids.World.Timer
@@ -41,3 +44,17 @@ wrapSpace = do
     | x > w          -> set e $ Position (V2 (x-w) y)
     | y > h          -> set e $ Position (V2 x (y-h))
     | otherwise      -> pure ()
+
+-- | Check collision of player with any of asteroids
+playerCollide :: (MonadIO m
+  , Has w m Player
+  , Has w m Asteroid
+  , Has w m Position
+  ) => SystemT w m Bool
+playerCollide = do
+  pos <- cfold (\_ (Player, Position pos) -> pos) 0
+  let checkAsteroid True _ = True
+      checkAsteroid _ (Asteroid _ r, Position apos) = let
+        r' = r+playerCollideRadius
+        in quadrance (pos - apos) <= r'*r'
+  cfold checkAsteroid False

@@ -1,12 +1,14 @@
 module Game.Asteroids.World.Player(
     Player(..)
   , playerSize
+  , playerCollideRadius
   , playerMass
   , playerThrust
   , playerRotateSpeed
   , spawnPlayer
   , rotatePlayer
   , addPlayerVelocity
+  , killPlayer
   ) where
 
 import Apecs
@@ -26,6 +28,10 @@ instance Component Player
 -- | Player size in pixels (1 px == 1 meter)
 playerSize :: V2 Float
 playerSize = V2 30 25
+
+-- | Collision radius for player
+playerCollideRadius :: Float
+playerCollideRadius = 25
 
 -- | Player mass in kg
 playerMass :: Float
@@ -75,3 +81,13 @@ addPlayerVelocity :: (MonadIO m
   -> SystemT w m ()
 addPlayerVelocity dv = cmap $ \(Player, Velocity v, Rotation r) -> (Player, Velocity $ v + V2 (dv * cos r) (dv * sin r))
 {-# INLINE addPlayerVelocity #-}
+
+-- | Destroy player entity
+killPlayer :: (MonadIO m
+  , Has w m Player
+  , Has w m Mass
+  , Has w m Position
+  , Has w m Rotation
+  , Has w m Velocity
+  ) => SystemT w m ()
+killPlayer = cmapM_ $ \(Player, e) -> destroy e (Proxy :: Proxy (Player, Mass, Position, Rotation, Velocity))

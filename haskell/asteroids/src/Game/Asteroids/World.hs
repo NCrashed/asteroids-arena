@@ -52,5 +52,9 @@ simulateWorld es w = do
     traverse_ reactInputEvent es
     applyMotion
     wrapSpace
+    collided <- playerCollide
+    when collided $ do
+      killPlayer
+      void $ spawnPlayer
     runGC
     ask
