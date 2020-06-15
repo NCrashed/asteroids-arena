@@ -49,6 +49,7 @@ simulateWorld es w = do
   t <- getTime Monotonic
   runWith w $ do
     setDelta t
+    setPlayerThursting False
     traverse_ reactInputEvent es
     applyMotion
     wrapSpace

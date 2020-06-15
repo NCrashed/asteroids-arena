@@ -28,4 +28,6 @@ reactInputEvent e = do
   case e of
     InputRotateLeft -> rotatePlayer $ negate $ dt * playerRotateSpeed
     InputRotateRight -> rotatePlayer $ dt * playerRotateSpeed
-    InputThrust -> addPlayerVelocity $ dt * playerThrust / playerMass
+    InputThrust -> do
+      addPlayerVelocity $ dt * playerThrust / playerMass
+      setPlayerThursting True

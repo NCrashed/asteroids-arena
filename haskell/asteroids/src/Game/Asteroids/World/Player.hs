@@ -9,6 +9,7 @@ module Game.Asteroids.World.Player(
   , rotatePlayer
   , addPlayerVelocity
   , killPlayer
+  , setPlayerThursting
   ) where
 
 import Apecs
@@ -20,7 +21,8 @@ import Game.Asteroids.World.Size
 import Game.Asteroids.World.Velocity
 import Linear
 
-data Player = Player
+-- | Player contains flag if thrust engine is one (for rendering)
+data Player = Player !Bool
 
 instance Component Player
   where type Storage Player = Unique Player
@@ -31,7 +33,7 @@ playerSize = V2 30 25
 
 -- | Collision radius for player
 playerCollideRadius :: Float
-playerCollideRadius = 25
+playerCollideRadius = 15
 
 -- | Player mass in kg
 playerMass :: Float
@@ -57,14 +59,14 @@ spawnPlayer :: (MonadIO m
   ) => SystemT w m Entity
 spawnPlayer = do
   ws <- getWorldSize
-  newEntity (Player, Mass playerMass, Position (ws * 0.5), Rotation 0, Velocity 0)
+  newEntity (Player False, Mass playerMass, Position (ws * 0.5), Rotation 0, Velocity 0)
 
 -- | Rotate player to given amount of radians
 rotatePlayer :: (MonadIO m
   , Has w m Player
   , Has w m Rotation
   ) => Float -> SystemT w m ()
-rotatePlayer a = cmap $ \(Player, Rotation r) -> (Player, Rotation $ clamp $ r+a)
+rotatePlayer a = cmap $ \(Player t, Rotation r) -> (Player t, Rotation $ clamp $ r+a)
   where
     clamp a | a < 0     = 2*pi + a
             | a > 2*pi  = a - 2*pi
@@ -79,7 +81,7 @@ addPlayerVelocity :: (MonadIO m
   , Has w m Rotation
   ) => Float -- ^ Velocity
   -> SystemT w m ()
-addPlayerVelocity dv = cmap $ \(Player, Velocity v, Rotation r) -> (Player, Velocity $ v + V2 (dv * cos r) (dv * sin r))
+addPlayerVelocity dv = cmap $ \(Player t, Velocity v, Rotation r) -> (Player t, Velocity $ v + V2 (dv * cos r) (dv * sin r))
 {-# INLINE addPlayerVelocity #-}
 
 -- | Destroy player entity
@@ -90,4 +92,11 @@ killPlayer :: (MonadIO m
   , Has w m Rotation
   , Has w m Velocity
   ) => SystemT w m ()
-killPlayer = cmapM_ $ \(Player, e) -> destroy e (Proxy :: Proxy (Player, Mass, Position, Rotation, Velocity))
+killPlayer = cmapM_ $ \(Player _, e) -> destroy e (Proxy :: Proxy (Player, Mass, Position, Rotation, Velocity))
+
+-- | Mark engines on-off
+setPlayerThursting :: (MonadIO m
+  , Has w m Player
+  ) => Bool -> SystemT w m ()
+setPlayerThursting v = cmap $ \(Player _) -> Player v
+{-# INLINE setPlayerThursting #-}

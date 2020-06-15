@@ -52,7 +52,7 @@ playerCollide :: (MonadIO m
   , Has w m Position
   ) => SystemT w m Bool
 playerCollide = do
-  pos <- cfold (\_ (Player, Position pos) -> pos) 0
+  pos <- cfold (\_ (Player _, Position pos) -> pos) 0
   let checkAsteroid True _ = True
       checkAsteroid _ (Asteroid _ r, Position apos) = let
         r' = r+playerCollideRadius

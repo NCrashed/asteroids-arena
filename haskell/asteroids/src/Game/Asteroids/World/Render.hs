@@ -3,6 +3,7 @@ module Game.Asteroids.World.Render(
   ) where
 
 import Apecs as A
+import Control.Monad
 import Control.Monad.IO.Class
 import Foreign.C.Types
 import Game.Asteroids.Render
@@ -28,14 +29,20 @@ instance CanRender World World where
   {-# INLINE render #-}
 
 renderPlayer :: MonadIO m => Renderer -> (Player, Position, Rotation) -> m ()
-renderPlayer rd (_, Position p, Rotation r) = do
+renderPlayer rd (Player isThrust, Position p, Rotation r) = do
   let V2 dx dy = playerSize * 0.5
   rendererDrawColor rd SDL.$= 255
-  drawLines rd $ V.map (P . fmap round . (p +) . rotateV2 r) [
+  let mkPoints = V.map (P . fmap round . (p +) . rotateV2 r)
+  drawLines rd $ mkPoints [
       V2 dx 0
     , V2 (-dx) (-dy)
     , V2 (-dx) dy
     , V2 dx 0 ]
+  when isThrust $ drawLines rd $ mkPoints [
+      V2 (-dx) (0.5 * dy)
+    , V2 (-dx-10) 0
+    , V2 (-dx) (-0.5 * dy)
+    ]
 {-# INLINE renderPlayer #-}
 
 renderAsteroid :: MonadIO m => Renderer -> (Asteroid, Position, Rotation) -> m ()
