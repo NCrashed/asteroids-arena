@@ -13,6 +13,7 @@ import Data.IORef
 import System.Clock
 
 import Game.Asteroids.World.Asteroid
+import Game.Asteroids.World.Audio
 import Game.Asteroids.World.Bullet
 import Game.Asteroids.World.Event
 import Game.Asteroids.World.Mass
@@ -26,6 +27,7 @@ import Game.Asteroids.World.Velocity
 
 makeWorld "World" [
     ''WorldWidth
+  , ''AudioState
   , ''Asteroid
   , ''Bullet
   , ''Mass
@@ -53,6 +55,7 @@ simulateWorld es w = do
   runWith w $ do
     setDelta t
     setPlayerThursting False
+    updateAudioCooldowns
     updatePlayerCooldown
     traverse_ reactInputEvent es
     applyMotion
@@ -83,6 +86,7 @@ collidePlayer = do
 collideBullets :: (MonadIO m
   , Has w m Bullet
   , Has w m Asteroid
+  , Has w m AudioState
   , Has w m Position
   , Has w m Mass
   , Has w m Rotation

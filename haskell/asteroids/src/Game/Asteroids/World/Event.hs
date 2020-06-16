@@ -5,6 +5,7 @@ module Game.Asteroids.World.Event(
 
 import Apecs
 import Control.Monad.IO.Class
+import Game.Asteroids.World.Audio
 import Game.Asteroids.World.Bullet
 import Game.Asteroids.World.Player
 import Game.Asteroids.World.Position
@@ -21,6 +22,7 @@ data InputEvent =
   deriving (Show, Eq)
 
 reactInputEvent :: (MonadIO m
+  , Has w m AudioState
   , Has w m Player
   , Has w m Rotation
   , Has w m Position
@@ -35,6 +37,9 @@ reactInputEvent e = do
     InputRotateLeft -> rotatePlayer $ negate $ dt * playerRotateSpeed
     InputRotateRight -> rotatePlayer $ dt * playerRotateSpeed
     InputThrust -> do
+      playSound audioThrust 0 50 0.35
       addPlayerVelocity $ dt * playerThrust / playerMass
       setPlayerThursting True
-    InputFire -> playerFire
+    InputFire -> do
+      playSound audioFire 1 50 0.2
+      playerFire

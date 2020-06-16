@@ -7,6 +7,7 @@ module Game.Asteroids.World.Asteroid(
 import Apecs
 import Control.Monad
 import Control.Monad.IO.Class
+import Game.Asteroids.World.Audio
 import Game.Asteroids.World.Mass
 import Game.Asteroids.World.Position
 import Game.Asteroids.World.Rotation
@@ -89,6 +90,7 @@ breakAsteroid :: (MonadIO m
   , Has w m WorldWidth
   , Has w m WorldHeight
   , Has w m Asteroid
+  , Has w m AudioState
   , Has w m Mass
   , Has w m Position
   , Has w m Rotation
@@ -98,6 +100,7 @@ breakAsteroid :: (MonadIO m
 breakAsteroid e = do
   (Asteroid n r, Mass m, Position pos, Rotation a, Velocity vel) <- get e
   destroyAsteroid e
+  playSound audioBang 2 50 0.2
   let r' = r * 0.5
   when (r' > fst asteroidSizeRange) $ do
     let m' = m * 0.5
