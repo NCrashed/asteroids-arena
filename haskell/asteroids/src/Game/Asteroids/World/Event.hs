@@ -5,7 +5,9 @@ module Game.Asteroids.World.Event(
 
 import Apecs
 import Control.Monad.IO.Class
+import Game.Asteroids.World.Bullet
 import Game.Asteroids.World.Player
+import Game.Asteroids.World.Position
 import Game.Asteroids.World.Rotation
 import Game.Asteroids.World.Timer
 import Game.Asteroids.World.Velocity
@@ -15,12 +17,16 @@ data InputEvent =
     InputRotateLeft
   | InputRotateRight
   | InputThrust
+  | InputFire
   deriving (Show, Eq)
 
 reactInputEvent :: (MonadIO m
   , Has w m Player
   , Has w m Rotation
+  , Has w m Position
   , Has w m Velocity
+  , Has w m Bullet
+  , Has w m EntityCounter
   , Has w m Timer
   ) => InputEvent -> SystemT w m ()
 reactInputEvent e = do
@@ -31,3 +37,4 @@ reactInputEvent e = do
     InputThrust -> do
       addPlayerVelocity $ dt * playerThrust / playerMass
       setPlayerThursting True
+    InputFire -> playerFire

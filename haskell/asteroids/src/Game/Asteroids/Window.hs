@@ -26,6 +26,7 @@ renderLoop w0 nextWorld = do
   leftRef <- newIORef False
   rightRef <- newIORef False
   thrustRef <- newIORef False
+  fireRef <- newIORef False
   let loop :: WorldRender world => world -> IO ()
       loop w = do
         events <- pollEvents
@@ -44,6 +45,7 @@ renderLoop w0 nextWorld = do
                   KeycodeLeft -> writeIORef leftRef pressed
                   KeycodeRight -> writeIORef rightRef pressed
                   KeycodeUp -> writeIORef thrustRef pressed
+                  KeycodeSpace -> writeIORef fireRef pressed
                   _ -> pure ()
               _ -> pure ()
         traverse_ updateWorldEvent events
@@ -55,6 +57,7 @@ renderLoop w0 nextWorld = do
                 ife InputRotateLeft leftRef
               , ife InputRotateRight rightRef
               , ife InputThrust thrustRef
+              , ife InputFire fireRef
               ]
         rendererDrawColor renderer $= V4 0 0 0 255
         clear renderer

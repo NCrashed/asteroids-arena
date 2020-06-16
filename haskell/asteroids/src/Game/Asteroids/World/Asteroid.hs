@@ -1,6 +1,7 @@
 module Game.Asteroids.World.Asteroid(
     Asteroid(..)
   , spawnAsteroids
+  , breakAsteroid
   ) where
 
 import Apecs
@@ -74,3 +75,36 @@ spawnAsteroid = do
   let m = pi * r * r * asteroidDensity
   a <- liftIO $ randomRIO (0, 2*pi)
   newEntity (Asteroid n r, Mass m, Position (V2 x y), Rotation a, Velocity (V2 vx vy))
+
+destroyAsteroid :: (MonadIO m
+  , Has w m Asteroid
+  , Has w m Mass
+  , Has w m Position
+  , Has w m Rotation
+  , Has w m Velocity
+  ) => Entity -> SystemT w m ()
+destroyAsteroid e = destroy e (Proxy :: Proxy (Asteroid, Mass, Position, Rotation, Velocity))
+
+breakAsteroid :: (MonadIO m
+  , Has w m WorldWidth
+  , Has w m WorldHeight
+  , Has w m Asteroid
+  , Has w m Mass
+  , Has w m Position
+  , Has w m Rotation
+  , Has w m Velocity
+  , Has w m EntityCounter
+  ) => Entity -> SystemT w m ()
+breakAsteroid e = do
+  (Asteroid n r, Mass m, Position pos, Rotation a, Velocity vel) <- get e
+  destroyAsteroid e
+  let r' = r * 0.5
+  when (r' > fst asteroidSizeRange) $ do
+    let m' = m * 0.5
+    vx <- liftIO $ randomRIO asteroidVelocityRange
+    vy <- liftIO $ randomRIO asteroidVelocityRange
+    let dv1 = V2 vx vy
+        dv2 = negate dv1
+    _ <- newEntity (Asteroid n r', Mass m', Position pos, Rotation a, Velocity (vel + dv1))
+    _ <- newEntity (Asteroid n r', Mass m', Position pos, Rotation a, Velocity (vel + dv2))
+    pure ()

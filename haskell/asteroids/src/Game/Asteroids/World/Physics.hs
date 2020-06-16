@@ -3,6 +3,7 @@ module Game.Asteroids.World.Physics(
     applyMotion
   , wrapSpace
   , playerCollide
+  , bulletCollide
   ) where
 
 import Apecs
@@ -52,9 +53,21 @@ playerCollide :: (MonadIO m
   , Has w m Position
   ) => SystemT w m Bool
 playerCollide = do
-  pos <- cfold (\_ (Player _, Position pos) -> pos) 0
+  pos <- cfold (\_ (Player _ _, Position pos) -> pos) 0
   let checkAsteroid True _ = True
       checkAsteroid _ (Asteroid _ r, Position apos) = let
         r' = r+playerCollideRadius
         in quadrance (pos - apos) <= r'*r'
   cfold checkAsteroid False
+
+-- | Check collision of player with any of asteroids
+bulletCollide :: (MonadIO m
+  , Has w m Asteroid
+  , Has w m Position
+  ) => V2 Float -> SystemT w m (Maybe Entity)
+bulletCollide pos = do
+  let checkAsteroid (Just a) _ = Just a
+      checkAsteroid _ (Asteroid _ r, Position apos, e) = if quadrance (pos - apos) <= r*r
+        then Just e
+        else Nothing
+  cfold checkAsteroid Nothing

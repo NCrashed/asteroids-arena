@@ -7,8 +7,10 @@ import Control.Monad
 import Control.Monad.IO.Class
 import Foreign.C.Types
 import Game.Asteroids.Render
+import Game.Asteroids.Vector
 import Game.Asteroids.World
 import Game.Asteroids.World.Asteroid
+import Game.Asteroids.World.Bullet
 import Game.Asteroids.World.Player
 import Game.Asteroids.World.Position
 import Game.Asteroids.World.Rotation
@@ -25,11 +27,12 @@ instance CanRender World World where
   render r _ = do
     cmapM_ (renderPlayer r)
     cmapM_ (renderAsteroid r)
+    cmapM_ (renderBullet r)
     pure ()
   {-# INLINE render #-}
 
 renderPlayer :: MonadIO m => Renderer -> (Player, Position, Rotation) -> m ()
-renderPlayer rd (Player isThrust, Position p, Rotation r) = do
+renderPlayer rd (Player isThrust _, Position p, Rotation r) = do
   let V2 dx dy = playerSize * 0.5
   rendererDrawColor rd SDL.$= 255
   let mkPoints = V.map (P . fmap round . (p +) . rotateV2 r)
@@ -61,6 +64,8 @@ drawCircloid rd n a0 (V2 x0 y0) r = drawLines rd $ V.fromList [
   ]
 {-# INLINE drawCircloid #-}
 
-rotateV2 :: Float -> V2 Float -> V2 Float
-rotateV2 a (V2 x y) = V2 (x * cos a - y * sin a) (x * sin a + y * cos a)
-{-# INLINE rotateV2 #-}
+renderBullet :: MonadIO m => Renderer -> (Bullet, Position) -> m ()
+renderBullet rd (Bullet _, Position p) = do
+  rendererDrawColor rd SDL.$= 255
+  drawPoint rd (P $ fmap round p)
+{-# INLINE renderBullet #-}
