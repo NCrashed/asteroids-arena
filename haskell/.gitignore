@@ -4,4 +4,3 @@ result
 .ghc-*
 *.prof
 fps.out
-fps.png
