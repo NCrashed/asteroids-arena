@@ -4,7 +4,7 @@ module Game.Asteroids.Window(
 
 import Apecs (runWith, Has)
 import Control.Concurrent.STM
-import Control.Monad (unless)
+import Control.Monad (unless, when)
 import Data.Foldable (traverse_)
 import Data.IORef
 import Data.Maybe (catMaybes)
@@ -26,7 +26,7 @@ renderLoop w0 nextWorld = do
   withAudio defaultAudio 256 $ do
     audio <- loadAudioResources $ ddir <> "/sounds"
     runWith w0 $ setupAudioResources audio
-    setHintWithPriority NormalPriority HintRenderVSync EnableVSync
+    -- setHintWithPriority NormalPriority HintRenderVSync EnableVSync
     size <- getRenderSize w0
     window <- createWindow "Asteroids" defaultWindow {
         windowInitialSize = size
@@ -36,8 +36,9 @@ renderLoop w0 nextWorld = do
     rightRef <- newIORef False
     thrustRef <- newIORef False
     fireRef <- newIORef False
-    let loop :: WorldRender world => world -> IO ()
-        loop w = do
+    let loop :: WorldRender world => Int -> world -> IO ()
+        loop !i w = do
+          t1 <- ticks
           events <- pollEvents
           let isEventExit event =
                 case eventPayload event of
@@ -73,6 +74,10 @@ renderLoop w0 nextWorld = do
           runWith w $ {-# SCC "renderWorld" #-} render renderer w
           present renderer
           w' <- {-# SCC "nextWorld" #-} nextWorld worldEvents w
-          unless exitEvent (loop w')
+          t2 <- ticks
+          let fps :: Int
+              fps = round $ recip $ fromIntegral (t2 - t1) * 0.001
+          when (i `mod` 1000 == 0) $ putStrLn $ "FPS " <> show fps
+          unless exitEvent (loop (i+1) w')
         {-# INLINABLE loop #-}
-    loop w0
+    loop 0 w0
