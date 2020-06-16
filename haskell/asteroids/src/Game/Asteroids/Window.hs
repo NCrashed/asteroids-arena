@@ -12,6 +12,7 @@ import Linear (V4(..))
 import Paths_asteroids
 import SDL
 import SDL.Mixer
+import System.IO
 
 import Game.Asteroids.Audio
 import Game.Asteroids.Render
@@ -23,7 +24,8 @@ renderLoop :: forall world . (WorldRender world, Has world IO AudioState)
 renderLoop w0 nextWorld = do
   ddir <- getDataDir
   initializeAll
-  withAudio defaultAudio 256 $ do
+  withAudio defaultAudio 256 $ withFile "fps.out" WriteMode $ \fpsFile -> do
+    hSetBuffering fpsFile $ BlockBuffering Nothing
     audio <- loadAudioResources $ ddir <> "/sounds"
     runWith w0 $ setupAudioResources audio
     -- setHintWithPriority NormalPriority HintRenderVSync EnableVSync
@@ -77,6 +79,7 @@ renderLoop w0 nextWorld = do
           t2 <- ticks
           let fps :: Int
               fps = round $ recip $ fromIntegral (t2 - t1) * 0.001
+          hPutStrLn fpsFile $ show fps
           when (i `mod` 1000 == 0) $ putStrLn $ "FPS " <> show fps
           unless exitEvent (loop (i+1) w')
         {-# INLINABLE loop #-}

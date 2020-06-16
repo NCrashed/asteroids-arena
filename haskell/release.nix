@@ -9,5 +9,6 @@ let
 in project {
   packages = {
     asteroids = ./asteroids;
+    plotting = ./plotting;
   };
 }
