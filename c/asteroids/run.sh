@@ -1,2 +1,3 @@
+set -xe
 make
 ./asteroids

@@ -3,6 +3,9 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
+#include "asteroids/error.h"
+#include "asteroids/world.h"
+
 bool processEvents(void) {
   SDL_Event e;
   while (SDL_PollEvent(&e)) {
@@ -36,6 +39,15 @@ int main(int argc, char *argv[])
   SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
   if (!renderer) {
     SDL_Log("SDL renderer creation error: %s\n", SDL_GetError());
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+    return EXIT_FAILURE;
+  }
+
+  struct World world;
+  if (init_world(&world)) {
+    SDL_Log("World allocation error: %s\n", asteroids_get_error());
+    SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
     return EXIT_FAILURE;
