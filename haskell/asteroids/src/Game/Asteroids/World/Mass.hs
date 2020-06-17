@@ -7,4 +7,4 @@ import Apecs
 newtype Mass = Mass { unMass :: Float } deriving (Show, Num)
 
 instance Component Mass where
-  type Storage Mass = Map Mass
+  type Storage Mass = Cache 500 (Map Mass)

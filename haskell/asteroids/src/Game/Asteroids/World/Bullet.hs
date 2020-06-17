@@ -19,7 +19,7 @@ import Linear
 data Bullet = Bullet !Float
 
 instance Component Bullet
-  where type Storage Bullet = Map Bullet
+  where type Storage Bullet = Cache 500 (Map Bullet)
 
 -- | Bullet speed m per second
 bulletSpeed :: Float

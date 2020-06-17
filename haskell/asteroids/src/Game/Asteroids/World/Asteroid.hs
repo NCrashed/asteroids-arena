@@ -20,7 +20,7 @@ import System.Random
 data Asteroid = Asteroid !Int !Float
 
 instance Component Asteroid
-  where type Storage Asteroid = Map Asteroid
+  where type Storage Asteroid = Cache 500 (Map Asteroid)
 
 -- | Asteroid possible amount of edges in generation
 asteroidEdgesRange :: (Int, Int)

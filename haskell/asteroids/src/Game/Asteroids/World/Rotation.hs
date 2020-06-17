@@ -9,4 +9,4 @@ import Linear
 newtype Rotation = Rotation { unRotation :: Float } deriving (Show, Num)
 
 instance Component Rotation where
-  type Storage Rotation = Map Rotation
+  type Storage Rotation = Cache 500 (Map Rotation)
