@@ -1,5 +1,6 @@
 /**
-  Module that defines whole game state and storages for different components.
+  Module that handles global error message that was occured at last executed
+  asteroid function. Used to print message to user when some function fails.
 */
 #ifndef ASTEROIDS_ERROR_H
 #define ASTEROIDS_ERROR_H
