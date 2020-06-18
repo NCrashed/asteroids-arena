@@ -6,6 +6,7 @@
 
 #include <stdlib.h>
 #include "asteroids/position.h"
+#include "asteroids/velocity.h"
 
 /**
   The game uses Entity-Component-System (ECS) design where all game entities
@@ -16,6 +17,7 @@
 struct World {
   size_t entity_counter;
   position_storage position;
+  velocity_storage velocity;
 };
 
 /// Initialize internal storages, allocates memory for them. Return non zero

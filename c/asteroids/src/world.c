@@ -5,6 +5,10 @@ int init_world(struct World *world) {
   if (init_position_storage(&world->position)) {
     return 1;
   }
+  if (init_velocity_storage(&world->velocity)) {
+    destroy_position_storage(&world->position);
+    return 1;
+  }
   return 0;
 }
 
