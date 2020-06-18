@@ -4,6 +4,7 @@
 #ifndef ASTEROIDS_WORLD_H
 #define ASTEROIDS_WORLD_H
 
+#include <stdlib.h>
 #include "asteroids/position.h"
 
 /**
@@ -19,17 +20,9 @@ struct World {
 
 /// Initialize internal storages, allocates memory for them. Return non zero
 /// result on error.
-int init_world(struct World *world) {
-  world->entity_counter = 0;
-  if (init_position_storage(&world->position)) {
-    return 1;
-  }
-  return 0;
-}
+int init_world(struct World *world);
 
 /// Deallocate internal storages and free memory.
-void destroy_world(struct World *world) {
-  destroy_position_storage(&world->position);
-}
+void destroy_world(struct World *world);
 
 #endif /* ASTEROIDS_WORLD_H */
