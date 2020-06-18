@@ -9,6 +9,11 @@ int init_world(struct World *world) {
     destroy_position_storage(&world->position);
     return 1;
   }
+  if (init_rotation_storage(&world->rotation)) {
+    destroy_velocity_storage(&world->velocity);
+    destroy_position_storage(&world->position);
+    return 1;
+  }
   return 0;
 }
 
