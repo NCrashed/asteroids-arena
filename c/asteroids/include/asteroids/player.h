@@ -1,16 +1,22 @@
 /**
-  Module that defines position component of each entity in the game.
+  Module that defines player component of an entity in the game.
 */
-#ifndef ASTEROIDS_POSITION_H
-#define ASTEROIDS_POSITION_H
+#ifndef ASTEROIDS_PLAYER_H
+#define ASTEROIDS_PLAYER_H
 
 #include "asteroids/error.h"
 #include "asteroids/storage.h"
-#include "asteroids/v2.h"
 
-typedef struct v2f * position_storage;
+struct player_component {
+  /// Whether player ship is accelerating at the moment
+  bool thrust;
+  /// Counts until moment when player can emit a new bullet
+  float fire_cooldown;
+};
 
-int init_position_storage(position_storage *storage);
-void destroy_position_storage(position_storage *storage);
+typedef struct player_component* player_storage;
 
-#endif /* ASTEROIDS_POSITION_H */
+int init_player_storage(player_storage *storage);
+void destroy_player_storage(player_storage *storage);
+
+#endif /* ASTEROIDS_PLAYER_H */

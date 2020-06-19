@@ -9,6 +9,7 @@
 #include "asteroids/position.h"
 #include "asteroids/velocity.h"
 #include "asteroids/rotation.h"
+#include "asteroids/player.h"
 
 /**
   The game uses Entity-Component-System (ECS) design where all game entities
@@ -21,6 +22,7 @@ struct World {
   position_storage position;
   velocity_storage velocity;
   rotation_storage rotation;
+  player_storage player;
   component_tags tags;
 };
 
