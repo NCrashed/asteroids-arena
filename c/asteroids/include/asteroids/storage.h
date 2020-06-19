@@ -4,6 +4,8 @@
 #ifndef ASTEROIDS_STORAGE_H
 #define ASTEROIDS_STORAGE_H
 
+#include <stdbool.h>
+
 #define ENTITIES_MAXIMUM_COUNT 1024
 
 /// Entity is simple id in array of components.
@@ -25,5 +27,12 @@ typedef int * component_tags;
 
 int init_component_tags(component_tags *storage);
 void destroy_component_tags(component_tags *storage);
+
+/// Check whether the entity has associated component
+bool entity_has_component(entity e, enum component c, const component_tags tags);
+/// Mark that entity has given component. The function doesn't touch actuall component data.
+void tag_entity_component(entity e, enum component c, component_tags *tags);
+/// Mark that entity doesn't have given component. The function doesn't touch actuall component data. 
+void untag_entity_component(entity e, enum component c, component_tags *tags);
 
 #endif /* ASTEROIDS_STORAGE_H */

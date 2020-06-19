@@ -18,3 +18,26 @@ void destroy_component_tags(component_tags *storage) {
     free(storage);
   }
 }
+
+bool entity_has_component(entity e, enum component c, const component_tags tags) {
+  if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
+    return false;
+  }
+  int tag = tags[e];
+  int ctag = 1 << (int)c;
+  return (tag & ctag) == ctag;
+}
+
+void tag_entity_component(entity e, enum component c, component_tags *tags) {
+  if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
+    return;
+  }
+  *tags[e] = *tags[e] | (1 << (int)c);
+}
+
+void untag_entity_component(entity e, enum component c, component_tags *tags) {
+  if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
+    return;
+  }
+  *tags[e] = *tags[e] & ~(1 << (int)c);
+}
