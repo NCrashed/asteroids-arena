@@ -14,7 +14,7 @@ int init_player_storage(player_storage *storage) {
 
 void destroy_player_storage(player_storage *storage) {
   if (storage) {
-    free(storage);
+    free(*storage);
   }
 }
 

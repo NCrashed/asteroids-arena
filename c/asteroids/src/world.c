@@ -39,6 +39,11 @@ void destroy_world(struct World *world) {
   if (world->mass) destroy_mass_storage(&world->mass);
   if (world->player) destroy_player_storage(&world->player);
   if (world->tags) destroy_component_tags(&world->tags);
+  memset(world, 0, sizeof(struct World));
+}
+
+int step_world(struct World *world, float dt, const struct input_events *events) {
+  return 0;
 }
 
 /// Allocate new player in world. Return -1 if failed.

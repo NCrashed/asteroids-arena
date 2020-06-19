@@ -14,7 +14,7 @@ int init_velocity_storage(velocity_storage *storage) {
 
 void destroy_velocity_storage(velocity_storage *storage) {
   if (storage) {
-    free(storage);
+    free(*storage);
   }
 }
 

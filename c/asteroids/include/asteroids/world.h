@@ -11,6 +11,7 @@
 #include "asteroids/rotation.h"
 #include "asteroids/mass.h"
 #include "asteroids/player.h"
+#include "asteroids/events.h"
 
 /**
   The game uses Entity-Component-System (ECS) design where all game entities
@@ -34,6 +35,9 @@ int init_world(struct World *world);
 
 /// Deallocate internal storages and free memory.
 void destroy_world(struct World *world);
+
+/// Make one tick of world simulation with given inputs. Return non zero if failed.
+int step_world(struct World *world, float dt, const struct input_events *events);
 
 /// Allocate new player in world. Return -1 if failed.
 entity world_spawn_player(struct World *world

@@ -14,7 +14,7 @@ int init_rotation_storage(rotation_storage *storage) {
 
 void destroy_rotation_storage(rotation_storage *storage) {
   if (storage) {
-    free(storage);
+    free(*storage);
   }
 }
 

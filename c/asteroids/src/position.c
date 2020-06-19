@@ -14,7 +14,7 @@ int init_position_storage(position_storage *storage) {
 
 void destroy_position_storage(position_storage *storage) {
   if (storage) {
-    free(storage);
+    free(*storage);
   }
 }
 

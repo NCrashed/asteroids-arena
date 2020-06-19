@@ -14,7 +14,7 @@ int init_mass_storage(mass_storage *storage) {
 
 void destroy_mass_storage(mass_storage *storage) {
   if (storage) {
-    free(storage);
+    free(*storage);
   }
 }
 

@@ -15,7 +15,7 @@ int init_component_tags(component_tags *storage) {
 
 void destroy_component_tags(component_tags *storage) {
   if (storage) {
-    free(storage);
+    free(*storage);
   }
 }
 
