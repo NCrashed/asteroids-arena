@@ -17,3 +17,20 @@ void destroy_position_storage(position_storage *storage) {
     free(storage);
   }
 }
+
+void add_position_component(entity e, struct v2f pos, position_storage *storage, component_tags *tags) {
+  if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
+    return;
+  }
+
+  tag_entity_component(e, COMPONENT_POSITION, tags);
+  *storage[e] = pos;
+}
+
+void del_position_component(entity e, position_storage *storage, component_tags *tags) {
+  if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
+    return;
+  }
+
+  untag_entity_component(e, COMPONENT_POSITION, tags);
+}
