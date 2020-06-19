@@ -5,6 +5,7 @@
 #define ASTEROIDS_STORAGE_H
 
 #include <stdbool.h>
+#include <stdlib.h>
 
 #define ENTITIES_MAXIMUM_COUNT 1024
 

@@ -12,6 +12,7 @@ struct v2f {
   float y;
 } __attribute__((__packed__));
 
-
+/// Add components of second vector to the firsts one
+void v2f_set_add(struct v2f *dest, struct v2f other);
 
 #endif /* ASTEROIDS_V2_H */

@@ -28,12 +28,12 @@ void del_player_component(entity e, player_storage *storage, component_tags *tag
 
 /// Spawn new player entity and return new entity.
 entity spawn_player(
-      struct player_component player, player_storage *storage
-    , struct v2f position, position_storage *pos_storage
-    , struct v2f velocity, velocity_storage *vel_storage
-    , float rotation, rotation_storage *rot_storage
-    , float mass, mass_storage *m_storage
-    , component_tags *tags
-    , size_t *entity_counter );
+    struct player_component player, player_storage *storage
+  , struct v2f position, position_storage *pos_storage
+  , struct v2f velocity, velocity_storage *vel_storage
+  , float rotation, rotation_storage *rot_storage
+  , float mass, mass_storage *m_storage
+  , component_tags *tags
+  , size_t *entity_counter );
 
 #endif /* ASTEROIDS_PLAYER_H */

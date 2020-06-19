@@ -1,4 +1,5 @@
 #include "asteroids/world.h"
+#include "asteroids/physics/movement.h"
 #include <string.h>
 
 int init_world(struct World *world) {
@@ -43,6 +44,7 @@ void destroy_world(struct World *world) {
 }
 
 int step_world(struct World *world, float dt, const struct input_events *events) {
+  system_movement(&world->position, world->velocity, dt, world->entity_counter, world->tags);
   return 0;
 }
 
