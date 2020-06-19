@@ -6,7 +6,6 @@
 
 #include "asteroids/error.h"
 #include "asteroids/storage.h"
-#include "asteroids/v2.h"
 
 typedef float * rotation_storage;
 

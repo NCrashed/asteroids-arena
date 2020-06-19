@@ -9,6 +9,7 @@
 #include "asteroids/position.h"
 #include "asteroids/velocity.h"
 #include "asteroids/rotation.h"
+#include "asteroids/mass.h"
 #include "asteroids/player.h"
 
 /**
@@ -22,6 +23,7 @@ struct World {
   position_storage position;
   velocity_storage velocity;
   rotation_storage rotation;
+  mass_storage mass;
   player_storage player;
   component_tags tags;
 };
