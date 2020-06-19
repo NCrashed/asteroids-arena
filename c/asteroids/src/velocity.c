@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "asteroids/velocity.h"
+#include "asteroids/component/velocity.h"
 
 int init_velocity_storage(velocity_storage *storage) {
   velocity_storage tmp = (velocity_storage)malloc(sizeof(struct v2f) * ENTITIES_MAXIMUM_COUNT);

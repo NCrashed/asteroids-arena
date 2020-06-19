@@ -6,11 +6,11 @@
 
 #include <stdlib.h>
 #include "asteroids/storage.h"
-#include "asteroids/position.h"
-#include "asteroids/velocity.h"
-#include "asteroids/rotation.h"
-#include "asteroids/mass.h"
-#include "asteroids/player.h"
+#include "asteroids/component/position.h"
+#include "asteroids/component/velocity.h"
+#include "asteroids/component/rotation.h"
+#include "asteroids/component/mass.h"
+#include "asteroids/component/player.h"
 #include "asteroids/events.h"
 
 /**

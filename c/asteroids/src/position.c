@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "asteroids/position.h"
+#include "asteroids/component/position.h"
 
 int init_position_storage(position_storage *storage) {
   position_storage tmp = (position_storage)malloc(sizeof(struct v2f) * ENTITIES_MAXIMUM_COUNT);

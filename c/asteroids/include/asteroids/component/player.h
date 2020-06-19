@@ -6,10 +6,10 @@
 
 #include "asteroids/error.h"
 #include "asteroids/storage.h"
-#include "asteroids/position.h"
-#include "asteroids/velocity.h"
-#include "asteroids/rotation.h"
-#include "asteroids/mass.h"
+#include "asteroids/component/position.h"
+#include "asteroids/component/velocity.h"
+#include "asteroids/component/rotation.h"
+#include "asteroids/component/mass.h"
 
 struct player_component {
   /// Whether player ship is accelerating at the moment

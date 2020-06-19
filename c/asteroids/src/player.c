@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "asteroids/player.h"
+#include "asteroids/component/player.h"
 
 int init_player_storage(player_storage *storage) {
   player_storage tmp = (player_storage)malloc(sizeof(struct player_component) * ENTITIES_MAXIMUM_COUNT);

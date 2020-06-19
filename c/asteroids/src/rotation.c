@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "asteroids/rotation.h"
+#include "asteroids/component/rotation.h"
 
 int init_rotation_storage(rotation_storage *storage) {
   rotation_storage tmp = (rotation_storage)malloc(sizeof(float) * ENTITIES_MAXIMUM_COUNT);

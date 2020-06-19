@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "asteroids/mass.h"
+#include "asteroids/component/mass.h"
 
 int init_mass_storage(mass_storage *storage) {
   mass_storage tmp = (mass_storage)malloc(sizeof(float) * ENTITIES_MAXIMUM_COUNT);
