@@ -5,6 +5,7 @@
 #define ASTEROIDS_WORLD_H
 
 #include <stdlib.h>
+#include "asteroids/storage.h"
 #include "asteroids/position.h"
 #include "asteroids/velocity.h"
 #include "asteroids/rotation.h"
@@ -20,6 +21,7 @@ struct World {
   position_storage position;
   velocity_storage velocity;
   rotation_storage rotation;
+  component_tags tags;
 };
 
 /// Initialize internal storages, allocates memory for them. Return non zero
