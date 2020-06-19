@@ -32,7 +32,7 @@ entity spawn_player(
     , struct v2f position, position_storage *pos_storage
     , struct v2f velocity, velocity_storage *vel_storage
     , float rotation, rotation_storage *rot_storage
-    , float mass, mass_storage *mass_storage
+    , float mass, mass_storage *m_storage
     , component_tags *tags
     , size_t *entity_counter );
 

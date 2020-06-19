@@ -32,7 +32,10 @@ void destroy_component_tags(component_tags *storage);
 bool entity_has_component(entity e, enum component c, const component_tags tags);
 /// Mark that entity has given component. The function doesn't touch actuall component data.
 void tag_entity_component(entity e, enum component c, component_tags *tags);
-/// Mark that entity doesn't have given component. The function doesn't touch actuall component data. 
+/// Mark that entity doesn't have given component. The function doesn't touch actuall component data.
 void untag_entity_component(entity e, enum component c, component_tags *tags);
+
+/// Allocate new entity (increasing the counter) and return -1 if failed to do so.
+entity allocate_entity(size_t *entity_counter);
 
 #endif /* ASTEROIDS_STORAGE_H */

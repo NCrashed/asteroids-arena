@@ -40,3 +40,20 @@ void destroy_world(struct World *world) {
   if (world->player) destroy_player_storage(&world->player);
   if (world->tags) destroy_component_tags(&world->tags);
 }
+
+/// Allocate new player in world. Return -1 if failed.
+entity world_spawn_player(struct World *world
+  , struct player_component player
+  , struct v2f position
+  , struct v2f velocity
+  , float rotation
+  , float mass) {
+  return spawn_player(
+      player, &world->player
+    , position, &world->position
+    , velocity, &world->velocity
+    , rotation, &world->rotation
+    , mass, &world->mass
+    , &world->tags
+    , &world->entity_counter);
+}

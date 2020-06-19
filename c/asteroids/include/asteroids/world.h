@@ -35,4 +35,12 @@ int init_world(struct World *world);
 /// Deallocate internal storages and free memory.
 void destroy_world(struct World *world);
 
+/// Allocate new player in world. Return -1 if failed.
+entity world_spawn_player(struct World *world
+  , struct player_component player
+  , struct v2f position
+  , struct v2f velocity
+  , float rotation
+  , float mass);
+
 #endif /* ASTEROIDS_WORLD_H */

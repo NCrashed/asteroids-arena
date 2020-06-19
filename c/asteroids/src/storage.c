@@ -41,3 +41,13 @@ void untag_entity_component(entity e, enum component c, component_tags *tags) {
   }
   *tags[e] = *tags[e] & ~(1 << (int)c);
 }
+
+entity allocate_entity(size_t *entity_counter) {
+  entity e = *entity_counter;
+  if (e >= ENTITIES_MAXIMUM_COUNT-1) {
+    return -1;
+  } else {
+    *entity_counter = e+1;
+    return e+1;
+  }
+}

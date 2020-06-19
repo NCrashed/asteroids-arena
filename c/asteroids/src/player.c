@@ -34,3 +34,25 @@ void del_player_component(entity e, player_storage *storage, component_tags *tag
 
   untag_entity_component(e, COMPONENT_PLAYER, tags);
 }
+
+entity spawn_player(
+      struct player_component player, player_storage *storage
+    , struct v2f position, position_storage *pos_storage
+    , struct v2f velocity, velocity_storage *vel_storage
+    , float rotation, rotation_storage *rot_storage
+    , float mass, mass_storage *m_storage
+    , component_tags *tags
+    , size_t *entity_counter ) {
+  entity e = allocate_entity(entity_counter);
+  if (e < 0) {
+    asteroids_set_error("Failed to allocate new entity for player!");
+    return -1;
+  }
+
+  add_player_component(e, player, storage, tags);
+  add_position_component(e, position, pos_storage, tags);
+  add_velocity_component(e, velocity, vel_storage, tags);
+  add_rotation_component(e, rotation, rot_storage, tags);
+  add_mass_component(e, mass, m_storage, tags);
+  return e;
+}
