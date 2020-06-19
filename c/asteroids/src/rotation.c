@@ -17,3 +17,20 @@ void destroy_rotation_storage(rotation_storage *storage) {
     free(storage);
   }
 }
+
+void add_rotation_component(entity e, float angle, rotation_storage *storage, component_tags *tags) {
+  if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
+    return;
+  }
+
+  tag_entity_component(e, COMPONENT_ROTATION, tags);
+  *storage[e] = angle;
+}
+
+void del_rotation_component(entity e, rotation_storage *storage, component_tags *tags) {
+  if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
+    return;
+  }
+
+  untag_entity_component(e, COMPONENT_ROTATION, tags);
+}

@@ -19,4 +19,7 @@ typedef struct player_component* player_storage;
 int init_player_storage(player_storage *storage);
 void destroy_player_storage(player_storage *storage);
 
+void add_player_component(entity e, struct player_component pos, player_storage *storage, component_tags *tags);
+void del_player_component(entity e, player_storage *storage, component_tags *tags);
+
 #endif /* ASTEROIDS_PLAYER_H */

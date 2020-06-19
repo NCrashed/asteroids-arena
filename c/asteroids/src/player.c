@@ -17,3 +17,20 @@ void destroy_player_storage(player_storage *storage) {
     free(storage);
   }
 }
+
+void add_player_component(entity e, struct player_component p, player_storage *storage, component_tags *tags) {
+  if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
+    return;
+  }
+
+  tag_entity_component(e, COMPONENT_PLAYER, tags);
+  *storage[e] = p;
+}
+
+void del_player_component(entity e, player_storage *storage, component_tags *tags) {
+  if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
+    return;
+  }
+
+  untag_entity_component(e, COMPONENT_PLAYER, tags);
+}
