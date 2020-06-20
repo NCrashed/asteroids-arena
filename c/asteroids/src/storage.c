@@ -2,6 +2,8 @@
 #include "asteroids/error.h"
 #include "asteroids/storage.h"
 
+#include <stdio.h>
+
 int init_component_tags(component_tags *storage) {
   component_tags tmp = (component_tags)malloc(sizeof(int) * ENTITIES_MAXIMUM_COUNT);
   if (!tmp) {
@@ -19,35 +21,34 @@ void destroy_component_tags(component_tags *storage) {
   }
 }
 
-bool entity_has_component(entity e, enum component c, const component_tags tags) {
+bool entity_has_component(entity e, int components, const component_tags tags) {
   if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
     return false;
   }
   int tag = tags[e];
-  int ctag = 1 << (int)c;
-  return (tag & ctag) == ctag;
+  return (tag & components) == components;
 }
 
-void tag_entity_component(entity e, enum component c, component_tags *tags) {
+void tag_entity_component(entity e, enum component c, component_tags tags) {
   if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
     return;
   }
-  *tags[e] = *tags[e] | (1 << (int)c);
+  tags[e] = tags[e] | (int)c;
 }
 
-void untag_entity_component(entity e, enum component c, component_tags *tags) {
+void untag_entity_component(entity e, enum component c, component_tags tags) {
   if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
     return;
   }
-  *tags[e] = *tags[e] & ~(1 << (int)c);
+  tags[e] = tags[e] & ~(int)c;
 }
 
 entity allocate_entity(size_t *entity_counter) {
   entity e = *entity_counter;
-  if (e >= ENTITIES_MAXIMUM_COUNT-1) {
+  if (e >= ENTITIES_MAXIMUM_COUNT) {
     return -1;
   } else {
     *entity_counter = e+1;
-    return e+1;
+    return e;
   }
 }

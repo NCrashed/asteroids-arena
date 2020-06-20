@@ -11,6 +11,8 @@
 #include "asteroids/component/rotation.h"
 #include "asteroids/component/mass.h"
 
+#define PLAYER_MASS 1000
+
 struct player_component {
   /// Whether player ship is accelerating at the moment
   bool thrust;
@@ -23,8 +25,8 @@ typedef struct player_component* player_storage;
 int init_player_storage(player_storage *storage);
 void destroy_player_storage(player_storage *storage);
 
-void add_player_component(entity e, struct player_component player, player_storage *storage, component_tags *tags);
-void del_player_component(entity e, player_storage *storage, component_tags *tags);
+void add_player_component(entity e, struct player_component player, player_storage *storage, component_tags tags);
+void del_player_component(entity e, player_storage *storage, component_tags tags);
 
 /// Spawn new player entity and return new entity.
 entity spawn_player(
@@ -33,7 +35,7 @@ entity spawn_player(
   , struct v2f velocity, velocity_storage *vel_storage
   , float rotation, rotation_storage *rot_storage
   , float mass, mass_storage *m_storage
-  , component_tags *tags
+  , component_tags tags
   , size_t *entity_counter );
 
 #endif /* ASTEROIDS_PLAYER_H */

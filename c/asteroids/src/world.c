@@ -2,7 +2,7 @@
 #include "asteroids/physics/movement.h"
 #include <string.h>
 
-int init_world(struct World *world) {
+int alloc_world(struct World *world) {
   world->entity_counter = 0;
   memset(world, 0, sizeof(struct World));
 
@@ -30,6 +30,28 @@ int init_world(struct World *world) {
     destroy_world(world);
     return 1;
   }
+  return 0;
+}
+
+int prepare_world(struct World *world) {
+  entity player = world_spawn_player(world
+    , (struct player_component) { .thrust = false, .fire_cooldown = 0 }
+    , (struct v2f) { .x = 0, .y = 0 }
+    , (struct v2f) { .y = 0, .y = 0 }
+    , 0
+    , PLAYER_MASS );
+  if (player < 0) {
+    asteroids_set_error("Failed to create initial player!");
+    return 1;
+  }
+  return 0;
+}
+
+int init_world(struct World *world) {
+  if (alloc_world(world)) {
+    return 1;
+  }
+  prepare_world(world);
   return 0;
 }
 
@@ -61,6 +83,6 @@ entity world_spawn_player(struct World *world
     , velocity, &world->velocity
     , rotation, &world->rotation
     , mass, &world->mass
-    , &world->tags
+    , world->tags
     , &world->entity_counter);
 }

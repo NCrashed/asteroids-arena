@@ -18,7 +18,7 @@ void destroy_player_storage(player_storage *storage) {
   }
 }
 
-void add_player_component(entity e, struct player_component p, player_storage *storage, component_tags *tags) {
+void add_player_component(entity e, struct player_component p, player_storage *storage, component_tags tags) {
   if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
     return;
   }
@@ -27,7 +27,7 @@ void add_player_component(entity e, struct player_component p, player_storage *s
   *storage[e] = p;
 }
 
-void del_player_component(entity e, player_storage *storage, component_tags *tags) {
+void del_player_component(entity e, player_storage *storage, component_tags tags) {
   if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
     return;
   }
@@ -41,7 +41,7 @@ entity spawn_player(
     , struct v2f velocity, velocity_storage *vel_storage
     , float rotation, rotation_storage *rot_storage
     , float mass, mass_storage *m_storage
-    , component_tags *tags
+    , component_tags tags
     , size_t *entity_counter ) {
   entity e = allocate_entity(entity_counter);
   if (e < 0) {

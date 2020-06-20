@@ -18,7 +18,7 @@ void destroy_velocity_storage(velocity_storage *storage) {
   }
 }
 
-void add_velocity_component(entity e, struct v2f pos, velocity_storage *storage, component_tags *tags) {
+void add_velocity_component(entity e, struct v2f pos, velocity_storage *storage, component_tags tags) {
   if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
     return;
   }
@@ -27,7 +27,7 @@ void add_velocity_component(entity e, struct v2f pos, velocity_storage *storage,
   *storage[e] = pos;
 }
 
-void del_velocity_component(entity e, velocity_storage *storage, component_tags *tags) {
+void del_velocity_component(entity e, velocity_storage *storage, component_tags tags) {
   if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
     return;
   }

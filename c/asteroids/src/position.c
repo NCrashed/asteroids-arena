@@ -18,7 +18,7 @@ void destroy_position_storage(position_storage *storage) {
   }
 }
 
-void add_position_component(entity e, struct v2f pos, position_storage *storage, component_tags *tags) {
+void add_position_component(entity e, struct v2f pos, position_storage *storage, component_tags tags) {
   if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
     return;
   }
@@ -27,7 +27,7 @@ void add_position_component(entity e, struct v2f pos, position_storage *storage,
   *storage[e] = pos;
 }
 
-void del_position_component(entity e, position_storage *storage, component_tags *tags) {
+void del_position_component(entity e, position_storage *storage, component_tags tags) {
   if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
     return;
   }

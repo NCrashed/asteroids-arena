@@ -8,8 +8,7 @@ void system_movement(
   , const component_tags tags)
 {
   for (size_t e=0; e < entity_counter; e++) {
-    if (entity_has_component(e, COMPONENT_POSITION, tags)
-     && entity_has_component(e, COMPONENT_VELOCITY, tags)) {
+    if (entity_has_component(e, COMPONENT_POSITION | COMPONENT_VELOCITY, tags)) {
        v2f_set_add(position[e], velocity[e]);
     }
   }

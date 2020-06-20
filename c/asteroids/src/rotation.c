@@ -18,7 +18,7 @@ void destroy_rotation_storage(rotation_storage *storage) {
   }
 }
 
-void add_rotation_component(entity e, float angle, rotation_storage *storage, component_tags *tags) {
+void add_rotation_component(entity e, float angle, rotation_storage *storage, component_tags tags) {
   if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
     return;
   }
@@ -27,7 +27,7 @@ void add_rotation_component(entity e, float angle, rotation_storage *storage, co
   *storage[e] = angle;
 }
 
-void del_rotation_component(entity e, rotation_storage *storage, component_tags *tags) {
+void del_rotation_component(entity e, rotation_storage *storage, component_tags tags) {
   if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
     return;
   }
