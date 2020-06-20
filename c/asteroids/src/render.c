@@ -24,8 +24,8 @@ void render_circloid(SDL_Renderer *renderer, int n, float a0, struct v2f pos, fl
   }
 }
 
-void render_asteroid(SDL_Renderer *renderer, struct asteroid_component asteroid, struct v2f pos, float rotation) {
-  render_circloid(renderer, asteroid.edges, rotation, pos, asteroid.radius);
+void render_asteroid(SDL_Renderer *renderer, struct asteroid_component asteroid, struct v2f pos, float rotation, float radius) {
+  render_circloid(renderer, asteroid.edges, rotation, pos, radius);
 }
 
 void render_player(SDL_Renderer *renderer, struct player_component player, struct v2f pos, float rotation) {
@@ -52,6 +52,7 @@ void render_entity(SDL_Renderer *renderer, entity e, const struct World *world) 
     render_asteroid(renderer
       , *get_asteroid_component_const(e, &world->asteroid)
       , *get_position_component_const(e, &world->position)
-      , *get_rotation_component_const(e, &world->rotation) );
+      , *get_rotation_component_const(e, &world->rotation)
+      , *get_radius_component_const(e, &world->radius) );
   }
 }

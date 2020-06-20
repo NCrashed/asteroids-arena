@@ -1,6 +1,8 @@
 #include "asteroids/world.h"
 #include "asteroids/physics/movement.h"
+#include "asteroids/physics/collision.h"
 #include <string.h>
+#include <stdio.h>
 
 int alloc_world(struct World *world) {
   world->entity_counter = 0;
@@ -19,6 +21,10 @@ int alloc_world(struct World *world) {
     return 1;
   }
   if (init_mass_storage(&world->mass)) {
+    destroy_world(world);
+    return 1;
+  }
+  if (init_radius_storage(&world->radius)) {
     destroy_world(world);
     return 1;
   }
@@ -67,6 +73,7 @@ void destroy_world(struct World *world) {
   if (world->velocity) destroy_velocity_storage(&world->velocity);
   if (world->rotation) destroy_rotation_storage(&world->rotation);
   if (world->mass) destroy_mass_storage(&world->mass);
+  if (world->radius) destroy_radius_storage(&world->radius);
   destroy_player_storage(&world->player);
   if (world->asteroid) destroy_asteroid_storage(&world->asteroid);
   if (world->tags) destroy_component_tags(&world->tags);
@@ -115,6 +122,10 @@ int step_world(struct World *world, float dt, const struct input_events *events)
   apply_events(world, dt, events);
   for (size_t e=0; e < world->entity_counter; e++) {
     system_movement(e, &world->position, &world->velocity, dt, world->tags);
+    entity ecoll = system_collision(e, &world->position, &world->radius, world->entity_counter, world->tags);
+    if (ecoll > 0) {
+      printf("COLLISION!!!!\n");
+    }
   }
   return 0;
 }
@@ -143,13 +154,15 @@ entity world_spawn_asteroid(struct World *world
   , struct v2f position
   , struct v2f velocity
   , float rotation
-  , float mass)
+  , float mass
+  , float radius )
 {
   return spawn_asteroid(
       asteroid, &world->asteroid
     , position, &world->position
     , velocity, &world->velocity
     , rotation, &world->rotation
+    , radius, &world->radius
     , mass, &world->mass
     , world->tags
     , &world->entity_counter);
@@ -168,11 +181,12 @@ int world_spawn_asteroids(struct World *world, size_t num) {
     float radius = randf(ASTEROID_SIZE_MIN, ASTEROID_SIZE_MAX);
     entity e = world_spawn_asteroid
       (  world
-      , (struct asteroid_component) { .edges = randi(ASTEROID_EDGES_MIN, ASTEROID_EDGES_MAX), .radius = radius }
+      , (struct asteroid_component) { .edges = randi(ASTEROID_EDGES_MIN, ASTEROID_EDGES_MAX) }
       , (struct v2f) { .x = randf(0, WORLD_WIDTH), .y = randf(0, WORLD_HEIGHT) }
       , (struct v2f) { .x = randf(ASTEROID_VELOCITY_MIN, ASTEROID_VELOCITY_MAX), .y = randf(ASTEROID_VELOCITY_MIN, ASTEROID_VELOCITY_MAX) }
       , randf(0, 2*M_PI)
       , ASTEROID_DENSITY * M_PI * radius * radius
+      , radius
       );
     if (e < 0) {
       return 1;

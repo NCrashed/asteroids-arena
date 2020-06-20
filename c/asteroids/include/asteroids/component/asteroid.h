@@ -10,6 +10,7 @@
 #include "asteroids/component/position.h"
 #include "asteroids/component/velocity.h"
 #include "asteroids/component/rotation.h"
+#include "asteroids/component/radius.h"
 
 #define ASTEROID_EDGES_MIN 8
 #define ASTEROID_EDGES_MAX 20
@@ -24,8 +25,6 @@
 struct asteroid_component {
   /// Amount of edges for rendering
   int edges;
-  /// Collision radius
-  float radius;
 };
 
 typedef struct asteroid_component * asteroid_storage;
@@ -46,6 +45,7 @@ entity spawn_asteroid
   , struct v2f vel, velocity_storage *vel_store
   , float rot, rotation_storage *rot_store
   , float mass, mass_storage *mass_store
+  , float radius, radius_storage *radius_store
   , component_tags tags
   , size_t *entity_counter);
 

@@ -10,6 +10,7 @@
 #include "asteroids/component/velocity.h"
 #include "asteroids/component/rotation.h"
 #include "asteroids/component/mass.h"
+#include "asteroids/component/radius.h"
 #include "asteroids/component/player.h"
 #include "asteroids/component/asteroid.h"
 #include "asteroids/events.h"
@@ -29,6 +30,7 @@ struct World {
   velocity_storage velocity;
   rotation_storage rotation;
   mass_storage mass;
+  radius_storage radius;
   player_storage player;
   asteroid_storage asteroid;
   component_tags tags;
@@ -58,7 +60,8 @@ entity world_spawn_asteroid(struct World *world
   , struct v2f position
   , struct v2f velocity
   , float rotation
-  , float mass);
+  , float mass
+  , float radius );
 
 /// Spawn random asteroids in world. Return non zero on failure.
 int world_spawn_asteroids(struct World *world, size_t num);

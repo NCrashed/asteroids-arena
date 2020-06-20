@@ -50,6 +50,7 @@ entity spawn_asteroid
   , struct v2f vel, velocity_storage *vel_store
   , float rot, rotation_storage *rot_store
   , float mass, mass_storage *mass_store
+  , float radius, radius_storage *radius_store
   , component_tags tags
   , size_t *entity_counter)
 {
@@ -64,5 +65,6 @@ entity spawn_asteroid
   add_velocity_component(e, vel, vel_store, tags);
   add_rotation_component(e, rot, rot_store, tags);
   add_mass_component(e, mass, mass_store, tags);
+  add_radius_component(e, radius, radius_store, tags);
   return e;
 }
