@@ -27,6 +27,14 @@ void add_radius_component(entity e, float angle, radius_storage *storage, compon
   (*storage)[e] = angle;
 }
 
+void set_radius_component(entity e, float angle, radius_storage *storage) {
+  if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
+    return;
+  }
+
+  (*storage)[e] = angle;
+}
+
 void del_radius_component(entity e, radius_storage *storage, component_tags tags) {
   if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
     return;

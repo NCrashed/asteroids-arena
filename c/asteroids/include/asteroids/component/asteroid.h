@@ -33,6 +33,7 @@ int init_asteroid_storage(asteroid_storage *storage);
 void destroy_asteroid_storage(asteroid_storage *storage);
 
 void add_asteroid_component(entity e, struct asteroid_component cmp, asteroid_storage *storage, component_tags tags);
+void set_asteroid_component(entity e, struct asteroid_component cmp, asteroid_storage *storage);
 void del_asteroid_component(entity e, asteroid_storage *storage, component_tags tags);
 
 struct asteroid_component* get_asteroid_component(entity e, asteroid_storage *storage);

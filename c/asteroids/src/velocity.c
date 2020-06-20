@@ -27,6 +27,14 @@ void add_velocity_component(entity e, struct v2f pos, velocity_storage *storage,
   (*storage)[e] = pos;
 }
 
+void set_velocity_component(entity e, struct v2f pos, velocity_storage *storage) {
+  if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
+    return;
+  }
+
+  (*storage)[e] = pos;
+}
+
 void del_velocity_component(entity e, velocity_storage *storage, component_tags tags) {
   if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
     return;

@@ -10,10 +10,11 @@
 #include "asteroids/storage.h"
 
 /// Iterate over all entities to check collision against the given entity.
-bool system_collision(
+/// Returns -1 if no entity exists.
+entity system_collision(
     entity e
-  , position_storage *position
-  , radius_storage *radius
+  , const position_storage *position
+  , const radius_storage *radius
   , size_t entity_counter
   , const component_tags tags);
 

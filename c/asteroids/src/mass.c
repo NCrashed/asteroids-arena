@@ -28,6 +28,14 @@ void add_mass_component(entity e, float mass, mass_storage *storage, component_t
   (*storage)[e] = mass;
 }
 
+void set_mass_component(entity e, float mass, mass_storage *storage) {
+  if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
+    return;
+  }
+
+  (*storage)[e] = mass;
+}
+
 void del_mass_component(entity e, mass_storage *storage, component_tags tags) {
   if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
     return;

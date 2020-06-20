@@ -13,6 +13,7 @@ int init_radius_storage(radius_storage *storage);
 void destroy_radius_storage(radius_storage *storage);
 
 void add_radius_component(entity e, float angle, radius_storage *storage, component_tags tags);
+void set_radius_component(entity e, float angle, radius_storage *storage);
 void del_radius_component(entity e, radius_storage *storage, component_tags tags);
 
 float* get_radius_component(entity e, radius_storage *storage);

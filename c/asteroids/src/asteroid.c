@@ -28,6 +28,13 @@ void add_asteroid_component(entity e, struct asteroid_component cmp, asteroid_st
   (*storage)[e] = cmp;
 }
 
+void set_asteroid_component(entity e, struct asteroid_component cmp, asteroid_storage *storage) {
+  if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
+    return;
+  }
+  (*storage)[e] = cmp;
+}
+
 void del_asteroid_component(entity e, asteroid_storage *storage, component_tags tags) {
   if (e < 0 || e > ENTITIES_MAXIMUM_COUNT) {
     return;

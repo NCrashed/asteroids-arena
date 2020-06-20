@@ -124,7 +124,13 @@ int step_world(struct World *world, float dt, const struct input_events *events)
     system_movement(e, &world->position, &world->velocity, dt, world->tags);
     entity ecoll = system_collision(e, &world->position, &world->radius, world->entity_counter, world->tags);
     if (ecoll > 0) {
-      printf("COLLISION!!!!\n");
+      if (entity_has_component(e, COMPONENT_PLAYER, world->tags) && entity_has_component(ecoll, COMPONENT_ASTEROID, world->tags)) {
+        respawn_player(e
+          , (struct player_component) { .thrust = false, .fire_cooldown = 0 }, &world->player
+          , (struct v2f) { .x = WORLD_WIDTH * 0.5, .y = WORLD_HEIGHT * 0.5 }, &world->position
+          , (struct v2f) { .y = 0, .y = 0 }, &world->velocity
+          , 0, &world->rotation );
+      }
     }
   }
   return 0;
@@ -144,6 +150,7 @@ entity world_spawn_player(struct World *world
     , velocity, &world->velocity
     , rotation, &world->rotation
     , mass, &world->mass
+    , PLAYER_COLLIDE_RADIUS, &world->radius
     , world->tags
     , &world->entity_counter);
 }

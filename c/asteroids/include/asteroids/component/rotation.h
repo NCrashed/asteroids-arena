@@ -13,6 +13,7 @@ int init_rotation_storage(rotation_storage *storage);
 void destroy_rotation_storage(rotation_storage *storage);
 
 void add_rotation_component(entity e, float angle, rotation_storage *storage, component_tags tags);
+void set_rotation_component(entity e, float angle, rotation_storage *storage);
 void del_rotation_component(entity e, rotation_storage *storage, component_tags tags);
 
 float* get_rotation_component(entity e, rotation_storage *storage);

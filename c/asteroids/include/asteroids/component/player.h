@@ -10,6 +10,7 @@
 #include "asteroids/component/velocity.h"
 #include "asteroids/component/rotation.h"
 #include "asteroids/component/mass.h"
+#include "asteroids/component/radius.h"
 #include "math.h"
 
 /// Mass of player ship in kg
@@ -47,6 +48,7 @@ int init_player_storage(player_storage *storage);
 void destroy_player_storage(player_storage *storage);
 
 void add_player_component(entity e, struct player_component player, player_storage *storage, component_tags tags);
+void set_player_component(entity e, struct player_component player, player_storage *storage);
 void del_player_component(entity e, player_storage *storage, component_tags tags);
 
 struct player_component* get_player_component(entity e, player_storage *storage);
@@ -59,7 +61,17 @@ entity spawn_player(
   , struct v2f velocity, velocity_storage *vel_storage
   , float rotation, rotation_storage *rot_storage
   , float mass, mass_storage *m_storage
+  , float radius, radius_storage *r_storage
   , component_tags tags
   , size_t *entity_counter );
+
+/// Move player entity to spawn position and reset it state
+void respawn_player(
+    entity e
+  , struct player_component player, player_storage *storage
+  , struct v2f position, position_storage *pos_storage
+  , struct v2f velocity, velocity_storage *vel_storage
+  , float rotation, rotation_storage *rot_storage
+  );
 
 #endif /* ASTEROIDS_PLAYER_H */

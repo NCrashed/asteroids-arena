@@ -14,3 +14,10 @@ void v2f_rotate(struct v2f *v, float a)
   v->x = x;
   v->y = y;
 }
+
+float v2f_dist_squared(struct v2f v1, struct v2f v2)
+{
+  float x = v2.x - v1.x;
+  float y = v2.y - v1.y;
+  return x*x + y*y;
+}

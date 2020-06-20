@@ -14,6 +14,7 @@ int init_position_storage(position_storage *storage);
 void destroy_position_storage(position_storage *storage);
 
 void add_position_component(entity e, struct v2f pos, position_storage *storage, component_tags tags);
+void set_position_component(entity e, struct v2f pos, position_storage *storage);
 void del_position_component(entity e, position_storage *storage, component_tags tags);
 
 struct v2f* get_position_component(entity e, position_storage *storage);
