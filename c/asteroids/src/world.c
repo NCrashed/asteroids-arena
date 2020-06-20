@@ -36,7 +36,7 @@ int alloc_world(struct World *world) {
 int prepare_world(struct World *world) {
   entity player = world_spawn_player(world
     , (struct player_component) { .thrust = false, .fire_cooldown = 0 }
-    , (struct v2f) { .x = 0, .y = 0 }
+    , (struct v2f) { .x = WORLD_WIDTH * 0.5, .y = WORLD_HEIGHT * 0.5 }
     , (struct v2f) { .y = 0, .y = 0 }
     , 0
     , PLAYER_MASS );

@@ -15,4 +15,7 @@ struct v2f {
 /// Add components of second vector to the firsts one
 void v2f_set_add(struct v2f *dest, struct v2f other);
 
+/// Rotate given vector around 0 to given angle
+void v2f_rotate(struct v2f *v, float angle);
+
 #endif /* ASTEROIDS_V2_H */

@@ -11,7 +11,16 @@
 #include "asteroids/component/rotation.h"
 #include "asteroids/component/mass.h"
 
+/// Mass of player ship in kg
 #define PLAYER_MASS 1000
+/// Visual X size of ship in meters
+#define PLAYER_RENDER_WIDTH 30
+/// Visual Y size of ship in meters
+#define PLAYER_RENDER_HEIGHT 25
+/// Collision radius for player ship in meters
+#define PLAYER_COLLIDE_RADIUS 15
+/// Force of engine in Newtons
+#define PLAYER_THRUST 100000
 
 struct player_component {
   /// Whether player ship is accelerating at the moment

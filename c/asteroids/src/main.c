@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 
   SDL_Window *window = SDL_CreateWindow("Asteroids",
     SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-    1480, 1024, SDL_WINDOW_SHOWN);
+    WORLD_WIDTH, WORLD_HEIGHT, SDL_WINDOW_SHOWN);
   if (!window) {
     SDL_Log("SDL window creation error: %s\n", SDL_GetError());
     SDL_Quit();
@@ -74,8 +74,9 @@ int main(int argc, char *argv[])
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     for (size_t e=0; e < world.entity_counter; e++) {
-      render_entity(e, &world);
+      render_entity(renderer, e, &world);
     }
     SDL_RenderPresent(renderer);
   }

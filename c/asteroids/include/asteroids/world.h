@@ -13,6 +13,9 @@
 #include "asteroids/component/player.h"
 #include "asteroids/events.h"
 
+#define WORLD_WIDTH 1480
+#define WORLD_HEIGHT 1024
+
 /**
   The game uses Entity-Component-System (ECS) design where all game entities
   are decomposed into data pieces called Components. Components are stored
