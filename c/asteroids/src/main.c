@@ -5,6 +5,7 @@
 
 #include "asteroids/error.h"
 #include "asteroids/world.h"
+#include "asteroids/render.h"
 
 bool processEvents(struct input_events *events) {
   SDL_Event e;
@@ -73,7 +74,9 @@ int main(int argc, char *argv[])
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-
+    for (size_t e=0; e < world.entity_counter; e++) {
+      render_entity(e, &world);
+    }
     SDL_RenderPresent(renderer);
   }
 
