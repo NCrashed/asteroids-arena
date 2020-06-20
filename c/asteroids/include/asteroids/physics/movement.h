@@ -8,6 +8,7 @@
 #include "asteroids/component/velocity.h"
 
 /// Iterate over all entities that have velocites and apply them to positions.
+/// Also wrap space.
 void system_movement(
     entity e
   , position_storage *position
