@@ -24,7 +24,7 @@ void add_velocity_component(entity e, struct v2f pos, velocity_storage *storage,
   }
 
   tag_entity_component(e, COMPONENT_VELOCITY, tags);
-  *storage[e] = pos;
+  (*storage)[e] = pos;
 }
 
 void del_velocity_component(entity e, velocity_storage *storage, component_tags tags) {
@@ -33,4 +33,12 @@ void del_velocity_component(entity e, velocity_storage *storage, component_tags 
   }
 
   untag_entity_component(e, COMPONENT_VELOCITY, tags);
+}
+
+struct v2f* get_velocity_component(entity e, velocity_storage *storage) {
+  return &(*storage)[e];
+}
+
+const struct v2f* get_velocity_component_const(entity e, const velocity_storage *storage) {
+  return &(*storage)[e];
 }

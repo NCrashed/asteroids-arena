@@ -21,7 +21,7 @@
 /// Collision radius for player ship in meters
 #define PLAYER_COLLIDE_RADIUS 15
 /// Force of engine in newtons
-#define PLAYER_THRUST 10000
+#define PLAYER_THRUST 20000000
 /// Recharge time for bullets in seconds
 #define PLAYER_FIRE_COOLDOWN 0.3
 /// Rotation speed of ship in radians/seconds
@@ -48,6 +48,9 @@ void destroy_player_storage(player_storage *storage);
 
 void add_player_component(entity e, struct player_component player, player_storage *storage, component_tags tags);
 void del_player_component(entity e, player_storage *storage, component_tags tags);
+
+struct player_component* get_player_component(entity e, player_storage *storage);
+const struct player_component* get_player_component_const(entity e, const player_storage *storage);
 
 /// Spawn new player entity and return new entity.
 entity spawn_player(

@@ -1,11 +1,11 @@
 #include <stdlib.h>
+#include <string.h>
 #include "asteroids/error.h"
 #include "asteroids/storage.h"
 
-#include <stdio.h>
-
 int init_component_tags(component_tags *storage) {
   component_tags tmp = (component_tags)malloc(sizeof(int) * ENTITIES_MAXIMUM_COUNT);
+  memset(tmp, 0, sizeof(int) * ENTITIES_MAXIMUM_COUNT);
   if (!tmp) {
     asteroids_set_error("Failed to allocate component tags storage!");
     return 1;

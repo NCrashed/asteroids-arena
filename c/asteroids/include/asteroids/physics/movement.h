@@ -12,7 +12,7 @@
 void system_movement(
     entity e
   , position_storage *position
-  , const velocity_storage velocity
+  , const velocity_storage *velocity
   , float delta
   , const component_tags tags);
 

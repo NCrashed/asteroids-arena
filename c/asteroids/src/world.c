@@ -26,6 +26,10 @@ int alloc_world(struct World *world) {
     destroy_world(world);
     return 1;
   }
+  if (init_asteroid_storage(&world->asteroid)) {
+    destroy_world(world);
+    return 1;
+  }
   if (init_component_tags(&world->tags)) {
     destroy_world(world);
     return 1;
@@ -42,6 +46,9 @@ int prepare_world(struct World *world) {
     , PLAYER_MASS );
   if (player < 0) {
     asteroids_set_error("Failed to create initial player!");
+    return 1;
+  }
+  if (world_spawn_asteroids(world, ASTEROID_AMOUNT)) {
     return 1;
   }
   return 0;
@@ -61,6 +68,7 @@ void destroy_world(struct World *world) {
   if (world->rotation) destroy_rotation_storage(&world->rotation);
   if (world->mass) destroy_mass_storage(&world->mass);
   destroy_player_storage(&world->player);
+  if (world->asteroid) destroy_asteroid_storage(&world->asteroid);
   if (world->tags) destroy_component_tags(&world->tags);
   memset(world, 0, sizeof(struct World));
 }
@@ -106,7 +114,7 @@ int step_world(struct World *world, float dt, const struct input_events *events)
   update_player(world, dt);
   apply_events(world, dt, events);
   for (size_t e=0; e < world->entity_counter; e++) {
-    system_movement(e, &world->position, world->velocity, dt, world->tags);
+    system_movement(e, &world->position, &world->velocity, dt, world->tags);
   }
   return 0;
 }
@@ -117,7 +125,8 @@ entity world_spawn_player(struct World *world
   , struct v2f position
   , struct v2f velocity
   , float rotation
-  , float mass) {
+  , float mass)
+{
   return spawn_player(
       player, &world->player
     , position, &world->position
@@ -126,4 +135,48 @@ entity world_spawn_player(struct World *world
     , mass, &world->mass
     , world->tags
     , &world->entity_counter);
+}
+
+/// Allocate new player in world. Return -1 if failed.
+entity world_spawn_asteroid(struct World *world
+  , struct asteroid_component asteroid
+  , struct v2f position
+  , struct v2f velocity
+  , float rotation
+  , float mass)
+{
+  return spawn_asteroid(
+      asteroid, &world->asteroid
+    , position, &world->position
+    , velocity, &world->velocity
+    , rotation, &world->rotation
+    , mass, &world->mass
+    , world->tags
+    , &world->entity_counter);
+}
+
+float randf(float min, float max) {
+  return min + (float)rand()/(float)(RAND_MAX/(max - min));
+}
+
+int randi(int min, int max) {
+  return min + (int)((float)rand()/(RAND_MAX/(float)(max - min)));
+}
+
+int world_spawn_asteroids(struct World *world, size_t num) {
+  for (size_t i=0; i < num; i++) {
+    float radius = randf(ASTEROID_SIZE_MIN, ASTEROID_SIZE_MAX);
+    entity e = world_spawn_asteroid
+      (  world
+      , (struct asteroid_component) { .edges = randi(ASTEROID_EDGES_MIN, ASTEROID_EDGES_MAX), .radius = radius }
+      , (struct v2f) { .x = randf(0, WORLD_WIDTH), .y = randf(0, WORLD_HEIGHT) }
+      , (struct v2f) { .x = randf(ASTEROID_VELOCITY_MIN, ASTEROID_VELOCITY_MAX), .y = randf(ASTEROID_VELOCITY_MIN, ASTEROID_VELOCITY_MAX) }
+      , randf(0, 2*M_PI)
+      , ASTEROID_DENSITY * M_PI * radius * radius
+      );
+    if (e < 0) {
+      return 1;
+    }
+  }
+  return 0;
 }

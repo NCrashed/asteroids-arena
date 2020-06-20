@@ -11,6 +11,7 @@
 #include "asteroids/component/rotation.h"
 #include "asteroids/component/mass.h"
 #include "asteroids/component/player.h"
+#include "asteroids/component/asteroid.h"
 #include "asteroids/events.h"
 
 #define WORLD_WIDTH 1480
@@ -29,6 +30,7 @@ struct World {
   rotation_storage rotation;
   mass_storage mass;
   player_storage player;
+  asteroid_storage asteroid;
   component_tags tags;
 };
 
@@ -49,5 +51,16 @@ entity world_spawn_player(struct World *world
   , struct v2f velocity
   , float rotation
   , float mass);
+
+/// Allocate new player in world. Return -1 if failed.
+entity world_spawn_asteroid(struct World *world
+  , struct asteroid_component asteroid
+  , struct v2f position
+  , struct v2f velocity
+  , float rotation
+  , float mass);
+
+/// Spawn random asteroids in world. Return non zero on failure.
+int world_spawn_asteroids(struct World *world, size_t num);
 
 #endif /* ASTEROIDS_WORLD_H */

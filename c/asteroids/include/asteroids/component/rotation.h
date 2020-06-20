@@ -15,4 +15,7 @@ void destroy_rotation_storage(rotation_storage *storage);
 void add_rotation_component(entity e, float angle, rotation_storage *storage, component_tags tags);
 void del_rotation_component(entity e, rotation_storage *storage, component_tags tags);
 
+float* get_rotation_component(entity e, rotation_storage *storage);
+const float* get_rotation_component_const(entity e, const rotation_storage *storage);
+
 #endif /* ASTEROIDS_ROTATION_H */

@@ -16,4 +16,7 @@ void destroy_position_storage(position_storage *storage);
 void add_position_component(entity e, struct v2f pos, position_storage *storage, component_tags tags);
 void del_position_component(entity e, position_storage *storage, component_tags tags);
 
+struct v2f* get_position_component(entity e, position_storage *storage);
+const struct v2f* get_position_component_const(entity e, const position_storage *storage);
+
 #endif /* ASTEROIDS_POSITION_H */

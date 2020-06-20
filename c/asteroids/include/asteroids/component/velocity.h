@@ -16,4 +16,7 @@ void destroy_velocity_storage(velocity_storage *storage);
 void add_velocity_component(entity e, struct v2f vel, velocity_storage *storage, component_tags tags);
 void del_velocity_component(entity e, velocity_storage *storage, component_tags tags);
 
+struct v2f* get_velocity_component(entity e, velocity_storage *storage);
+const struct v2f* get_velocity_component_const(entity e, const velocity_storage *storage);
+
 #endif /* ASTEROIDS_VELOCITY_H */

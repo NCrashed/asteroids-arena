@@ -24,7 +24,7 @@ void add_position_component(entity e, struct v2f pos, position_storage *storage,
   }
 
   tag_entity_component(e, COMPONENT_POSITION, tags);
-  *storage[e] = pos;
+  (*storage)[e] = pos;
 }
 
 void del_position_component(entity e, position_storage *storage, component_tags tags) {
@@ -33,4 +33,12 @@ void del_position_component(entity e, position_storage *storage, component_tags 
   }
 
   untag_entity_component(e, COMPONENT_POSITION, tags);
+}
+
+struct v2f* get_position_component(entity e, position_storage *storage) {
+  return &(*storage)[e];
+}
+
+const struct v2f* get_position_component_const(entity e, const position_storage *storage) {
+  return &(*storage)[e];
 }

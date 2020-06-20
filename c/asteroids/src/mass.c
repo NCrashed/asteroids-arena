@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "asteroids/component/mass.h"
+#include <stdio.h>
 
 int init_mass_storage(mass_storage *storage) {
   mass_storage tmp = (mass_storage)malloc(sizeof(float) * ENTITIES_MAXIMUM_COUNT);
@@ -24,7 +25,7 @@ void add_mass_component(entity e, float mass, mass_storage *storage, component_t
   }
 
   tag_entity_component(e, COMPONENT_MASS, tags);
-  *storage[e] = mass;
+  (*storage)[e] = mass;
 }
 
 void del_mass_component(entity e, mass_storage *storage, component_tags tags) {
@@ -33,4 +34,12 @@ void del_mass_component(entity e, mass_storage *storage, component_tags tags) {
   }
 
   untag_entity_component(e, COMPONENT_MASS, tags);
+}
+
+float* get_mass_component(entity e, mass_storage *storage) {
+  return &(*storage)[e];
+}
+
+const float* get_mass_component_const(entity e, const mass_storage *storage) {
+  return &(*storage)[e];
 }

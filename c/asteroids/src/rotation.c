@@ -24,7 +24,7 @@ void add_rotation_component(entity e, float angle, rotation_storage *storage, co
   }
 
   tag_entity_component(e, COMPONENT_ROTATION, tags);
-  *storage[e] = angle;
+  (*storage)[e] = angle;
 }
 
 void del_rotation_component(entity e, rotation_storage *storage, component_tags tags) {
@@ -33,4 +33,12 @@ void del_rotation_component(entity e, rotation_storage *storage, component_tags 
   }
 
   untag_entity_component(e, COMPONENT_ROTATION, tags);
+}
+
+float* get_rotation_component(entity e, rotation_storage *storage) {
+  return &(*storage)[e];
+}
+
+const float* get_rotation_component_const(entity e, const rotation_storage *storage) {
+  return &(*storage)[e];
 }

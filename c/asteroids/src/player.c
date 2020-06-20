@@ -51,3 +51,11 @@ entity spawn_player(
   add_mass_component(e, mass, m_storage, tags);
   return e;
 }
+
+struct player_component* get_player_component(entity e, player_storage *storage) {
+  return &storage->unique;
+}
+
+const struct player_component* get_player_component_const(entity e, const player_storage *storage) {
+  return &storage->unique;
+}
