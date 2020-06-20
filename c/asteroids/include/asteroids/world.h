@@ -13,6 +13,7 @@
 #include "asteroids/component/radius.h"
 #include "asteroids/component/player.h"
 #include "asteroids/component/asteroid.h"
+#include "asteroids/component/bullet.h"
 #include "asteroids/events.h"
 
 #define WORLD_WIDTH 1480
@@ -33,6 +34,7 @@ struct World {
   radius_storage radius;
   player_storage player;
   asteroid_storage asteroid;
+  bullet_storage bullet;
   component_tags tags;
 };
 
@@ -54,13 +56,20 @@ entity world_spawn_player(struct World *world
   , float rotation
   , float mass);
 
-/// Allocate new player in world. Return -1 if failed.
+/// Allocate new asteroid in world. Return -1 if failed.
 entity world_spawn_asteroid(struct World *world
   , struct asteroid_component asteroid
   , struct v2f position
   , struct v2f velocity
   , float rotation
   , float mass
+  , float radius );
+
+/// Allocate new bullet in world. Return -1 if failed.
+entity world_spawn_bullet(struct World *world
+  , struct bullet_component bullet
+  , struct v2f position
+  , struct v2f velocity
   , float radius );
 
 /// Spawn random asteroids in world. Return non zero on failure.

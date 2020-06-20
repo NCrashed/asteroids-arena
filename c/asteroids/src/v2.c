@@ -21,3 +21,9 @@ float v2f_dist_squared(struct v2f v1, struct v2f v2)
   float y = v2.y - v1.y;
   return x*x + y*y;
 }
+
+void v2f_scale(struct v2f *v, float scalar)
+{
+  v->x *= scalar;
+  v->y *= scalar;
+}

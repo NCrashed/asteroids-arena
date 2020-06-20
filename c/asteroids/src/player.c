@@ -84,3 +84,10 @@ struct player_component* get_player_component(entity e, player_storage *storage)
 const struct player_component* get_player_component_const(entity e, const player_storage *storage) {
   return &storage->unique;
 }
+
+struct v2f get_player_direction(entity e, rotation_storage *rot_storage) {
+  struct v2f bdir = (struct v2f) { .x = 1, .y = 0 };
+  float rot = *get_rotation_component(e, rot_storage);
+  v2f_rotate(&bdir, rot);
+  return bdir;
+}

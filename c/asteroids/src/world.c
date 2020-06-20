@@ -2,7 +2,7 @@
 #include "asteroids/physics/movement.h"
 #include "asteroids/physics/collision.h"
 #include <string.h>
-#include <stdio.h>
+#include <SDL2/SDL.h>
 
 int alloc_world(struct World *world) {
   world->entity_counter = 0;
@@ -33,6 +33,10 @@ int alloc_world(struct World *world) {
     return 1;
   }
   if (init_asteroid_storage(&world->asteroid)) {
+    destroy_world(world);
+    return 1;
+  }
+  if (init_bullet_storage(&world->bullet)) {
     destroy_world(world);
     return 1;
   }
@@ -76,6 +80,7 @@ void destroy_world(struct World *world) {
   if (world->radius) destroy_radius_storage(&world->radius);
   destroy_player_storage(&world->player);
   if (world->asteroid) destroy_asteroid_storage(&world->asteroid);
+  if (world->bullet) destroy_bullet_storage(&world->bullet);
   if (world->tags) destroy_component_tags(&world->tags);
   memset(world, 0, sizeof(struct World));
 }
@@ -110,7 +115,16 @@ void apply_events(struct World *world, float dt, const struct input_events *even
     }
     if (events->ship_fire) {
       if (world->player.unique.fire_cooldown <= 0) {
-        // spawn bullet
+        struct v2f bpos = *get_position_component(pe, &world->position);
+        struct v2f bvel = get_player_direction(pe, &world->rotation);
+        v2f_scale(&bvel, BULLET_SPEED);
+
+        entity be = world_spawn_bullet(world
+          , (struct bullet_component) { .life_time = BULLET_LIFE_TIME }
+          , bpos, bvel, BULLET_RADIUS);
+        if (be < 0) {
+          SDL_Log("Failed to spawn player bullet: %s\n", asteroids_get_error());
+        }
         world->player.unique.fire_cooldown = PLAYER_FIRE_COOLDOWN;
       }
     }
@@ -171,6 +185,22 @@ entity world_spawn_asteroid(struct World *world
     , rotation, &world->rotation
     , radius, &world->radius
     , mass, &world->mass
+    , world->tags
+    , &world->entity_counter);
+}
+
+/// Allocate new bullet in world. Return -1 if failed.
+entity world_spawn_bullet(struct World *world
+  , struct bullet_component bullet
+  , struct v2f position
+  , struct v2f velocity
+  , float radius )
+{
+  return spawn_bullet(
+      bullet, &world->bullet
+    , position, &world->position
+    , velocity, &world->velocity
+    , radius, &world->radius
     , world->tags
     , &world->entity_counter);
 }

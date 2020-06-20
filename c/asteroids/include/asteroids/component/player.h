@@ -74,4 +74,7 @@ void respawn_player(
   , float rotation, rotation_storage *rot_storage
   );
 
+/// Get player rotation vector
+struct v2f get_player_direction(entity e, rotation_storage *rot_storage);
+
 #endif /* ASTEROIDS_PLAYER_H */

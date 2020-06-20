@@ -43,6 +43,10 @@ void render_player(SDL_Renderer *renderer, struct player_component player, struc
   }
 }
 
+void render_bullet(SDL_Renderer *renderer, struct v2f pos) {
+  SDL_RenderDrawPoint(renderer, pos.x, pos.y);
+}
+
 void render_entity(SDL_Renderer *renderer, entity e, const struct World *world) {
   if (entity_has_component(e, COMPONENT_POSITION | COMPONENT_ROTATION | COMPONENT_PLAYER, world->tags)) {
     render_player(renderer, world->player.unique
@@ -54,5 +58,9 @@ void render_entity(SDL_Renderer *renderer, entity e, const struct World *world) 
       , *get_position_component_const(e, &world->position)
       , *get_rotation_component_const(e, &world->rotation)
       , *get_radius_component_const(e, &world->radius) );
+  } else if (entity_has_component(e, COMPONENT_POSITION | COMPONENT_BULLET, world->tags)) {
+    render_bullet(renderer
+      , *get_position_component_const(e, &world->position)
+      );
   }
 }

@@ -21,4 +21,7 @@ void v2f_rotate(struct v2f *v, float angle);
 /// Return squared distance between two points
 float v2f_dist_squared(struct v2f v1, struct v2f v2);
 
+/// Scale given vector by scalar
+void v2f_scale(struct v2f *v, float scalar);
+
 #endif /* ASTEROIDS_V2_H */
