@@ -66,7 +66,9 @@ void destroy_world(struct World *world) {
 }
 
 int step_world(struct World *world, float dt, const struct input_events *events) {
-  system_movement(&world->position, world->velocity, dt, world->entity_counter, world->tags);
+  for (size_t e=0; e < world->entity_counter; e++) {
+    system_movement(e, &world->position, world->velocity, dt, world->tags);
+  }
   return 0;
 }
 

@@ -9,10 +9,10 @@
 
 /// Iterate over all entities that have velocites and apply them to positions.
 void system_movement(
-    position_storage *position
+    entity e
+  , position_storage *position
   , const velocity_storage velocity
   , float delta
-  , size_t entity_counter
   , const component_tags tags);
 
 #endif /* ASTEROIDS_MOVEMENT_H */
