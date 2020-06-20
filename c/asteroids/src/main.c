@@ -85,6 +85,7 @@ int main(int argc, char *argv[])
 
   float dt = 0;
   unsigned int lastTick = 0;
+  int i = 0;
   while(true) {
     bool quit = processEvents(&events);
     if (quit) break;
@@ -105,6 +106,11 @@ int main(int argc, char *argv[])
       render_entity(renderer, e, &world);
     }
     SDL_RenderPresent(renderer);
+    i += 1;
+    if (i % 20000 == 0) {
+      SDL_Log("FPS: %f", 1 / dt);
+      i = 0;
+    }
   }
 
   destroy_world(&world);
