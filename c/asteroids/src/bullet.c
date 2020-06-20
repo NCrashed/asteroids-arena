@@ -70,3 +70,16 @@ entity spawn_bullet
   add_radius_component(e, radius, radius_store, tags);
   return e;
 }
+
+void destroy_bullet(entity e
+  , bullet_storage *bul_store
+  , position_storage *pos_store
+  , velocity_storage *vel_store
+  , radius_storage *radius_store
+  , component_tags tags)
+{
+  del_bullet_component(e, bul_store, tags);
+  del_position_component(e, pos_store, tags);
+  del_velocity_component(e, vel_store, tags);
+  del_radius_component(e, radius_store, tags);
+}

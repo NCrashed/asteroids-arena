@@ -1,4 +1,4 @@
-#include "asteroids/physics/movement.h"
+#include "asteroids/system/movement.h"
 #include "asteroids/world.h"
 
 void system_movement(

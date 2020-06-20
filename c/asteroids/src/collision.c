@@ -1,4 +1,4 @@
-#include "asteroids/physics/collision.h"
+#include "asteroids/system/collision.h"
 
 entity system_collision(
     entity e1

@@ -41,4 +41,12 @@ entity spawn_bullet
   , component_tags tags
   , size_t *entity_counter);
 
+/// Destroy bullet. Untags all components
+void destroy_bullet(entity e
+  , bullet_storage *storage
+  , position_storage *pos_store
+  , velocity_storage *vel_store
+  , radius_storage *radius_store
+  , component_tags tags);
+
 #endif /* ASTEROIDS_BULLET_H */

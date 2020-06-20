@@ -1,6 +1,7 @@
 #include "asteroids/world.h"
-#include "asteroids/physics/movement.h"
-#include "asteroids/physics/collision.h"
+#include "asteroids/system/movement.h"
+#include "asteroids/system/collision.h"
+#include "asteroids/system/lifetime.h"
 #include <string.h>
 #include <SDL2/SDL.h>
 
@@ -135,6 +136,7 @@ int step_world(struct World *world, float dt, const struct input_events *events)
   update_player(world, dt);
   apply_events(world, dt, events);
   for (size_t e=0; e < world->entity_counter; e++) {
+    system_lifetime(e, &world->bullet, &world->position, &world->velocity, &world->radius, dt, world->tags);
     system_movement(e, &world->position, &world->velocity, dt, world->tags);
     entity ecoll = system_collision(e, &world->position, &world->radius, world->entity_counter, world->tags);
     if (ecoll > 0) {
