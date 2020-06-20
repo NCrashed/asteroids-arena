@@ -15,6 +15,32 @@ bool processEvents(struct input_events *events) {
     } else if (e.type == SDL_KEYDOWN) {
       if (e.key.keysym.sym == SDLK_ESCAPE) {
         return true;
+      } else if (e.key.keysym.sym == SDLK_UP) {
+        events->ship_thrust = true;
+        return false;
+      } else if (e.key.keysym.sym == SDLK_LEFT) {
+        events->ship_left = true;
+        return false;
+      } else if (e.key.keysym.sym == SDLK_RIGHT) {
+        events->ship_right = true;
+        return false;
+      } else if (e.key.keysym.sym == SDLK_SPACE) {
+        events->ship_fire = true;
+        return false;
+      }
+    } else if (e.type == SDL_KEYUP) {
+      if (e.key.keysym.sym == SDLK_UP) {
+        events->ship_thrust = false;
+        return false;
+      } else if (e.key.keysym.sym == SDLK_LEFT) {
+        events->ship_left = false;
+        return false;
+      } else if (e.key.keysym.sym == SDLK_RIGHT) {
+        events->ship_right = false;
+        return false;
+      } else if (e.key.keysym.sym == SDLK_SPACE) {
+        events->ship_fire = false;
+        return false;
       }
     }
   }

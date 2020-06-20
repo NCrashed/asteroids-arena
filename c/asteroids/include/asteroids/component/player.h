@@ -10,17 +10,22 @@
 #include "asteroids/component/velocity.h"
 #include "asteroids/component/rotation.h"
 #include "asteroids/component/mass.h"
+#include "math.h"
 
 /// Mass of player ship in kg
-#define PLAYER_MASS 1000
+#define PLAYER_MASS 100000
 /// Visual X size of ship in meters
 #define PLAYER_RENDER_WIDTH 30
 /// Visual Y size of ship in meters
 #define PLAYER_RENDER_HEIGHT 25
 /// Collision radius for player ship in meters
 #define PLAYER_COLLIDE_RADIUS 15
-/// Force of engine in Newtons
-#define PLAYER_THRUST 100000
+/// Force of engine in newtons
+#define PLAYER_THRUST 10000
+/// Recharge time for bullets in seconds
+#define PLAYER_FIRE_COOLDOWN 0.3
+/// Rotation speed of ship in radians/seconds
+#define PLAYER_ROTATION_SPEED M_PI
 
 struct player_component {
   /// Whether player ship is accelerating at the moment
@@ -29,7 +34,14 @@ struct player_component {
   float fire_cooldown;
 };
 
-typedef struct player_component* player_storage;
+/// We have a single player. So any entity with player component has the same
+/// data for player component.
+typedef struct player_storage_t {
+  //// We have single unique component for all entities
+  struct player_component unique;
+  /// Self reference to find other components associated with the player
+  entity self;
+} player_storage;
 
 int init_player_storage(player_storage *storage);
 void destroy_player_storage(player_storage *storage);

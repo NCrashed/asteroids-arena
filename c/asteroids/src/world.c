@@ -60,12 +60,51 @@ void destroy_world(struct World *world) {
   if (world->velocity) destroy_velocity_storage(&world->velocity);
   if (world->rotation) destroy_rotation_storage(&world->rotation);
   if (world->mass) destroy_mass_storage(&world->mass);
-  if (world->player) destroy_player_storage(&world->player);
+  destroy_player_storage(&world->player);
   if (world->tags) destroy_component_tags(&world->tags);
   memset(world, 0, sizeof(struct World));
 }
 
+void update_player(struct World *world, float dt) {
+  if (world->player.self < 0) return;
+  entity pe = world->player.self;
+
+  if (world->player.unique.thrust) {
+    float rot = world->rotation[pe];
+    float acc = dt * PLAYER_THRUST / world->mass[pe];
+    world->velocity[pe].x += cos(rot) * acc;
+    world->velocity[pe].y += sin(rot) * acc;
+  }
+  world->player.unique.thrust = false;
+  if (world->player.unique.fire_cooldown > 0) {
+    world->player.unique.fire_cooldown -= dt;
+  }
+}
+
+void apply_events(struct World *world, float dt, const struct input_events *events) {
+  if (world->player.self >= 0) {
+    entity pe = world->player.self;
+    if (events->ship_left) {
+      world->rotation[pe] -= PLAYER_ROTATION_SPEED * dt;
+    }
+    if (events->ship_right) {
+      world->rotation[pe] += PLAYER_ROTATION_SPEED * dt;
+    }
+    if (events->ship_thrust) {
+      world->player.unique.thrust = true;
+    }
+    if (events->ship_fire) {
+      if (world->player.unique.fire_cooldown <= 0) {
+        // spawn bullet
+        world->player.unique.fire_cooldown = PLAYER_FIRE_COOLDOWN;
+      }
+    }
+  }
+}
+
 int step_world(struct World *world, float dt, const struct input_events *events) {
+  update_player(world, dt);
+  apply_events(world, dt, events);
   for (size_t e=0; e < world->entity_counter; e++) {
     system_movement(e, &world->position, world->velocity, dt, world->tags);
   }

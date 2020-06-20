@@ -27,6 +27,6 @@ void render_player(SDL_Renderer *renderer, struct player_component player, struc
 
 void render_entity(SDL_Renderer *renderer, entity e, const struct World *world) {
   if (entity_has_component(e, COMPONENT_POSITION | COMPONENT_ROTATION | COMPONENT_PLAYER, world->tags)) {
-     render_player(renderer, world->player[e], world->position[e], world->rotation[e]);
+     render_player(renderer, world->player.unique, world->position[e], world->rotation[e]);
   }
 }
