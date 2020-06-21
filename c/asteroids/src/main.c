@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
+#include "SDL_mixer.h"
 
 #include "asteroids/error.h"
+#include "asteroids/sound.h"
 #include "asteroids/world.h"
 #include "asteroids/render.h"
 
@@ -54,11 +56,38 @@ int main(int argc, char *argv[])
     return EXIT_FAILURE;
   }
 
+  int flags = 0;
+  int initted = Mix_Init(flags);
+  if ((initted & flags) != flags) {
+    SDL_Log("Mix_Init: Failed to init!\n");
+    SDL_Log("Mix_Init: %s\n", Mix_GetError());
+    SDL_Quit();
+    return EXIT_FAILURE;
+  }
+  if(Mix_OpenAudio(11025, AUDIO_S16SYS, 2, 1024)==-1) {
+    SDL_Log("Mix_OpenAudio: %s\n", Mix_GetError());
+    Mix_Quit();
+    SDL_Quit();
+    return EXIT_FAILURE;
+  }
+
+  struct sound_resources reses;
+  if(init_sound_resources(&reses, "./sounds")) {
+    SDL_Log("Failed to load sound resources: %s\n", Mix_GetError());
+    Mix_CloseAudio();
+    Mix_Quit();
+    SDL_Quit();
+    return EXIT_FAILURE;
+  }
+
   SDL_Window *window = SDL_CreateWindow("Asteroids",
     SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
     WORLD_WIDTH, WORLD_HEIGHT, SDL_WINDOW_SHOWN);
   if (!window) {
     SDL_Log("SDL window creation error: %s\n", SDL_GetError());
+    destroy_sound_resources(&reses);
+    Mix_CloseAudio();
+    Mix_Quit();
     SDL_Quit();
     return EXIT_FAILURE;
   }
@@ -67,15 +96,21 @@ int main(int argc, char *argv[])
   if (!renderer) {
     SDL_Log("SDL renderer creation error: %s\n", SDL_GetError());
     SDL_DestroyWindow(window);
+    destroy_sound_resources(&reses);
+    Mix_CloseAudio();
+    Mix_Quit();
     SDL_Quit();
     return EXIT_FAILURE;
   }
 
   struct World world;
-  if (init_world(&world)) {
+  if (init_world(&world, &reses)) {
     SDL_Log("World allocation error: %s\n", asteroids_get_error());
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    destroy_sound_resources(&reses);
+    Mix_CloseAudio();
+    Mix_Quit();
     SDL_Quit();
     return EXIT_FAILURE;
   }
@@ -94,6 +129,7 @@ int main(int argc, char *argv[])
     dt = (float)(currentTick - lastTick) / 1000.0;
     lastTick = currentTick;
 
+    update_sound_cooldowns(&reses, dt);
     if (step_world(&world, dt, &events)) {
       SDL_Log("World stepping error: %s\n", asteroids_get_error());
       break;
@@ -116,6 +152,9 @@ int main(int argc, char *argv[])
   destroy_world(&world);
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
+  destroy_sound_resources(&reses);
+  Mix_CloseAudio();
+  Mix_Quit();
   SDL_Quit();
   return EXIT_SUCCESS;
 }

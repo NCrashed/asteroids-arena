@@ -5,9 +5,9 @@
 #include <string.h>
 #include <SDL2/SDL.h>
 
-int alloc_world(struct World *world) {
-  world->entity_counter = 0;
+int alloc_world(struct World *world, struct sound_resources *sounds) {
   memset(world, 0, sizeof(struct World));
+  world->sounds = sounds;
 
   if (init_position_storage(&world->position)) {
     destroy_world(world);
@@ -65,8 +65,8 @@ int prepare_world(struct World *world) {
   return 0;
 }
 
-int init_world(struct World *world) {
-  if (alloc_world(world)) {
+int init_world(struct World *world, struct sound_resources *sounds) {
+  if (alloc_world(world, sounds)) {
     return 1;
   }
   prepare_world(world);
@@ -113,9 +113,11 @@ void apply_events(struct World *world, float dt, const struct input_events *even
     }
     if (events->ship_thrust) {
       world->player.unique.thrust = true;
+      play_sound(world->sounds, world->sounds->thrust, 0, 0.35);
     }
     if (events->ship_fire) {
       if (world->player.unique.fire_cooldown <= 0) {
+        play_sound(world->sounds, world->sounds->fire, 1, 0.2);
         struct v2f bpos = *get_position_component(pe, &world->position);
         struct v2f bvel = get_player_direction(pe, &world->rotation);
         v2f_scale(&bvel, BULLET_SPEED);
@@ -134,6 +136,7 @@ void apply_events(struct World *world, float dt, const struct input_events *even
 }
 
 void world_respawn_player(struct World *world, entity e) {
+  play_sound(world->sounds, world->sounds->bang_medium, 2, 0.3);
   respawn_player(e
     , (struct player_component) { .thrust = false, .fire_cooldown = PLAYER_FIRE_COOLDOWN }, &world->player
     , (struct v2f) { .x = WORLD_WIDTH * 0.5, .y = WORLD_HEIGHT * 0.5 }, &world->position
@@ -142,6 +145,7 @@ void world_respawn_player(struct World *world, entity e) {
 }
 
 void world_break_asteroid(struct World *world, entity bullet_entity, entity asteroid_entity) {
+  play_sound(world->sounds, world->sounds->bang_medium, 2, 0.2);
   destroy_bullet(bullet_entity, &world->bullet, &world->position, &world->velocity, &world->radius, world->tags);
   world_spawn_asteroid_cracks(world, asteroid_entity);
   destroy_asteroid(asteroid_entity, &world->asteroid, &world->position, &world->velocity, &world->rotation, &world->radius, &world->mass, world->tags);

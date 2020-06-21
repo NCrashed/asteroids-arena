@@ -15,6 +15,7 @@
 #include "asteroids/component/asteroid.h"
 #include "asteroids/component/bullet.h"
 #include "asteroids/events.h"
+#include "asteroids/sound.h"
 
 #define WORLD_WIDTH 1480
 #define WORLD_HEIGHT 1024
@@ -36,11 +37,12 @@ struct World {
   asteroid_storage asteroid;
   bullet_storage bullet;
   component_tags tags;
+  struct sound_resources *sounds;
 };
 
 /// Initialize internal storages, allocates memory for them. Return non zero
 /// result on error.
-int init_world(struct World *world);
+int init_world(struct World *world, struct sound_resources *sounds);
 
 /// Deallocate internal storages and free memory.
 void destroy_world(struct World *world);
