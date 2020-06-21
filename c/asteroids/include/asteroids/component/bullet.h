@@ -12,7 +12,7 @@
 
 #define BULLET_SPEED 200
 #define BULLET_LIFE_TIME 3
-#define BULLET_RADIUS 0.5
+#define BULLET_RADIUS 1
 
 /// Marks that the entity is bullet
 struct bullet_component {

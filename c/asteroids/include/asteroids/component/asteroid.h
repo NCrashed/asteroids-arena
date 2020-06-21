@@ -18,7 +18,7 @@
 #define ASTEROID_SIZE_MAX 130
 #define ASTEROID_DENSITY 1
 #define ASTEROID_AMOUNT 20
-#define ASTEROID_VELOCITY_MIN 0
+#define ASTEROID_VELOCITY_MIN (-100)
 #define ASTEROID_VELOCITY_MAX 100
 
 /// Marks that the entity is asteroid
@@ -49,5 +49,17 @@ entity spawn_asteroid
   , float radius, radius_storage *radius_store
   , component_tags tags
   , size_t *entity_counter);
+
+/// Untags all components of asteroid
+void destroy_asteroid
+  ( entity e
+  , asteroid_storage *storage
+  , position_storage *pos_store
+  , velocity_storage *vel_store
+  , rotation_storage *rot_store
+  , mass_storage *mass_store
+  , radius_storage *radius_store
+  , component_tags tags
+  );
 
 #endif /* ASTEROIDS_ASTEROID_H */

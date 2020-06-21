@@ -75,3 +75,21 @@ entity spawn_asteroid
   add_radius_component(e, radius, radius_store, tags);
   return e;
 }
+
+void destroy_asteroid
+  ( entity e
+  , asteroid_storage *storage
+  , position_storage *pos_store
+  , velocity_storage *vel_store
+  , rotation_storage *rot_store
+  , mass_storage *mass_store
+  , radius_storage *radius_store
+  , component_tags tags )
+{
+  del_asteroid_component(e, storage, tags);
+  del_position_component(e, pos_store, tags);
+  del_velocity_component(e, vel_store, tags);
+  del_rotation_component(e, rot_store, tags);
+  del_mass_component(e, mass_store, tags);
+  del_radius_component(e, radius_store, tags);
+}

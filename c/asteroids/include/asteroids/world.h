@@ -65,6 +65,9 @@ entity world_spawn_asteroid(struct World *world
   , float mass
   , float radius );
 
+/// Allocate new asteroids in world. Return -1 if failed.
+int world_spawn_asteroid_cracks(struct World *world, entity parent);
+
 /// Allocate new bullet in world. Return -1 if failed.
 entity world_spawn_bullet(struct World *world
   , struct bullet_component bullet

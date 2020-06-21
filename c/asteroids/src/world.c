@@ -119,6 +119,7 @@ void apply_events(struct World *world, float dt, const struct input_events *even
         struct v2f bpos = *get_position_component(pe, &world->position);
         struct v2f bvel = get_player_direction(pe, &world->rotation);
         v2f_scale(&bvel, BULLET_SPEED);
+        v2f_set_add(&bvel, *get_velocity_component(pe, &world->velocity));
 
         entity be = world_spawn_bullet(world
           , (struct bullet_component) { .life_time = BULLET_LIFE_TIME }
@@ -132,22 +133,80 @@ void apply_events(struct World *world, float dt, const struct input_events *even
   }
 }
 
+void world_respawn_player(struct World *world, entity e) {
+  respawn_player(e
+    , (struct player_component) { .thrust = false, .fire_cooldown = PLAYER_FIRE_COOLDOWN }, &world->player
+    , (struct v2f) { .x = WORLD_WIDTH * 0.5, .y = WORLD_HEIGHT * 0.5 }, &world->position
+    , (struct v2f) { .y = 0, .y = 0 }, &world->velocity
+    , 0, &world->rotation );
+}
+
+void world_break_asteroid(struct World *world, entity bullet_entity, entity asteroid_entity) {
+  destroy_bullet(bullet_entity, &world->bullet, &world->position, &world->velocity, &world->radius, world->tags);
+  world_spawn_asteroid_cracks(world, asteroid_entity);
+  destroy_asteroid(asteroid_entity, &world->asteroid, &world->position, &world->velocity, &world->rotation, &world->radius, &world->mass, world->tags);
+}
+
 int step_world(struct World *world, float dt, const struct input_events *events) {
   update_player(world, dt);
   apply_events(world, dt, events);
   for (size_t e=0; e < world->entity_counter; e++) {
     system_lifetime(e, &world->bullet, &world->position, &world->velocity, &world->radius, dt, world->tags);
     system_movement(e, &world->position, &world->velocity, dt, world->tags);
-    entity ecoll = system_collision(e, &world->position, &world->radius, world->entity_counter, world->tags);
-    if (ecoll > 0) {
-      if (entity_has_component(e, COMPONENT_PLAYER, world->tags) && entity_has_component(ecoll, COMPONENT_ASTEROID, world->tags)) {
-        respawn_player(e
-          , (struct player_component) { .thrust = false, .fire_cooldown = 0 }, &world->player
-          , (struct v2f) { .x = WORLD_WIDTH * 0.5, .y = WORLD_HEIGHT * 0.5 }, &world->position
-          , (struct v2f) { .y = 0, .y = 0 }, &world->velocity
-          , 0, &world->rotation );
+    entity old_ecoll = -1;
+    entity ecoll = -1;
+    do {
+      ecoll = system_collision(e, old_ecoll, &world->position, &world->radius, world->entity_counter, world->tags);
+      if (ecoll >= 0) {
+        if (entity_has_component(e, COMPONENT_PLAYER, world->tags) && entity_has_component(ecoll, COMPONENT_ASTEROID, world->tags)) {
+          world_respawn_player(world, e);
+        } else if (entity_has_component(e, COMPONENT_ASTEROID, world->tags) && entity_has_component(ecoll, COMPONENT_PLAYER, world->tags)) {
+          world_respawn_player(world, ecoll);
+        } else if (entity_has_component(e, COMPONENT_BULLET, world->tags) && entity_has_component(ecoll, COMPONENT_ASTEROID, world->tags)) {
+          world_break_asteroid(world, e, ecoll);
+        } else if (entity_has_component(e, COMPONENT_ASTEROID, world->tags) && entity_has_component(ecoll, COMPONENT_BULLET, world->tags)) {
+          world_break_asteroid(world, ecoll, e);
+        }
       }
-    }
+      old_ecoll = ecoll;
+    } while (ecoll >= 0);
+  }
+  return 0;
+}
+
+float randf(float min, float max) {
+  return min + (float)rand()/(float)(RAND_MAX/(max - min));
+}
+
+int randi(int min, int max) {
+  return min + (int)((float)rand()/(RAND_MAX/(float)(max - min)));
+}
+
+struct v2f random_asteroid_velocity(struct v2f v) {
+  return (struct v2f) { .x = v.x + randf(ASTEROID_VELOCITY_MIN, ASTEROID_VELOCITY_MAX), .y = v.y + randf(ASTEROID_VELOCITY_MIN, ASTEROID_VELOCITY_MAX) };
+}
+
+int world_spawn_asteroid_cracks(struct World *world, entity parent) {
+  float r = 0.5 * (*get_radius_component(parent, &world->radius));
+  if (r < ASTEROID_SIZE_MIN) return 0;
+
+  struct v2f pos = *get_position_component(parent, &world->position);
+  struct v2f vel = *get_velocity_component(parent, &world->velocity);
+
+  float m = ASTEROID_DENSITY * M_PI * r * r;
+  entity a1 = world_spawn_asteroid(world
+    , (struct asteroid_component) { .edges = randi(ASTEROID_EDGES_MIN, ASTEROID_EDGES_MAX) }
+    , pos, random_asteroid_velocity(vel), randf(0, 2*M_PI), m, r);
+  if (a1 < 0) {
+    SDL_Log("Failed to crack asteroid: %s\n", asteroids_get_error());
+    return -1;
+  }
+  entity a2 = world_spawn_asteroid(world
+    , (struct asteroid_component) { .edges = randi(ASTEROID_EDGES_MIN, ASTEROID_EDGES_MAX) }
+    , pos, random_asteroid_velocity(vel), randf(0, 2*M_PI), m, r);
+  if (a2 < 0) {
+    SDL_Log("Failed to crack asteroid: %s\n", asteroids_get_error());
+    return -1;
   }
   return 0;
 }
@@ -207,14 +266,6 @@ entity world_spawn_bullet(struct World *world
     , &world->entity_counter);
 }
 
-float randf(float min, float max) {
-  return min + (float)rand()/(float)(RAND_MAX/(max - min));
-}
-
-int randi(int min, int max) {
-  return min + (int)((float)rand()/(RAND_MAX/(float)(max - min)));
-}
-
 int world_spawn_asteroids(struct World *world, size_t num) {
   for (size_t i=0; i < num; i++) {
     float radius = randf(ASTEROID_SIZE_MIN, ASTEROID_SIZE_MAX);
@@ -222,7 +273,7 @@ int world_spawn_asteroids(struct World *world, size_t num) {
       (  world
       , (struct asteroid_component) { .edges = randi(ASTEROID_EDGES_MIN, ASTEROID_EDGES_MAX) }
       , (struct v2f) { .x = randf(0, WORLD_WIDTH), .y = randf(0, WORLD_HEIGHT) }
-      , (struct v2f) { .x = randf(ASTEROID_VELOCITY_MIN, ASTEROID_VELOCITY_MAX), .y = randf(ASTEROID_VELOCITY_MIN, ASTEROID_VELOCITY_MAX) }
+      , random_asteroid_velocity((struct v2f) { .x = 0, .y = 0 })
       , randf(0, 2*M_PI)
       , ASTEROID_DENSITY * M_PI * radius * radius
       , radius

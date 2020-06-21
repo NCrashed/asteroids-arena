@@ -11,8 +11,11 @@
 
 /// Iterate over all entities to check collision against the given entity.
 /// Returns -1 if no entity exists.
+/// Second parameter is used to rescan collisions from given another entity,
+/// if set to below zero, will scan from begining.
 entity system_collision(
     entity e
+  , entity prev_collided
   , const position_storage *position
   , const radius_storage *radius
   , size_t entity_counter
