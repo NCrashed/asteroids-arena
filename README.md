@@ -24,8 +24,8 @@ I am personally interested to compare some not common languages for gamedev.
 Languages:
 - Haskell. My major language. The goal to test pressure of GC on performance and if it really more comfortable for game developing. **Done**.
 - C. Control group for performance. **Done**.
+- ATS2. Low level FP language with dependent typing that will allow mutation in place, redundant checks elimination and zero cost abstractions. **In progress**.
 - Clean. Unique types can provide mutation in place without hassle. Not started yet.
-- ATS2. Low level FP language with dependent typing that will allow mutation in place, redundant checks elimination and zero cost abstractions. Not started yet.
 - D. Curious to test it with GC and without GC. Not started yet.
 - Zig. Low level alternative to pure C. Curious in performance and if it easy to bind to C libraries. Not started yet.
 - Rust. Curious in performance and expressive power comparing to Haskell. Not started yet.
