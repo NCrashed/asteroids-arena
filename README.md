@@ -27,3 +27,21 @@ Languages:
 - D. Curious to test it with GC and without GC.
 - Zig. Low level alternative to pure C. Curious in performance and if it easy to bind to C libraries.
 - Rust. Curious in performance and expressive power comparing to Haskell.
+
+# Results
+
+## FPS
+
+FPS plots are built with [haskell utility](./haskell/plotting). Like:
+```
+cabal new-run plotting -- fps.out
+```
+In haskell nix-shell.
+
+### Haskell
+FPS drops to unplayable values very often.
+![Haskell FPS](./haskell/fps.png)
+
+### C
+There is smooth gameplay. I experienced drops to 500 FPS occasionally.
+![C FPS](./c/asteroids/fps.png)
