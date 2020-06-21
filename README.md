@@ -30,6 +30,8 @@ Languages:
 
 # Results
 
+![Gameplay](./screenshots/c_001.png)
+
 ## FPS
 
 FPS plots are built with [haskell utility](./haskell/plotting). Like:
