@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 #include <SDL2/SDL.h>
 #include "SDL_mixer.h"
 
@@ -118,15 +119,20 @@ int main(int argc, char *argv[])
   struct input_events events;
   init_input_events(&events);
 
+  FILE *fps_file = fopen("./fps.out", "w");
+  if (!fps_file) {
+    SDL_Log("Failed to open ./fps.out for writing!");
+  }
+
   float dt = 0;
-  unsigned int lastTick = 0;
+  clock_t lastTick = 0;
   int i = 0;
   while(true) {
     bool quit = processEvents(&events);
     if (quit) break;
 
-    unsigned int currentTick = SDL_GetTicks();
-    dt = (float)(currentTick - lastTick) / 1000.0;
+    clock_t currentTick = clock();
+    dt = (float)(currentTick - lastTick) / CLOCKS_PER_SEC;
     lastTick = currentTick;
 
     update_sound_cooldowns(&reses, dt);
@@ -143,12 +149,19 @@ int main(int argc, char *argv[])
     }
     SDL_RenderPresent(renderer);
     i += 1;
+    float fps = 1 / dt;
     if (i % 20000 == 0) {
-      SDL_Log("FPS: %f", 1 / dt);
-      i = 0;
+      SDL_Log("FPS: %f", fps);
     }
+    clock_t ptick1 = clock();
+    if (i % 1000 == 0 && fps_file) {
+      fprintf(fps_file, "%f\n", fps);
+    }
+    clock_t ptick2 = clock();
+    lastTick += ptick2 - ptick1;
   }
 
+  if (fps_file) fclose(fps_file);
   destroy_world(&world);
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
