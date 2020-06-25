@@ -1,21 +1,24 @@
 
 { stdenv, fetchurl, gmp
 , withEmacsSupport ? true
-, withContrib ? true }:
+, withContrib ? true
+, fetchFromGitHub }:
 
 let
   versionPkg = "0.4.0" ;
 
-  contrib = fetchurl {
-    url = "https://sourceforge.net/projects/ats2-lang/files/ats2-lang/ats2-postiats-${versionPkg}/ATS2-Postiats-contrib-${versionPkg}.tgz/download?use_mirror=liquidtelecom";
-    sha256 = "1fckpk62w2ifbdp4r4gjk4df02nv7dqqpc449y8a8wv4vl8ilr7m";
+  contrib = fetchFromGitHub {
+    owner = "githwxi";
+    repo = "ATS-Postiats-contrib";
+    rev = "6e18ebef95a8e67d6924397178f7f37bc87095db";
+    sha256 = "1xkgvwgs7l609z6r37b0qampk372lj2lbac56qmqqb2wngnzhwps";
   };
 
   postInstallContrib = stdenv.lib.optionalString withContrib
   ''
     local contribDir=$out/lib/ats2-postiats-*/ ;
     mkdir -p $contribDir ;
-    tar -xzf "${contrib}" --strip-components 1 -C $contribDir ;
+    cp -r ${contrib}/* $contribDir
   '';
 
   postInstallEmacs = stdenv.lib.optionalString withEmacsSupport
