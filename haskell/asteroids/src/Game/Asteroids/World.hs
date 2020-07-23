@@ -63,7 +63,7 @@ simulateWorld es w = do
     collidePlayer
     collideBullets
     ageBullets
-    runGC
+    -- runGC
     ask
 
 collidePlayer :: (MonadIO m
