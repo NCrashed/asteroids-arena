@@ -62,6 +62,7 @@ library
     , random          >= 1.0      && < 1.2
     , sdl2            >= 2.5      && < 2.6
     , sdl2-mixer      >= 1.1      && < 1.2
+    , kecsik          >= 0.1      && < 0.2
     , stm             >= 2.5      && < 2.6
 
   if flag(liquidhaskell)

@@ -6,4 +6,5 @@ let
 in
 ghc-override compiler ( self: super: {
   asteroids = pkgs.addLiquidSolver super.asteroids;
+  kecsik = pkgs.addLiquidSolver super.kecsik;
 }) super

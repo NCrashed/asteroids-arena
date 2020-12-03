@@ -5,6 +5,7 @@ in project rec {
   packages = {
     asteroids = ./asteroids;
     plotting = ./plotting;
+    kecsik = ./kecsik;
   };
   shellHook = pkgs: ''
     ${pkgs.addLiquidSolverHook}
