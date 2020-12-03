@@ -1,15 +1,15 @@
 let
   nixpkgs = import ../nix/pkgs.nix;
-  project = import ((nixpkgs {}).fetchFromGitHub {
-    owner = "NCrashed";
-    repo = "haskell-nix";
-    rev = "0c1c27a22daa78d359d7704448e4c6e2512cde5d";
-    sha256  = "1wbf40lr4bgf0b00dmqdq299j9llngxr38zp4y4qv9j5rl4hlcz1";
-  }) { inherit nixpkgs; };
-in project {
+  project = import (import ../nix/project.nix) { inherit nixpkgs; };
+in project rec {
   packages = {
     asteroids = ./asteroids;
     plotting = ./plotting;
   };
-  compiler = "ghc8101";
+  shellHook = pkgs: ''
+    ${pkgs.addLiquidSolverHook}
+  '';
+  overlays = [ (import (import ../nix/liquidhaskell.nix) { inherit compiler; }) ];
+  overlaysAfter = [ ((import ./solver.nix) { inherit compiler; }) ];
+  compiler = "ghc8102";
 }

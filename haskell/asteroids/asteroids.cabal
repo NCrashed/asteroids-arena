@@ -20,7 +20,7 @@ extra-source-files:
   README.md
   CHANGELOG.md
 data-files:
-  sounds/*
+  sounds/*.wav
 
 source-repository head
   type: git
@@ -55,7 +55,7 @@ library
     , apecs           >= 0.9      && < 0.10
     , clock           >= 0.8      && < 0.9
     , containers      >= 0.6      && < 0.7
-    , linear          >= 1.20     && < 1.21
+    , linear          >= 1.20     && < 1.22
     , random          >= 1.0      && < 1.2
     , sdl2            >= 2.5      && < 2.6
     , sdl2-mixer      >= 1.1      && < 1.2
