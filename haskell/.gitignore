@@ -4,3 +4,4 @@ result
 .ghc-*
 *.prof
 fps.out
+.liquid
