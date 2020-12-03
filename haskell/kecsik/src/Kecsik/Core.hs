@@ -4,8 +4,11 @@ module Kecsik.Core(
   , newWorld
   , SystemT
   , System
-  , runSystemT
-  , execSystemT
+  , runSystem
+  , execSystem
+  , execSystem_
+  , runWith
+  , runWith_
   , Component(..)
   , IsStorage(..)
   ) where
@@ -37,18 +40,24 @@ newtype SystemT cs m a = SystemT { unSystemT :: ReaderT (Ref (PrimState m) (Worl
 
 type System cs a = SystemT cs IO
 
-runSystemT :: SystemT cs m a -> Ref (PrimState m) (World cs) -> m a
-runSystemT ma w = runReaderT (unSystemT ma) w
+runSystem :: SystemT cs m a -> Ref (PrimState m) (World cs) -> m a
+runSystem ma w = runReaderT (unSystemT ma) w
 
-execSystemT :: (Monad m, Mutable (PrimState m) (Storage cs), PrimMonad m) => SystemT cs m a -> World cs -> m (a, World cs)
-execSystemT ma w = do
+execSystem :: (Monad m, Mutable (PrimState m) (Storage cs), PrimMonad m) => SystemT cs m a -> World cs -> m (a, World cs)
+execSystem ma w = do
   wr <- thawRef w
-  a <- runSystemT ma wr
+  a <- runSystem ma wr
   w' <- freezeRef wr
   pure (a, w')
 
-execSystemT_ :: (Monad m, Mutable (PrimState m) (Storage cs), PrimMonad m) => SystemT cs m a -> World cs -> m a
-execSystemT_ ma w = runSystemT ma =<< thawRef w
+execSystem_ :: (Monad m, Mutable (PrimState m) (Storage cs), PrimMonad m) => SystemT cs m a -> World cs -> m a
+execSystem_ ma w = runSystem ma =<< thawRef w
+
+runWith :: (Monad m, Mutable (PrimState m) (Storage cs), PrimMonad m) => World cs -> SystemT cs m a -> m (a, World cs)
+runWith = flip execSystem
+
+runWith_ :: (Monad m, Mutable (PrimState m) (Storage cs), PrimMonad m) => World cs -> SystemT cs m a -> m a
+runWith_ = flip execSystem_
 
 class IsStorage (Storage a) => Component a where
   type Storage a :: *

@@ -34,3 +34,10 @@ spec_creationWorld = describe "creates world" $ do
   it "creates composite storage world" $ do
     _ :: World (Position, Velocity) <- newWorld
     shouldBe True True
+
+spec_runSystem :: Spec
+spec_runSystem = describe "run system monad" $ do
+  it "exec noop" $ do
+    w :: World Position <- newWorld
+    execSystem_ (pure ()) w
+    shouldBe True True
