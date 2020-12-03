@@ -1,6 +1,7 @@
 module Kecsik.Test where
 
 import Kecsik
+import Control.Monad
 import Test.QuickCheck.Instances.ByteString ()
 import Test.Tasty.Hspec
 import Test.Tasty.QuickCheck
@@ -41,3 +42,23 @@ spec_runSystem = describe "run system monad" $ do
     w :: World Position <- newWorld
     execSystem_ (pure ()) w
     shouldBe True True
+  it "exec result" $ do
+    w :: World Position <- newWorld
+    (_, !w') <- execSystem (pure ()) w
+    shouldBe True True
+
+spec_createEntity :: Spec
+spec_createEntity = describe "creates entities" $ do
+  it "allocates entity" $ do
+    w :: World Position <- newWorld
+    e <- execSystem_ newEntity w
+    shouldBe e 0
+  it "allocates two entities" $ do
+    w :: World Position <- newWorld
+    (e1, e2) <- execSystem_ ((,) <$> newEntity <*> newEntity) w
+    shouldBe e1 0
+    shouldBe e2 1
+  it "allocates 1000 entities" $ do
+    w :: World Position <- newWorld
+    es <- execSystem_ (replicateM 1000 newEntity) w
+    shouldBe (last es) 999
