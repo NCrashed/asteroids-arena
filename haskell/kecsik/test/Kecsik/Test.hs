@@ -104,3 +104,16 @@ spec_addComponents = describe "creates components" $ do
     r1 `shouldBe` Nothing
     r2 `shouldBe` Just (Velocity 1 2)
     r3 `shouldBe` Just (Velocity 1 3)
+  it "composite component both" $ do
+    w :: World s (Position, Velocity) <- newWorld Nothing
+    (r1, r2, r3) <- runWith_ w $ do
+      e <- newEntity
+      r1 :: Maybe (Velocity, Position) <- get e
+      set e (Proxy @(Velocity, Position)) (Velocity 1 2, Position 2 2)
+      r2 :: Maybe (Velocity, Position) <- get e
+      set e (Proxy @(Velocity, Position)) (Velocity 1 3, Position 3 3)
+      r3 :: Maybe (Velocity, Position) <- get e
+      pure (r1, r2, r3)
+    r1 `shouldBe` Nothing
+    r2 `shouldBe` Just (Velocity 1 2, Position 2 2)
+    r3 `shouldBe` Just (Velocity 1 3, Position 3 3)

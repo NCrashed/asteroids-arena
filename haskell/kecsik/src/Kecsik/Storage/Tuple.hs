@@ -175,3 +175,14 @@ instance (IsStorage s a, IsStorage s b, IsStorage s c, IsStorage s d, IsStorage 
 
   newStorage ms = (,,,,,,,,) <$> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms
   {-# INLINE newStorage #-}
+
+instance (ComponentOps m cs a, ComponentOps m cs b, AllocateComponent m cs (a, b) ~ (AllocateComponent m cs a, AllocateComponent m cs b)) => ComponentOps m cs (a, b) where
+  get e = do
+    ma <- get e
+    mb <- get e
+    pure $ (,) <$> ma <*> mb
+  {-# INLINE get #-}
+  set e _ (a, b) = do
+    set e (Proxy @a) a
+    set e (Proxy @b) b
+  {-# INLINe set #-}

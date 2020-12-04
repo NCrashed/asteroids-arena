@@ -14,10 +14,12 @@ module Kecsik.Core(
   , Has(..)
   , StorageHas
   , SubComponent
+  , AllocateComponent
   , IsStorage(..)
   , newEntity
   , setComponent
   , getComponent
+  , ComponentOps(..)
   ) where
 
 import Control.Monad.Primitive
@@ -98,6 +100,8 @@ instance Has s a a where
 type StorageHas s a b = (Has s (Elem a) b, Has s a (Storage s b), Component s b, Mutable s (Elem a), Mutable s b, Allocate a (Storage s b) ~ Allocate (Storage s b) (Storage s b))
 -- | States that b is subcomponent of a
 type SubComponent m a b = (Component (PrimState m) a, StorageHas (PrimState m) (Storage (PrimState m) a) b)
+-- | Allocation information that is needed to write subcomponent b within a
+type AllocateComponent m a b = Allocate (Storage (PrimState m) a) (Storage (PrimState m) b)
 
 -- | Storage backend that contains components inside. The typeclass defines low-level primitives to work
 -- with mutable components inside the storage.
@@ -139,7 +143,7 @@ newEntity = do
   i <- withPart (fieldMut #worldCounter) wr $ \cr -> updateRef' cr $ \c -> (c+1, c)
   pure $ Entity i
 
-setComponent :: forall cs c m . (SystemBase cs m, SubComponent m cs c) => Entity -> Proxy c -> Allocate (Storage (PrimState m) cs) (Storage (PrimState m) c) -> SystemT cs m ()
+setComponent :: forall cs c m . (SystemBase cs m, SubComponent m cs c) => Entity -> Proxy c -> AllocateComponent m cs c -> SystemT cs m ()
 setComponent e p c = do
   wr :: WorldRef m cs <- SystemT ask
   withPart (fieldMut #worldStorage) wr $ \sr -> void $ writeComponent sr e p c
@@ -150,3 +154,17 @@ getComponent e = do
   withPart (fieldMut #worldStorage) wr $ \sr -> do
     mr <- getComponentRef sr e
     traverse freezeRef mr
+
+-- | Operations with components that are overloaded such you can use it on tuples of components with any order.
+class Component (PrimState m) a => ComponentOps m cs a where
+  -- | Read component from memory and freeze it. Provides you with immutable copy of data.
+  get :: SystemBase cs m => Entity -> SystemT cs m (Maybe a)
+
+  -- | Write component into memory. Copies immutable content into mutable storage.
+  set :: SystemBase cs m => Entity -> Proxy a -> AllocateComponent m cs a -> SystemT cs m ()
+
+instance {-# OVERLAPPABLE #-} SubComponent m cs a => ComponentOps m cs a where
+  get = getComponent
+  {-# INLINE get #-}
+  set = setComponent
+  {-# INLINE set #-}
