@@ -55,6 +55,7 @@ library
     DeriveGeneric
     FlexibleContexts
     FlexibleInstances
+    FunctionalDependencies
     GADTs
     GeneralizedNewtypeDeriving
     MultiParamTypeClasses
@@ -64,6 +65,7 @@ library
     RecordWildCards
     ScopedTypeVariables
     TupleSections
+    TypeApplications
     TypeFamilies
     TypeOperators
     UndecidableInstances
@@ -82,6 +84,7 @@ test-suite kecsik-test
     DeriveGeneric
     FlexibleContexts
     FlexibleInstances
+    FunctionalDependencies
     GADTs
     GeneralizedNewtypeDeriving
     MultiParamTypeClasses
@@ -90,6 +93,7 @@ test-suite kecsik-test
     RecordWildCards
     ScopedTypeVariables
     TupleSections
+    TypeApplications
     TypeFamilies
     TypeOperators
     UndecidableInstances
