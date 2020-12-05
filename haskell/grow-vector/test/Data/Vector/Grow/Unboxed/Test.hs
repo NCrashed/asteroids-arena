@@ -1,4 +1,5 @@
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE OverloadedLists #-}
 module Data.Vector.Grow.Unboxed.Test where
 
 import Control.Monad.Primitive (RealWorld)
@@ -13,13 +14,46 @@ spec_creation = describe "vector creation" $ do
     v :: GrowVector RealWorld Int <- U.new 42
     l <- U.length v
     l `shouldBe` 0
-    U.capacity v `shouldBe` 42
+    c <- U.capacity v
+    c `shouldBe` 42
     r <- U.null v
     r `shouldBe` True
   it "preallocated initialized with right size" $ do
     v :: GrowVector RealWorld Int <- U.newSized 23 42
     l <- U.length v
     l `shouldBe` 23
-    U.capacity v `shouldBe` 42
+    c <- U.capacity v
+    c `shouldBe` 42
     r <- U.null v
-    r `shouldBe` False 
+    r `shouldBe` False
+
+spec_slicing :: Spec
+spec_slicing = describe "vector slicing" $ do
+  it "simple slice" $ do
+    v :: GrowVector RealWorld Int <- U.thaw [1, 2, 3, 4, 5]
+    v' <- U.slice 1 2 v
+    vf <- U.freeze v'
+    vf `shouldBe` [2, 3]
+  it "empty slice" $ do
+    v :: GrowVector RealWorld Int <- U.thaw [1, 2, 3, 4, 5]
+    v' <- U.slice 1 0 v
+    vf <- U.freeze v'
+    vf `shouldBe` []
+  it "begin slice" $ do
+    v :: GrowVector RealWorld Int <- U.thaw [1, 2, 3, 4, 5]
+    v' <- U.slice 0 1 v
+    vf <- U.freeze v'
+    vf `shouldBe` [1]
+  it "end slice" $ do
+    v :: GrowVector RealWorld Int <- U.thaw [1, 2, 3, 4, 5]
+    v' <- U.slice 4 1 v
+    vf <- U.freeze v'
+    vf `shouldBe` [5]
+  it "mutating parent slice" $ do
+    v :: GrowVector RealWorld Int <- U.thaw [1, 2, 3, 4, 5]
+    v' <- U.slice 1 2 v
+    vf1 <- U.freeze v'
+    vf1 `shouldBe` [2, 3]
+    U.write v 2 4
+    vf2 <- U.freeze v'
+    vf2 `shouldBe` [2, 4]
