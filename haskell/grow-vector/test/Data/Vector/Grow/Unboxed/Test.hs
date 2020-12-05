@@ -57,3 +57,27 @@ spec_slicing = describe "vector slicing" $ do
     U.write v 2 4
     vf2 <- U.freeze v'
     vf2 `shouldBe` [2, 4]
+
+spec_readWrite :: Spec
+spec_readWrite = describe "basic read write" $ do
+  it "read elements" $ do
+    v :: GrowVector RealWorld Int <- U.thaw [1, 2, 3, 4, 5]
+    a1 <- U.read v 0
+    a1 `shouldBe` 1
+    a2 <- U.read v 1
+    a2 `shouldBe` 2
+    a3 <- U.read v 2
+    a3 `shouldBe` 3
+    a4 <- U.read v 4
+    a4 `shouldBe` 5
+  it "writes elements" $ do
+    v :: GrowVector RealWorld Int <- U.newSized 2 2
+    U.write v 0 1
+    U.write v 1 2
+    v' <- U.freeze v
+    v' `shouldBe` [1, 2]
+  it "write-read indemponent" $ do
+    v :: GrowVector RealWorld Int <- U.newSized 1 1
+    U.write v 0 424242
+    a <- U.read v 0
+    a `shouldBe` 424242
