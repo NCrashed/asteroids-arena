@@ -4,8 +4,10 @@
 {-# LANGUAGE TypeFamilies #-}
 module Data.Vector.Grow.Unboxed(
     GrowVector(..)
+  , IOGrowVector
   -- * Quering info about vector
   , length
+  , null
   , capacity
   -- * Creation
   , new
@@ -16,7 +18,7 @@ import Control.Monad.Primitive
 import Data.Primitive.MutVar
 import Data.Vector.Unboxed.Mutable (MVector, Unbox)
 import GHC.Generics
-import Prelude hiding (length)
+import Prelude hiding (length, null)
 
 import qualified Data.Vector.Unboxed.Mutable as M
 
@@ -27,6 +29,8 @@ data GrowVector s a = GrowVector {
 , growVectorLength   :: !(MutVar s Int)
 } deriving (Generic)
 
+type IOGrowVector a = GrowVector RealWorld a
+
 -- | Return current capacity of the vector (amount of elements that it can fit without realloc)
 capacity :: Unbox a => GrowVector s a -> Int
 capacity = M.length . growVector
@@ -36,6 +40,11 @@ capacity = M.length . growVector
 length :: PrimMonad m => GrowVector (PrimState m) a -> m Int
 length = readMutVar . growVectorLength
 {-# INLINE length #-}
+
+-- | Return 'True' if there is no elements inside the vector
+null :: PrimMonad m => GrowVector (PrimState m) a -> m Bool
+null = fmap (== 0) . length
+{-# INLINE null #-}
 
 -- | Allocation of new growable vector with given capacity.
 new :: (Unbox a, PrimMonad m) => Int -> m (GrowVector (PrimState m) a)

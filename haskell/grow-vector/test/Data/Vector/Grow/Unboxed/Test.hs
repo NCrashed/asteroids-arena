@@ -14,8 +14,12 @@ spec_creation = describe "vector creation" $ do
     l <- U.length v
     l `shouldBe` 0
     U.capacity v `shouldBe` 42
+    r <- U.null v
+    r `shouldBe` True
   it "preallocated initialized with right size" $ do
     v :: GrowVector RealWorld Int <- U.newSized 23 42
     l <- U.length v
     l `shouldBe` 23
     U.capacity v `shouldBe` 42
+    r <- U.null v
+    r `shouldBe` False 
