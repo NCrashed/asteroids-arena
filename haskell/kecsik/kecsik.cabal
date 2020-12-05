@@ -24,16 +24,24 @@ library
   hs-source-dirs:      src
   exposed-modules:
     Kecsik
+    Kecsik.Component
+    Kecsik.Component.Entity
     Kecsik.Core
     Kecsik.Storage
+    Kecsik.Storage.Global
     Kecsik.Storage.HashTable
     Kecsik.Storage.Tuple
+    Kecsik.System
   build-depends:
-      stm             >= 2.5      && < 2.6
-    , hashtables      >= 1.2      && < 1.5
-    , mtl             >= 2.2      && < 2.3
-    , mutable         >= 0.2      && < 0.3
-    , primitive       >= 0.7      && < 0.8
+      stm                 >= 2.5      && < 2.6
+    , data-default        >= 0.7      && < 0.8
+    , data-default-class  >= 0.1      && < 0.2
+    , hashtables          >= 1.2      && < 1.5
+    , mtl                 >= 2.2      && < 2.3
+    , mutable             >= 0.2      && < 0.3
+    , primitive           >= 0.7      && < 0.8
+    , transformers        >= 0.5      && < 0.6
+    , vector-th-unbox     >= 0.2      && < 0.3
 
   if flag(liquidhaskell)
     ghc-options: -fplugin=LiquidHaskell

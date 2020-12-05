@@ -2,34 +2,44 @@ module Kecsik.Storage.HashTable(
     HashTable(..)
   ) where
 
-import Control.Monad.IO.Class
+import Control.Monad.Primitive
 import Data.Mutable
 import Data.Proxy
 import GHC.Generics
 import Kecsik.Core
-import qualified Data.HashTable.IO as H
 
-newtype HashTable s a = HashTable { unHashTable :: H.CuckooHashTable Int (Ref s a) }
+import qualified Data.HashTable.Class as H
+import qualified Data.HashTable.ST.Cuckoo as C
+import qualified Data.Vector.Unboxed as U
+
+newtype HashTable s a = HashTable { unHashTable :: C.HashTable s Int (Ref s a) }
   deriving (Generic)
 
 instance Mutable s a => Mutable s (HashTable s a)
 
-instance Mutable s a => IsStorage s (HashTable s a) where
-  type Elem (HashTable s a) = a
-  type Allocate (HashTable s a) c = a
+type instance Elem (HashTable s a) = a
 
-  newStorage Nothing = liftIO $ fmap HashTable H.new
-  newStorage (Just s) = liftIO $ fmap HashTable $ H.newSized s
+instance (PrimMonad m, PrimState m ~ s, Mutable s a) => IsStorage m (HashTable s a) where
+  storeInit Nothing = stToPrim $ fmap HashTable H.new
+  storeInit (Just s) = stToPrim $ fmap HashTable $ H.newSized s
 
-  getComponentRef r (Entity e) = do
-    HashTable h <- freezeRef r
-    mr <- liftIO $ H.lookup h e
-    pure $ getMutPart subPart <$> mr
-  {-# INLINE getComponentRef #-}
+  storeRef (HashTable h) (Entity e) = stToPrim $ H.lookup h e
+  {-# INLINEABLE storeRef #-}
 
-  writeComponent r (Entity e) _ c = do
-    HashTable h <- freezeRef r
-    cr <- thawRef c
-    liftIO $ H.insert h e cr
-    pure $ getMutPart subPart cr
-  {-# INLINE writeComponent #-}
+  storeAlloc (HashTable h) (Entity e) c = do
+    mr <- stToPrim $ H.lookup h e
+    case mr of
+      Nothing -> do
+        cr <- thawRef c
+        stToPrim $ H.insert h e cr
+        pure cr
+      Just cr -> pure cr
+  {-# INLINABLE storeAlloc #-}
+
+  storeDestroy (HashTable h) (Entity e) = stToPrim $ H.delete h e
+  {-# INLINEABLE storeDestroy #-}
+
+  storeMembers (HashTable h) = do
+    es <- stToPrim $ H.toList h
+    pure $ U.fromList $ fmap (Entity . fst) es
+  {-# INLINABLE storeMembers #-}

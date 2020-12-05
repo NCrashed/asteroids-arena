@@ -3,10 +3,21 @@ module Kecsik.Storage.Tuple() where
 
 import Control.Monad.IO.Class
 import Control.Monad.Primitive
+import Control.Monad.Trans.Maybe
 import Data.Mutable
 import Data.Proxy
 import GHC.Generics
 import Kecsik.Core
+
+import qualified Data.Vector.Unboxed as U
+
+type instance Elem (a, b) = (Elem a, Elem b)
+type instance Elem (a, b, c) = (Elem a, Elem b, Elem c)
+type instance Elem (a, b, c, d) = (Elem a, Elem b, Elem c, Elem d)
+type instance Elem (a, b, c, d, e) = (Elem a, Elem b, Elem c, Elem d, Elem e)
+type instance Elem (a, b, c, d, e, f) = (Elem a, Elem b, Elem c, Elem d, Elem e, Elem f)
+type instance Elem (a, b, c, d, e, f, g) = (Elem a, Elem b, Elem c, Elem d, Elem e, Elem f, Elem g)
+type instance Elem (a, b, c, d, e, f, g, k) = (Elem a, Elem b, Elem c, Elem d, Elem e, Elem f, Elem g, Elem k)
 
 instance (Component s a, Component s b) => Component s (a, b) where
   type Storage s (a, b) = (Storage s a, Storage s b)
@@ -26,163 +37,149 @@ instance (Component s a, Component s b, Component s c, Component s d, Component 
 instance (Component s a, Component s b, Component s c, Component s d, Component s e, Component s f, Component s g) => Component s (a, b, c, d, e, f, g) where
   type Storage s (a, b, c, d, e, f, g) = (Storage s a, Storage s b, Storage s c, Storage s d, Storage s e, Storage s f, Storage s g)
 
-instance (Component s a, Component s b, Component s c, Component s d, Component s e, Component s f, Component s g, Component s m) => Component s (a, b, c, d, e, f, g, m) where
-  type Storage s (a, b, c, d, e, f, g, m) = (Storage s a, Storage s b, Storage s c, Storage s d, Storage s e, Storage s f, Storage s g, Storage s m)
+instance (Component s a, Component s b, Component s c, Component s d, Component s e, Component s f, Component s g, Component s k) => Component s (a, b, c, d, e, f, g, k) where
+  type Storage s (a, b, c, d, e, f, g, k) = (Storage s a, Storage s b, Storage s c, Storage s d, Storage s e, Storage s f, Storage s g, Storage s k)
 
-instance (Component s a, Component s b, Component s c, Component s d, Component s e, Component s f, Component s g, Component s m, Component s k) => Component s (a, b, c, d, e, f, g, m, k) where
-  type Storage s (a, b, c, d, e, f, g, m, k) = (Storage s a, Storage s b, Storage s c, Storage s d, Storage s e, Storage s f, Storage s g, Storage s m, Storage s k)
+instance (Has w m a, Has w m b) => Has w m (a, b) where
+  getStore = (,) <$> getStore <*> getStore
+  {-# INLINABLE getStore #-}
 
-instance Has s (a, b) a where subPart = mutFst
-instance Has s (a, b) b where subPart = mutSnd
+instance (Has w m a, Has w m b, Has w m c) => Has w m (a, b, c) where
+  getStore = (,,) <$> getStore <*> getStore <*> getStore
+  {-# INLINABLE getStore #-}
 
-instance Has s (a, b, c) a where subPart = MutPart $ \(v, _, _) -> v
-instance Has s (a, b, c) b where subPart = MutPart $ \(_, v, _) -> v
-instance Has s (a, b, c) c where subPart = MutPart $ \(_, _, v) -> v
+instance (Has w m a, Has w m b, Has w m c, Has w m d) => Has w m (a, b, c, d) where
+  getStore = (,,,) <$> getStore <*> getStore <*> getStore <*> getStore
+  {-# INLINABLE getStore #-}
 
-instance Has s (a, b, c, d) a where subPart = MutPart $ \(v, _, _, _) -> v
-instance Has s (a, b, c, d) b where subPart = MutPart $ \(_, v, _, _) -> v
-instance Has s (a, b, c, d) c where subPart = MutPart $ \(_, _, v, _) -> v
-instance Has s (a, b, c, d) d where subPart = MutPart $ \(_, _, _, v) -> v
+instance (Has w m a, Has w m b, Has w m c, Has w m d, Has w m e) => Has w m (a, b, c, d, e) where
+  getStore = (,,,,) <$> getStore <*> getStore <*> getStore <*> getStore <*> getStore
+  {-# INLINABLE getStore #-}
 
-instance Has s (a, b, c, d, e) a where subPart = MutPart $ \(v, _, _, _, _) -> v
-instance Has s (a, b, c, d, e) b where subPart = MutPart $ \(_, v, _, _, _) -> v
-instance Has s (a, b, c, d, e) c where subPart = MutPart $ \(_, _, v, _, _) -> v
-instance Has s (a, b, c, d, e) d where subPart = MutPart $ \(_, _, _, v, _) -> v
-instance Has s (a, b, c, d, e) e where subPart = MutPart $ \(_, _, _, _, v) -> v
+instance (Has w m a, Has w m b, Has w m c, Has w m d, Has w m e, Has w m f) => Has w m (a, b, c, d, e, f) where
+  getStore = (,,,,,) <$> getStore <*> getStore <*> getStore <*> getStore <*> getStore <*> getStore
+  {-# INLINABLE getStore #-}
 
-instance Has s (a, b, c, d, e, f) a where subPart = MutPart $ \(v, _, _, _, _, _) -> v
-instance Has s (a, b, c, d, e, f) b where subPart = MutPart $ \(_, v, _, _, _, _) -> v
-instance Has s (a, b, c, d, e, f) c where subPart = MutPart $ \(_, _, v, _, _, _) -> v
-instance Has s (a, b, c, d, e, f) d where subPart = MutPart $ \(_, _, _, v, _, _) -> v
-instance Has s (a, b, c, d, e, f) e where subPart = MutPart $ \(_, _, _, _, v, _) -> v
-instance Has s (a, b, c, d, e, f) f where subPart = MutPart $ \(_, _, _, _, _, v) -> v
+instance (Has w m a, Has w m b, Has w m c, Has w m d, Has w m e, Has w m f, Has w m g) => Has w m (a, b, c, d, e, f, g) where
+  getStore = (,,,,,,) <$> getStore <*> getStore <*> getStore <*> getStore <*> getStore <*> getStore <*> getStore
+  {-# INLINABLE getStore #-}
 
-instance Has s (a, b, c, d, e, f, g) a where subPart = MutPart $ \(v, _, _, _, _, _, _) -> v
-instance Has s (a, b, c, d, e, f, g) b where subPart = MutPart $ \(_, v, _, _, _, _, _) -> v
-instance Has s (a, b, c, d, e, f, g) c where subPart = MutPart $ \(_, _, v, _, _, _, _) -> v
-instance Has s (a, b, c, d, e, f, g) d where subPart = MutPart $ \(_, _, _, v, _, _, _) -> v
-instance Has s (a, b, c, d, e, f, g) e where subPart = MutPart $ \(_, _, _, _, v, _, _) -> v
-instance Has s (a, b, c, d, e, f, g) f where subPart = MutPart $ \(_, _, _, _, _, v, _) -> v
-instance Has s (a, b, c, d, e, f, g) g where subPart = MutPart $ \(_, _, _, _, _, _, v) -> v
+instance (Has w m a, Has w m b, Has w m c, Has w m d, Has w m e, Has w m f, Has w m g, Has w m k) => Has w m (a, b, c, d, e, f, g, k) where
+  getStore = (,,,,,,,) <$> getStore <*> getStore <*> getStore <*> getStore <*> getStore <*> getStore <*> getStore <*> getStore
+  {-# INLINABLE getStore #-}
 
-instance Has s (a, b, c, d, e, f, g, m) a where subPart = MutPart $ \(v, _, _, _, _, _, _, _) -> v
-instance Has s (a, b, c, d, e, f, g, m) b where subPart = MutPart $ \(_, v, _, _, _, _, _, _) -> v
-instance Has s (a, b, c, d, e, f, g, m) c where subPart = MutPart $ \(_, _, v, _, _, _, _, _) -> v
-instance Has s (a, b, c, d, e, f, g, m) d where subPart = MutPart $ \(_, _, _, v, _, _, _, _) -> v
-instance Has s (a, b, c, d, e, f, g, m) e where subPart = MutPart $ \(_, _, _, _, v, _, _, _) -> v
-instance Has s (a, b, c, d, e, f, g, m) f where subPart = MutPart $ \(_, _, _, _, _, v, _, _) -> v
-instance Has s (a, b, c, d, e, f, g, m) g where subPart = MutPart $ \(_, _, _, _, _, _, v, _) -> v
-instance Has s (a, b, c, d, e, f, g, m) m where subPart = MutPart $ \(_, _, _, _, _, _, _, v) -> v
+storeRefT :: IsStorage m s => s -> Entity -> MaybeT m (ElemRef m s)
+storeRefT s e = MaybeT $ storeRef s e
+{-# INLINE storeRefT #-}
 
-instance Has s (a, b, c, d, e, f, g, m, k) a where subPart = MutPart $ \(v, _, _, _, _, _, _, _, _) -> v
-instance Has s (a, b, c, d, e, f, g, m, k) b where subPart = MutPart $ \(_, v, _, _, _, _, _, _, _) -> v
-instance Has s (a, b, c, d, e, f, g, m, k) c where subPart = MutPart $ \(_, _, v, _, _, _, _, _, _) -> v
-instance Has s (a, b, c, d, e, f, g, m, k) d where subPart = MutPart $ \(_, _, _, v, _, _, _, _, _) -> v
-instance Has s (a, b, c, d, e, f, g, m, k) e where subPart = MutPart $ \(_, _, _, _, v, _, _, _, _) -> v
-instance Has s (a, b, c, d, e, f, g, m, k) f where subPart = MutPart $ \(_, _, _, _, _, v, _, _, _) -> v
-instance Has s (a, b, c, d, e, f, g, m, k) g where subPart = MutPart $ \(_, _, _, _, _, _, v, _, _) -> v
-instance Has s (a, b, c, d, e, f, g, m, k) m where subPart = MutPart $ \(_, _, _, _, _, _, _, v, _) -> v
-instance Has s (a, b, c, d, e, f, g, m, k) k where subPart = MutPart $ \(_, _, _, _, _, _, _, _, v) -> v
+instance (IsStorage m a, IsStorage m b) => IsStorage m (a, b) where
+  storeInit ms = (,) <$> storeInit ms <*> storeInit ms
+  {-# INLINABLE storeInit #-}
 
-instance (IsStorage s a, IsStorage s b) => IsStorage s (a, b) where
-  type Elem (a, b) = (Elem a, Elem b)
-  type Allocate (a, b) a = Elem a
-  type Allocate (a, b) b = Elem b
+  storeRef (a, b) e = runMaybeT $ (,) <$> storeRefT a e <*> storeRefT b e
+  {-# INLINABLE storeRef #-}
 
-  newStorage ms = (,) <$> newStorage ms <*> newStorage ms
-  {-# INLINE newStorage #-}
+  storeAlloc (a, b) e (ac, bc) = (,) <$> storeAlloc a e ac <*> storeAlloc b e bc
+  {-# INLINABLE storeAlloc #-}
 
-instance (IsStorage s a, IsStorage s b, IsStorage s c) => IsStorage s (a, b, c) where
-  type Elem (a, b, c) = (Elem a, Elem b, Elem c)
-  type Allocate (a, b, c) a = Elem a
-  type Allocate (a, b, c) b = Elem b
-  type Allocate (a, b, c) c = Elem c
+  storeDestroy (a, b) e = storeDestroy a e >> storeDestroy b e
+  {-# INLINABLE storeDestroy #-}
 
-  newStorage ms = (,,) <$> newStorage ms <*> newStorage ms <*> newStorage ms
-  {-# INLINE newStorage #-}
+  storeMembers (a, b) = storeMembers a >>= U.filterM (storeExists b)
+  {-# INLINABLE storeMembers #-}
 
-instance (IsStorage s a, IsStorage s b, IsStorage s c, IsStorage s d) => IsStorage s (a, b, c, d) where
-  type Elem (a, b, c, d) = (Elem a, Elem b, Elem c, Elem d)
-  type Allocate (a, b, c, d) a = Elem a
-  type Allocate (a, b, c, d) b = Elem b
-  type Allocate (a, b, c, d) c = Elem c
-  type Allocate (a, b, c, d) d = Elem d
+instance (IsStorage m a, IsStorage m b, IsStorage m c) => IsStorage m (a, b, c) where
+  storeInit ms = (,,) <$> storeInit ms <*> storeInit ms <*> storeInit ms
+  {-# INLINABLE storeInit #-}
 
-  newStorage ms = (,,,) <$> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms
-  {-# INLINE newStorage #-}
+  storeRef (a, b, c) e = runMaybeT $ (,,) <$> storeRefT a e <*> storeRefT b e <*> storeRefT c e
+  {-# INLINABLE storeRef #-}
 
-instance (IsStorage s a, IsStorage s b, IsStorage s c, IsStorage s d, IsStorage s e) => IsStorage s (a, b, c, d, e) where
-  type Elem (a, b, c, d, e) = (Elem a, Elem b, Elem c, Elem d, Elem e)
-  type Allocate (a, b, c, d, e) a = Elem a
-  type Allocate (a, b, c, d, e) b = Elem b
-  type Allocate (a, b, c, d, e) c = Elem c
-  type Allocate (a, b, c, d, e) d = Elem d
-  type Allocate (a, b, c, d, e) e = Elem e
+  storeAlloc (a, b, c) e (ac, bc, cc) = (,,) <$> storeAlloc a e ac <*> storeAlloc b e bc <*> storeAlloc c e cc
+  {-# INLINABLE storeAlloc #-}
 
-  newStorage ms = (,,,,) <$> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms
-  {-# INLINE newStorage #-}
+  storeDestroy (a, b, c) e = storeDestroy a e >> storeDestroy b e >> storeDestroy c e
+  {-# INLINABLE storeDestroy #-}
 
-instance (IsStorage s a, IsStorage s b, IsStorage s c, IsStorage s d, IsStorage s e, IsStorage s f) => IsStorage s (a, b, c, d, e, f) where
-  type Elem (a, b, c, d, e, f) = (Elem a, Elem b, Elem c, Elem d, Elem e, Elem f)
-  type Allocate (a, b, c, d, e, f) a = Elem a
-  type Allocate (a, b, c, d, e, f) b = Elem b
-  type Allocate (a, b, c, d, e, f) c = Elem c
-  type Allocate (a, b, c, d, e, f) d = Elem d
-  type Allocate (a, b, c, d, e, f) e = Elem e
-  type Allocate (a, b, c, d, e, f) f = Elem f
+  storeMembers (a, b, c) = storeMembers a >>= U.filterM (storeExists b) >>= U.filterM (storeExists c)
+  {-# INLINABLE storeMembers #-}
 
-  newStorage ms = (,,,,,) <$> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms
-  {-# INLINE newStorage #-}
+instance (IsStorage m a, IsStorage m b, IsStorage m c, IsStorage m d) => IsStorage m (a, b, c, d) where
+  storeInit ms = (,,,) <$> storeInit ms <*> storeInit ms <*> storeInit ms <*> storeInit ms
+  {-# INLINABLE storeInit #-}
 
-instance (IsStorage s a, IsStorage s b, IsStorage s c, IsStorage s d, IsStorage s e, IsStorage s f, IsStorage s g) => IsStorage s (a, b, c, d, e, f, g) where
-  type Elem (a, b, c, d, e, f, g) = (Elem a, Elem b, Elem c, Elem d, Elem e, Elem f, Elem g)
-  type Allocate (a, b, c, d, e, f, g) a = Elem a
-  type Allocate (a, b, c, d, e, f, g) b = Elem b
-  type Allocate (a, b, c, d, e, f, g) c = Elem c
-  type Allocate (a, b, c, d, e, f, g) d = Elem d
-  type Allocate (a, b, c, d, e, f, g) e = Elem e
-  type Allocate (a, b, c, d, e, f, g) f = Elem f
-  type Allocate (a, b, c, d, e, f, g) g = Elem g
+  storeRef (a, b, c, d) e = runMaybeT $ (,,,) <$> storeRefT a e <*> storeRefT b e <*> storeRefT c e <*> storeRefT d e
+  {-# INLINABLE storeRef #-}
 
-  newStorage ms = (,,,,,,) <$> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms
-  {-# INLINE newStorage #-}
+  storeAlloc (a, b, c, d) e (ac, bc, cc, dc) = (,,,) <$> storeAlloc a e ac <*> storeAlloc b e bc <*> storeAlloc c e cc <*> storeAlloc d e dc
+  {-# INLINABLE storeAlloc #-}
 
-instance (IsStorage s a, IsStorage s b, IsStorage s c, IsStorage s d, IsStorage s e, IsStorage s f, IsStorage s g, IsStorage s m) => IsStorage s (a, b, c, d, e, f, g, m) where
-  type Elem (a, b, c, d, e, f, g, m) = (Elem a, Elem b, Elem c, Elem d, Elem e, Elem f, Elem g, Elem m)
-  type Allocate (a, b, c, d, e, f, g, m) a = Elem a
-  type Allocate (a, b, c, d, e, f, g, m) b = Elem b
-  type Allocate (a, b, c, d, e, f, g, m) c = Elem c
-  type Allocate (a, b, c, d, e, f, g, m) d = Elem d
-  type Allocate (a, b, c, d, e, f, g, m) e = Elem e
-  type Allocate (a, b, c, d, e, f, g, m) f = Elem f
-  type Allocate (a, b, c, d, e, f, g, m) g = Elem g
-  type Allocate (a, b, c, d, e, f, g, m) m = Elem m
+  storeDestroy (a, b, c, d) e = storeDestroy a e >> storeDestroy b e >> storeDestroy c e >> storeDestroy d e
+  {-# INLINABLE storeDestroy #-}
 
-  newStorage ms = (,,,,,,,) <$> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms
-  {-# INLINE newStorage #-}
+  storeMembers (a, b, c, d) = storeMembers a >>= U.filterM (storeExists b) >>= U.filterM (storeExists c) >>= U.filterM (storeExists d)
+  {-# INLINABLE storeMembers #-}
 
-instance (IsStorage s a, IsStorage s b, IsStorage s c, IsStorage s d, IsStorage s e, IsStorage s f, IsStorage s g, IsStorage s m, IsStorage s k) => IsStorage s (a, b, c, d, e, f, g, m, k) where
-  type Elem (a, b, c, d, e, f, g, m, k) = (Elem a, Elem b, Elem c, Elem d, Elem e, Elem f, Elem g, Elem m, Elem k)
-  type Allocate (a, b, c, d, e, f, g, m, k) a = Elem a
-  type Allocate (a, b, c, d, e, f, g, m, k) b = Elem b
-  type Allocate (a, b, c, d, e, f, g, m, k) c = Elem c
-  type Allocate (a, b, c, d, e, f, g, m, k) d = Elem d
-  type Allocate (a, b, c, d, e, f, g, m, k) e = Elem e
-  type Allocate (a, b, c, d, e, f, g, m, k) f = Elem f
-  type Allocate (a, b, c, d, e, f, g, m, k) g = Elem g
-  type Allocate (a, b, c, d, e, f, g, m, k) m = Elem m
-  type Allocate (a, b, c, d, e, f, g, m, k) k = Elem k
+instance (IsStorage m a, IsStorage m b, IsStorage m c, IsStorage m d, IsStorage m e) => IsStorage m (a, b, c, d, e) where
+  storeInit ms = (,,,,) <$> storeInit ms <*> storeInit ms <*> storeInit ms <*> storeInit ms <*> storeInit ms
+  {-# INLINABLE storeInit #-}
 
-  newStorage ms = (,,,,,,,,) <$> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms <*> newStorage ms
-  {-# INLINE newStorage #-}
+  storeRef (a, b, c, d, es) e = runMaybeT $ (,,,,) <$> storeRefT a e <*> storeRefT b e <*> storeRefT c e <*> storeRefT d e <*> storeRefT es e
+  {-# INLINABLE storeRef #-}
 
-instance (ComponentOps m cs a, ComponentOps m cs b, AllocateComponent m cs (a, b) ~ (AllocateComponent m cs a, AllocateComponent m cs b)) => ComponentOps m cs (a, b) where
-  get e = do
-    ma <- get e
-    mb <- get e
-    pure $ (,) <$> ma <*> mb
-  {-# INLINE get #-}
-  set e _ (a, b) = do
-    set e (Proxy @a) a
-    set e (Proxy @b) b
-  {-# INLINe set #-}
+  storeAlloc (a, b, c, d, es) e (ac, bc, cc, dc, ec) = (,,,,) <$> storeAlloc a e ac <*> storeAlloc b e bc <*> storeAlloc c e cc <*> storeAlloc d e dc <*> storeAlloc es e ec
+  {-# INLINABLE storeAlloc #-}
+
+  storeDestroy (a, b, c, d, es) e = storeDestroy a e >> storeDestroy b e >> storeDestroy c e >> storeDestroy d e >> storeDestroy es e
+  {-# INLINABLE storeDestroy #-}
+
+  storeMembers (a, b, c, d, es) = storeMembers a >>= U.filterM (storeExists b) >>= U.filterM (storeExists c) >>= U.filterM (storeExists d) >>= U.filterM (storeExists es)
+  {-# INLINABLE storeMembers #-}
+
+instance (IsStorage m a, IsStorage m b, IsStorage m c, IsStorage m d, IsStorage m e, IsStorage m f) => IsStorage m (a, b, c, d, e, f) where
+  storeInit ms = (,,,,,) <$> storeInit ms <*> storeInit ms <*> storeInit ms <*> storeInit ms <*> storeInit ms <*> storeInit ms
+  {-# INLINABLE storeInit #-}
+
+  storeRef (a, b, c, d, es, f) e = runMaybeT $ (,,,,,) <$> storeRefT a e <*> storeRefT b e <*> storeRefT c e <*> storeRefT d e <*> storeRefT es e <*> storeRefT f e
+  {-# INLINABLE storeRef #-}
+
+  storeAlloc (a, b, c, d, es, f) e (ac, bc, cc, dc, ec, fc) = (,,,,,) <$> storeAlloc a e ac <*> storeAlloc b e bc <*> storeAlloc c e cc <*> storeAlloc d e dc <*> storeAlloc es e ec <*> storeAlloc f e fc
+  {-# INLINABLE storeAlloc #-}
+
+  storeDestroy (a, b, c, d, es, f) e = storeDestroy a e >> storeDestroy b e >> storeDestroy c e >> storeDestroy d e >> storeDestroy es e >> storeDestroy f e
+  {-# INLINABLE storeDestroy #-}
+
+  storeMembers (a, b, c, d, es, f) = storeMembers a >>= U.filterM (storeExists b) >>= U.filterM (storeExists c) >>= U.filterM (storeExists d) >>= U.filterM (storeExists es) >>= U.filterM (storeExists f)
+  {-# INLINABLE storeMembers #-}
+
+instance (IsStorage m a, IsStorage m b, IsStorage m c, IsStorage m d, IsStorage m e, IsStorage m f, IsStorage m g) => IsStorage m (a, b, c, d, e, f, g) where
+  storeInit ms = (,,,,,,) <$> storeInit ms <*> storeInit ms <*> storeInit ms <*> storeInit ms <*> storeInit ms <*> storeInit ms <*> storeInit ms
+  {-# INLINABLE storeInit #-}
+
+  storeRef (a, b, c, d, es, f, g) e = runMaybeT $ (,,,,,,) <$> storeRefT a e <*> storeRefT b e <*> storeRefT c e <*> storeRefT d e <*> storeRefT es e <*> storeRefT f e <*> storeRefT g e
+  {-# INLINABLE storeRef #-}
+
+  storeAlloc (a, b, c, d, es, f, g) e (ac, bc, cc, dc, ec, fc, gc) = (,,,,,,) <$> storeAlloc a e ac <*> storeAlloc b e bc <*> storeAlloc c e cc <*> storeAlloc d e dc <*> storeAlloc es e ec <*> storeAlloc f e fc <*> storeAlloc g e gc
+  {-# INLINABLE storeAlloc #-}
+
+  storeDestroy (a, b, c, d, es, f, g) e = storeDestroy a e >> storeDestroy b e >> storeDestroy c e >> storeDestroy d e >> storeDestroy es e >> storeDestroy f e >> storeDestroy g e
+  {-# INLINABLE storeDestroy #-}
+
+  storeMembers (a, b, c, d, es, f, g) = storeMembers a >>= U.filterM (storeExists b) >>= U.filterM (storeExists c) >>= U.filterM (storeExists d) >>= U.filterM (storeExists es) >>= U.filterM (storeExists f) >>= U.filterM (storeExists g)
+  {-# INLINABLE storeMembers #-}
+
+instance (IsStorage m a, IsStorage m b, IsStorage m c, IsStorage m d, IsStorage m e, IsStorage m f, IsStorage m g, IsStorage m k) => IsStorage m (a, b, c, d, e, f, g, k) where
+  storeInit ms = (,,,,,,,) <$> storeInit ms <*> storeInit ms <*> storeInit ms <*> storeInit ms <*> storeInit ms <*> storeInit ms <*> storeInit ms <*> storeInit ms
+  {-# INLINABLE storeInit #-}
+
+  storeRef (a, b, c, d, es, f, g, k) e = runMaybeT $ (,,,,,,,) <$> storeRefT a e <*> storeRefT b e <*> storeRefT c e <*> storeRefT d e <*> storeRefT es e <*> storeRefT f e <*> storeRefT g e <*> storeRefT k e
+  {-# INLINABLE storeRef #-}
+
+  storeAlloc (a, b, c, d, es, f, g, k) e (ac, bc, cc, dc, ec, fc, gc, kc) = (,,,,,,,) <$> storeAlloc a e ac <*> storeAlloc b e bc <*> storeAlloc c e cc <*> storeAlloc d e dc <*> storeAlloc es e ec <*> storeAlloc f e fc <*> storeAlloc g e gc <*> storeAlloc k e kc
+  {-# INLINABLE storeAlloc #-}
+
+  storeDestroy (a, b, c, d, es, f, g, k) e = storeDestroy a e >> storeDestroy b e >> storeDestroy c e >> storeDestroy d e >> storeDestroy es e >> storeDestroy f e >> storeDestroy g e >> storeDestroy k e
+  {-# INLINABLE storeDestroy #-}
+
+  storeMembers (a, b, c, d, es, f, g, k) = storeMembers a >>= U.filterM (storeExists b) >>= U.filterM (storeExists c) >>= U.filterM (storeExists d) >>= U.filterM (storeExists es) >>= U.filterM (storeExists f) >>= U.filterM (storeExists g) >>= U.filterM (storeExists k)
+  {-# INLINABLE storeMembers #-}
