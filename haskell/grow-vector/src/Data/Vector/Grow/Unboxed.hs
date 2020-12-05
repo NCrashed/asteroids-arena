@@ -197,7 +197,8 @@ pushBack v a = do
   unsafePushBack v a
 {-# INLINABLE pushBack #-}
 
--- | O(1) amortized appending to vector
+-- | O(1) amortized appending to vector. Doesn't reallocate vector, so
+-- there must by capacity - length >= 1.
 unsafePushBack :: (Unbox a, PrimMonad m)
   => GrowVector (PrimState m) a
   -> a

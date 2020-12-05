@@ -103,3 +103,56 @@ spec_ensure = describe "capacity realloc" $ do
     U.ensureAppend v 14
     c3 <- U.capacity v
     c3 `shouldBe` 17
+
+spec_pushBack :: Spec
+spec_pushBack = describe "push back operations" $ do
+  it "push simple" $ do
+    v :: GrowVector RealWorld Int <- U.new 1
+    U.pushBack v 1
+    l1 <- U.length v
+    c1 <- U.capacity v
+    l1 `shouldBe` 1
+    c1 `shouldBe` 1
+    U.pushBack v 2
+    l2 <- U.length v
+    c2 <- U.capacity v
+    l2 `shouldBe` 2
+    c2 `shouldBe` 3
+    U.pushBack v 3
+    l3 <- U.length v
+    c3 <- U.capacity v
+    l3 `shouldBe` 3
+    c3 `shouldBe` 3
+    U.pushBack v 4
+    l4 <- U.length v
+    c4 <- U.capacity v
+    l4 `shouldBe` 4
+    c4 `shouldBe` 5
+    v' <- U.freeze v
+    v' `shouldBe` [1, 2, 3, 4]
+  it "push unsafe" $ do
+    v :: GrowVector RealWorld Int <- U.new 1
+    U.unsafePushBack v 1
+    l1 <- U.length v
+    c1 <- U.capacity v
+    l1 `shouldBe` 1
+    c1 `shouldBe` 1
+    U.ensureAppend v 1
+    U.unsafePushBack v 2
+    l2 <- U.length v
+    c2 <- U.capacity v
+    l2 `shouldBe` 2
+    c2 `shouldBe` 3
+    U.unsafePushBack v 3
+    l3 <- U.length v
+    c3 <- U.capacity v
+    l3 `shouldBe` 3
+    c3 `shouldBe` 3
+    U.ensureAppend v 1
+    U.unsafePushBack v 4
+    l4 <- U.length v
+    c4 <- U.capacity v
+    l4 `shouldBe` 4
+    c4 `shouldBe` 5
+    v' <- U.freeze v
+    v' `shouldBe` [1, 2, 3, 4]
