@@ -27,7 +27,7 @@ source-repository head
   location: https://github.com/NCrashed/asteroids-arena(haskell/asteroids)
 
 flag liquidhaskell
-  default: True
+  default: False
   manual: True
   description: Use liquid haskell to check sources
 
