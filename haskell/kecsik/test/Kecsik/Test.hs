@@ -86,7 +86,7 @@ spec_runSystem = describe "run system monad" $ do
     shouldBe True True
   it "exec result" $ do
     w <- newWorld1
-    (_, !w') <- execSystem (pure ()) w
+    (_, !_) <- execSystem (pure ()) w
     shouldBe True True
 
 spec_createEntity :: Spec
@@ -159,3 +159,29 @@ spec_addComponents = describe "creates components" $ do
     r1 `shouldBe` Nothing
     r2 `shouldBe` Just (Velocity 1 2, Position 2 2)
     r3 `shouldBe` Just (Velocity 1 3, Position 3 3)
+
+spec_modifyOperations :: Spec
+spec_modifyOperations = describe "modification utilities operate normally" $ do
+  it "modify" $ do
+    w <- newWorld3
+    (r1, r2) <- runWith_ w $ do
+      e <- newEntity
+      set e (Velocity 1 2)
+      r1 <- get e
+      modify e $ \(Velocity x y) -> Velocity (x*2) (y*2)
+      r2 <- get e
+      pure (r1, r2)
+    r1 `shouldBe` Just (Velocity 1 2)
+    r2 `shouldBe` Just (Velocity 2 4)
+  it "update" $ do
+    w <- newWorld3
+    (r1, r2, a) <- runWith_ w $ do
+      e <- newEntity
+      set e (Velocity 1 2)
+      r1 <- get e
+      a <- update e $ \(Velocity x y) -> (Velocity (x*2) (y*2), x*y)
+      r2 <- get e
+      pure (r1, r2, a)
+    r1 `shouldBe` Just (Velocity 1 2)
+    r2 `shouldBe` Just (Velocity 2 4)
+    a  `shouldBe` Just 2
