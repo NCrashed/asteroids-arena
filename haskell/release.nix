@@ -6,6 +6,7 @@ in project rec {
     asteroids = ./asteroids;
     plotting = ./plotting;
     kecsik = ./kecsik;
+    grow-vector = ./grow-vector;
   };
   shellHook = pkgs: ''
     ${pkgs.addLiquidSolverHook}
