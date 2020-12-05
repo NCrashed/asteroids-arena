@@ -19,11 +19,15 @@ module Data.Vector.Grow.Unboxed(
   , freeze
   -- * Capacity maninuplation
   , ensure
+  , ensureAppend
   -- * Accessing individual elements
   , read
   , write
   , unsafeRead
   , unsafeWrite
+  -- * Appending to vector
+  , pushBack
+  , unsafePushBack
   ) where
 
 import Control.Monad
@@ -68,7 +72,7 @@ new = newSized 0
 {-# INLINE new #-}
 
 -- | Allocation of new growable vector with given filled size and capacity.
--- Elements is not initialized.
+-- Elements is not initialized. Capacity must be greater than filled size.
 newSized :: (Unbox a, PrimMonad m) => Int -> Int -> m (GrowVector (PrimState m) a)
 newSized n cap = GrowVector <$> (newMutVar =<< M.new cap) <*> newMutVar n
 {-# INLINABLE newSized #-}
@@ -118,8 +122,24 @@ ensure v n = do
   c <- capacity v
   unless (c >= n) $ do
     mv <- readMutVar . growVector $! v
-    writeMutVar (growVector v) =<< M.grow mv n
+    writeMutVar (growVector v) =<< M.grow mv (n - c)
 {-# INLINABLE ensure #-}
+
+-- | Ensure that grow vector has enough space for additonal n elements.
+-- We grow vector by 1.5 factor or by
+ensureAppend :: (Unbox a, PrimMonad m)
+  => GrowVector (PrimState m) a
+  -> Int -- ^ Additional n elements
+  -> m ()
+ensureAppend v i = do
+  n <- readMutVar . growVectorLength $! v
+  mv <- readMutVar . growVector $! v
+  let c = M.length mv
+  unless (c >= n + i) $ do
+    let growFactor = 1.5
+        newCap = ceiling $ max (growFactor * fromIntegral c) (fromIntegral c + growFactor * fromIntegral (n + i - c))
+    writeMutVar (growVector v) =<< M.grow mv (newCap - c)
+{-# INLINABLE ensureAppend #-}
 
 -- | Read element from vector at given index.
 read :: (Unbox a, PrimMonad m)
@@ -166,3 +186,25 @@ unsafeWrite v i a = do
   mv <- readMutVar . growVector $! v
   M.unsafeWrite mv i a
 {-# INLINABLE unsafeWrite #-}
+
+-- | O(1) amortized appending to vector
+pushBack :: (Unbox a, PrimMonad m)
+  => GrowVector (PrimState m) a
+  -> a
+  -> m ()
+pushBack v a = do
+  ensureAppend v 1
+  unsafePushBack v a
+{-# INLINABLE pushBack #-}
+
+-- | O(1) amortized appending to vector
+unsafePushBack :: (Unbox a, PrimMonad m)
+  => GrowVector (PrimState m) a
+  -> a
+  -> m ()
+unsafePushBack v a = do
+  n <- readMutVar . growVectorLength $! v
+  mv <- readMutVar . growVector $! v
+  M.write mv n a
+  writeMutVar (growVectorLength v) (n+1)
+{-# INLINABLE unsafePushBack #-}

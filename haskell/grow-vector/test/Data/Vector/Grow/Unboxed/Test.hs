@@ -81,3 +81,25 @@ spec_readWrite = describe "basic read write" $ do
     U.write v 0 424242
     a <- U.read v 0
     a `shouldBe` 424242
+
+spec_ensure :: Spec
+spec_ensure = describe "capacity realloc" $ do
+  it "ensure reallocates properly" $ do
+    v :: GrowVector RealWorld Int <- U.new 5
+    U.ensure v 1
+    c1 <- U.capacity v
+    c1 `shouldBe` 5
+    U.ensure v 6
+    c2 <- U.capacity v
+    c2 `shouldBe` 6
+  it "ensureAppend reallocates properly" $ do
+    v :: GrowVector RealWorld Int <- U.new 5
+    U.ensureAppend v 1
+    c1 <- U.capacity v
+    c1 `shouldBe` 5
+    U.ensureAppend v 6
+    c2 <- U.capacity v
+    c2 `shouldBe` 8
+    U.ensureAppend v 14
+    c3 <- U.capacity v
+    c3 `shouldBe` 17
