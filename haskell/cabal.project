@@ -2,4 +2,3 @@ packages:
   ./asteroids
   ./plotting
   ./kecsik
-  ./grow-vector

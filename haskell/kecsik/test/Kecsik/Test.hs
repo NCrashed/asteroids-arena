@@ -185,3 +185,38 @@ spec_modifyOperations = describe "modification utilities operate normally" $ do
     r1 `shouldBe` Just (Velocity 1 2)
     r2 `shouldBe` Just (Velocity 2 4)
     a  `shouldBe` Just 2
+
+spec_existsOperations :: Spec
+spec_existsOperations = describe "existence checks" $ do
+  it "exists create" $ do
+    w <- newWorld3
+    (r1, r2) <- runWith_ w $ do
+      e <- newEntity
+      r1 <- exists e (Proxy @Position)
+      set e (Position 1 2)
+      r2 <- exists e (Proxy @Position)
+      pure (r1, r2)
+    r1 `shouldBe` False
+    r2 `shouldBe` True
+  it "exists destroy" $ do
+    w <- newWorld3
+    (r1, r2) <- runWith_ w $ do
+      e <- newEntity
+      set e (Position 1 2)
+      r1 <- exists e (Proxy @Position)
+      destroy e (Proxy @Position)
+      r2 <- exists e (Proxy @Position)
+      pure (r1, r2)
+    r1 `shouldBe` True
+    r2 `shouldBe` False
+  it "exists destroy all" $ do
+    w <- newWorld3
+    (r1, r2) <- runWith_ w $ do
+      e <- newEntity
+      set e (Position 1 2)
+      r1 <- exists e (Proxy @Position)
+      destroyAll e
+      r2 <- exists e (Proxy @Position)
+      pure (r1, r2)
+    r1 `shouldBe` True
+    r2 `shouldBe` False

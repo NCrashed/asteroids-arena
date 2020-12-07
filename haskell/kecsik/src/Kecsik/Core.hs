@@ -10,27 +10,37 @@ module Kecsik.Core(
   , execSystem_
   , runWith
   , runWith_
+  , ComponentId(..)
   , Component(..)
   , Elem
   , ElemRef
   , Has(..)
   , IsStorage(..)
   , Store(..)
+  , SomeStore(..)
+  , WorldComponents(..)
+  , destroyById
   ) where
 
 import Control.Monad.Primitive
 import Control.Monad.Reader
 import Control.Monad.Trans
+import Data.ByteArray.Hash (SipHash(..), SipKey(..), sipHash)
+import Data.Foldable (for_)
+import Data.Hashable (Hashable)
 import Data.Maybe
 import Data.Mutable
 import Data.Proxy
+import Data.Typeable
 import Data.Vector.Unboxed.Deriving
+import Data.Word
 import GHC.Generics (Generic)
 
+import qualified Data.ByteString.Char8 as BS
 import qualified Data.Vector.Unboxed as U
 
 newtype Entity = Entity { unEntity :: Int }
-  deriving (Generic, Show, Read, Eq, Ord, Num)
+  deriving (Generic, Show, Read, Eq, Ord, Num, Hashable)
 
 instance Mutable s Entity where
   type Ref s Entity = GRef s Entity
@@ -76,8 +86,25 @@ runWith = flip execSystem
 runWith_ :: SystemBase w m => w -> SystemT w m a -> m a
 runWith_ = flip execSystem_
 
-class Elem (Storage s a) ~ a => Component s a where
+-- | Component unique id that is used to track which components the entity has.
+newtype ComponentId = ComponentId { unComponentId :: Word64 }
+  deriving (Generic, Show, Read, Eq, Ord, Num, Hashable)
+
+instance Mutable s ComponentId where
+  type Ref s ComponentId = GRef s ComponentId
+
+derivingUnbox "ComponentId" [t| ComponentId -> Word64 |] [| unComponentId |] [| ComponentId |]
+
+class (Elem (Storage s a) ~ a, Typeable a) => Component s a where
   type Storage s a :: *
+
+  -- | Get unique component id. By default it is hash from it type.
+  componentId :: Proxy s -> Proxy a -> ComponentId
+  componentId _ p = ComponentId h
+    where
+      SipHash h = sipHash (SipKey 23 42) bs
+      bs = BS.pack $ show $ typeRep p
+  {-# INLINE componentId #-}
 
 type family Elem s
 
@@ -120,3 +147,15 @@ class (PrimMonad m, Mutable (PrimState m) (Elem s)) => IsStorage m s where
   {-# INLINABLE storeExists #-}
 
 type Store w m c = (Has w m c, IsStorage (SystemT w m) (Storage (PrimState m) c))
+
+data SomeStore m = forall s . IsStorage m s => SomeStore { unSomeStore :: s }
+
+class WorldComponents w m where
+  getStoreById :: ComponentId -> SystemT w m (Maybe (SomeStore m))
+
+-- | Destroy component by id
+destroyById :: (WorldComponents w m, SystemBase w m) => Entity -> ComponentId -> SystemT w m ()
+destroyById e i = do
+  ms <- getStoreById i
+  for_ ms $ \(SomeStore s) -> lift $ storeDestroy s e
+{-# INLINE destroyById #-}

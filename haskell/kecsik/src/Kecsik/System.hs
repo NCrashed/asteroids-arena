@@ -4,6 +4,7 @@ module Kecsik.System(
   , exists
   , modify
   , update
+  , destroy
   ) where
 
 import Data.Foldable (traverse_)
@@ -42,3 +43,12 @@ update ety f = do
   mref <- storeRef sx ety
   flip traverse mref $ \r -> updateRef' r f
 {-# INLINABLE update #-}
+
+-- | Destroy component for given entity. Return 'True' if there was a component.
+destroy :: forall w m a . Store w m a => Entity -> Proxy a -> SystemT w m Bool
+destroy e p = do
+  sx :: Storage (PrimState m) a <- getStore
+  r <- storeExists sx e
+  storeDestroy sx e
+  pure r
+{-# INLINABLE destroy #-}
