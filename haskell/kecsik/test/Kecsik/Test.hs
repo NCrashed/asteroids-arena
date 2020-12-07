@@ -1,7 +1,8 @@
 module Kecsik.Test where
 
-import Kecsik
 import Control.Monad
+import Data.Typeable
+import Kecsik
 import Test.QuickCheck.Instances.ByteString ()
 import Test.Tasty.Hspec
 import Test.Tasty.QuickCheck
@@ -24,19 +25,19 @@ instance Mutable s Velocity where
 instance Component s Velocity where
   type Storage s Velocity = HashTable s Velocity
 
-data World1 s = World1 !(Storage s EntityCounter) !(Storage s Position)
+data World1 s = World1 !(Storage s EntityCounter) !(Storage s Position) !(Storage s (EntityComponents s))
   deriving (Generic)
 
 instance Mutable s (World1 s) where
   type Ref s (World1 s) = GRef s (World1 s)
 
-data World2 s = World2 !(Storage s EntityCounter) !(Storage s Velocity)
+data World2 s = World2 !(Storage s EntityCounter) !(Storage s Velocity) !(Storage s (EntityComponents s))
   deriving (Generic)
 
 instance Mutable s (World2 s) where
   type Ref s (World2 s) = GRef s (World2 s)
 
-data World3 s = World3 !(Storage s EntityCounter) !(Storage s Position) !(Storage s Velocity)
+data World3 s = World3 !(Storage s EntityCounter) !(Storage s Position) !(Storage s Velocity) !(Storage s (EntityComponents s))
   deriving (Generic)
 
 instance Mutable s (World3 s) where
@@ -49,6 +50,13 @@ instance (PrimMonad m, s ~ PrimState m) => Has (World2 s) m EntityCounter where
 instance (PrimMonad m, s ~ PrimState m) => Has (World3 s) m EntityCounter where
   getStore = freezePart (posMut @1) =<< ask
 
+instance (PrimMonad m, s ~ PrimState m, Typeable s) => Has (World1 s) m (EntityComponents s) where
+  getStore = freezePart (posMut @3) =<< ask
+instance (PrimMonad m, s ~ PrimState m, Typeable s) => Has (World2 s) m (EntityComponents s) where
+  getStore = freezePart (posMut @3) =<< ask
+instance (PrimMonad m, s ~ PrimState m, Typeable s) => Has (World3 s) m (EntityComponents s) where
+  getStore = freezePart (posMut @4) =<< ask
+
 instance (PrimMonad m, s ~ PrimState m) => Has (World1 s) m Position where
   getStore = freezePart (posMut @2) =<< ask
 instance (PrimMonad m, s ~ PrimState m) => Has (World3 s) m Position where
@@ -59,14 +67,38 @@ instance (PrimMonad m, s ~ PrimState m) => Has (World2 s) m Velocity where
 instance (PrimMonad m, s ~ PrimState m) => Has (World3 s) m Velocity where
   getStore = freezePart (posMut @3) =<< ask
 
+instance (s ~ PrimState m, PrimMonad m) => WorldComponents (World1 s) m where
+  getStoreById i
+    | i == componentId (Proxy @s) (Proxy @Position) = do
+      s :: Storage s Position <- getStore
+      pure . Just . SomeStore $ s
+    | otherwise = pure Nothing
+
+instance (s ~ PrimState m, PrimMonad m) => WorldComponents (World2 s) m where
+  getStoreById i
+    | i == componentId (Proxy @s) (Proxy @Velocity) = do
+      s :: Storage s Velocity <- getStore
+      pure . Just . SomeStore $ s
+    | otherwise = pure Nothing
+
+instance (s ~ PrimState m, PrimMonad m) => WorldComponents (World3 s) m where
+  getStoreById i
+    | i == componentId (Proxy @s) (Proxy @Position) = do
+      s :: Storage s Position <- getStore
+      pure . Just . SomeStore $ s
+    | i == componentId (Proxy @s) (Proxy @Velocity) = do
+      s :: Storage s Velocity <- getStore
+      pure . Just . SomeStore $ s
+    | otherwise = pure Nothing
+
 newWorld1 :: PrimMonad m => m (World1 (PrimState m))
-newWorld1 = World1 <$> storeInit Nothing <*> storeInit Nothing
+newWorld1 = World1 <$> storeInit Nothing <*> storeInit Nothing <*> storeInit Nothing
 
 newWorld2 :: PrimMonad m => m (World2 (PrimState m))
-newWorld2 = World2 <$> storeInit Nothing <*> storeInit Nothing
+newWorld2 = World2 <$> storeInit Nothing <*> storeInit Nothing <*> storeInit Nothing
 
 newWorld3 :: PrimMonad m => m (World3 (PrimState m))
-newWorld3 = World3 <$> storeInit Nothing <*> storeInit Nothing <*> storeInit Nothing
+newWorld3 = World3 <$> storeInit Nothing <*> storeInit Nothing <*> storeInit Nothing <*> storeInit Nothing
 
 spec_creationWorld :: Spec
 spec_creationWorld = describe "creates world" $ do

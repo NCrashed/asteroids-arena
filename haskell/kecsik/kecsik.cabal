@@ -27,6 +27,10 @@ library
     Kecsik.Component
     Kecsik.Component.Entity
     Kecsik.Core
+    Kecsik.Core.Component
+    Kecsik.Core.Entity
+    Kecsik.Core.Storage
+    Kecsik.Core.System
     Kecsik.Storage
     Kecsik.Storage.Global
     Kecsik.Storage.HashTable
