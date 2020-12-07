@@ -1,16 +1,26 @@
 module Kecsik.System(
-    get
+    newEntity
+  , get
   , set
   , exists
   , modify
   , update
   , destroy
+  , destroyAll
   ) where
 
+import Control.Monad
 import Data.Foldable (traverse_)
+import Data.Maybe
 import Data.Mutable
 import Data.Proxy
+import Kecsik.Component.Entity
 import Kecsik.Core
+import Kecsik.Storage.Global
+
+newEntity :: Store w m EntityCounter => SystemT w m Entity
+newEntity = fmap (fromMaybe global) $ update global $ \(EntityCounter e) -> (EntityCounter $ e+1, e)
+{-# INLINE newEntity #-}
 
 get :: forall w m a . Store w m a => Entity -> SystemT w m (Maybe a)
 get e = do
@@ -18,10 +28,11 @@ get e = do
   storeGet sa e
 {-# INLINABLE get #-}
 
-set :: forall w m a . Store w m a => Entity -> a -> SystemT w m ()
+set :: forall w m a . (HasEntityComponents w m, Store w m a) => Entity -> a -> SystemT w m ()
 set e a = do
   sa :: Storage (PrimState m) a <- getStore
   storeSet sa e a
+  registryComponent e $ componentId (Proxy @(PrimState m)) (Proxy @a)
 {-# INLINABLE set #-}
 
 exists :: forall w m a . Store w m a => Entity -> Proxy a -> SystemT w m Bool
@@ -45,10 +56,12 @@ update ety f = do
 {-# INLINABLE update #-}
 
 -- | Destroy component for given entity. Return 'True' if there was a component.
-destroy :: forall w m a . Store w m a => Entity -> Proxy a -> SystemT w m Bool
+destroy :: forall w m a . (HasEntityComponents w m, Store w m a) => Entity -> Proxy a -> SystemT w m Bool
 destroy e p = do
   sx :: Storage (PrimState m) a <- getStore
   r <- storeExists sx e
-  storeDestroy sx e
+  when r $ do
+    storeDestroy sx e
+    unregistryComponent e $ componentId (Proxy @(PrimState m)) (Proxy @a)
   pure r
 {-# INLINABLE destroy #-}

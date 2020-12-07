@@ -1,7 +1,6 @@
 module Kecsik.Component.Entity(
   -- * Entity allocation
     EntityCounter(..)
-  , newEntity
   -- * Components registry
   , EntityComponents(..)
   , HasEntityComponents
@@ -23,7 +22,6 @@ import GHC.Generics
 import Kecsik.Core
 import Kecsik.Storage.Global
 import Kecsik.Storage.HashTable
-import Kecsik.System
 
 import qualified Data.Vector.Unboxed as U
 import qualified Data.Vector.Unboxed.Mutable as UM
@@ -42,10 +40,6 @@ instance Component s EntityCounter where
 instance Default EntityCounter where
   def = EntityCounter 0
   {-# INLINE def #-}
-
-newEntity :: Store w m EntityCounter => SystemT w m Entity
-newEntity = fmap (fromMaybe global) $ update global $ \(EntityCounter e) -> (EntityCounter $ e+1, e)
-{-# INLINE newEntity #-}
 
 -- | Stores which components the entity has
 newtype EntityComponents s = EntityComponents { unEntityComponents :: C.HashTable s ComponentId () }
