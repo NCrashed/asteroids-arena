@@ -39,7 +39,7 @@ instance Mutable s Player where
   type Ref s Player = GRef s Player
 
 instance Component s Player where
-  type Storage s Player = Global s Player
+  type Storage s Player = Unique s Player
 
 -- | Player size in pixels (1 px == 1 meter)
 playerSize :: V2 Float
