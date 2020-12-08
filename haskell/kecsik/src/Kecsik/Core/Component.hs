@@ -2,8 +2,7 @@
 module Kecsik.Core.Component(
     ComponentId(..)
   , Component(..)
-  , Has(..)
-  , Store
+  , HasStore(..)
   ) where
 
 import Data.ByteArray.Hash (SipHash(..), SipKey(..), sipHash)
@@ -39,7 +38,5 @@ class (Elem (Storage s a) ~ a, Typeable a) => Component s a where
       bs = BS.pack $ show $ typeRep p
   {-# INLINE componentId #-}
 
-class (SystemBase w m, Component (PrimState m) c) => Has w m c where
+class (SystemBase w m, Component (PrimState m) c, IsStorage (SystemT w m) (Storage (PrimState m) c)) => HasStore w m c where
   getStore :: SystemT w m (Storage (PrimState m) c)
-
-type Store w m c = (Has w m c, IsStorage (SystemT w m) (Storage (PrimState m) c))

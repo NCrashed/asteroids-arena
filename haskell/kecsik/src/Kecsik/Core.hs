@@ -14,9 +14,8 @@ module Kecsik.Core(
   , Component(..)
   , Elem
   , ElemRef
-  , Has(..)
+  , HasStore(..)
   , IsStorage(..)
-  , Store(..)
   , SomeStore(..)
   , WorldComponents(..)
   , destroyById

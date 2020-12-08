@@ -6,7 +6,7 @@ module Game.Asteroids.World.Bullet(
   , destroyBullet
   ) where
 
-import Apecs
+import Kecsik
 import Control.Monad.IO.Class
 import Game.Asteroids.World.Mass
 import Game.Asteroids.World.Position
@@ -17,9 +17,13 @@ import Linear
 
 -- | Bullet contains duration of life remains for that bullet
 data Bullet = Bullet !Float
+  deriving (Show, Generic)
 
-instance Component Bullet
-  where type Storage Bullet = Cache 500 (Map Bullet)
+instance Mutable s Bullet where
+  type Ref s Bullet = GRef s Bullet
+
+instance Component s Bullet where
+  type Storage s Bullet = HashTable s Bullet
 
 -- | Bullet speed m per second
 bulletSpeed :: Float
@@ -45,11 +49,11 @@ destroyBullet :: (MonadIO m
   , Has w m Bullet
   , Has w m Position
   , Has w m Velocity
-  ) => Entity -> SystemT w m ()
+  ) => Entity -> SystemT w m Bool
 destroyBullet e = destroy e (Proxy :: Proxy (Bullet, Position, Velocity))
 
 -- | Updates life time of bullets and remove bullets that are exceeded their life times
-ageBullets :: (MonadIO m
+ageBullets :: forall w m . (MonadIO m
   , Has w m Bullet
   , Has w m Position
   , Has w m Velocity
@@ -57,7 +61,7 @@ ageBullets :: (MonadIO m
   ) => SystemT w m ()
 ageBullets = do
   dt <- getDelta
-  cmapM_ $ \(Bullet l, e) -> do
+  cmapM_ $ \(Bullet l, Immutable e :: ImmutableEnt m) -> do
     let l' = l - dt
-    if(l' <= 0) then destroyBullet e
+    if(l' <= 0) then void $ destroyBullet e
       else set e (Bullet l')

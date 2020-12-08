@@ -5,7 +5,7 @@ module Kecsik.Core.Storage(
   , SomeStore(..)
   ) where
 
-import Data.Maybe 
+import Data.Maybe
 import Data.Mutable
 import Kecsik.Core.Entity
 import Kecsik.Core.System

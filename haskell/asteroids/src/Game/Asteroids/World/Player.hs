@@ -14,7 +14,7 @@ module Game.Asteroids.World.Player(
   , playerFire
   ) where
 
-import Apecs
+import Kecsik
 import Control.Monad
 import Control.Monad.IO.Class
 import Game.Asteroids.Vector
@@ -30,9 +30,16 @@ import Linear
 -- | Player contains flag if thrust engine is one (for rendering) and bullet
 -- cooldown time.
 data Player = Player !Bool !Float
+  deriving (Show, Generic)
 
-instance Component Player
-  where type Storage Player = Unique Player
+instance Default Player where
+  def = Player False 0
+
+instance Mutable s Player where
+  type Ref s Player = GRef s Player
+
+instance Component s Player where
+  type Storage s Player = Global s Player
 
 -- | Player size in pixels (1 px == 1 meter)
 playerSize :: V2 Float
@@ -96,14 +103,14 @@ addPlayerVelocity dv = cmap $ \(Player t cd, Velocity v, Rotation r) -> (Player 
 {-# INLINE addPlayerVelocity #-}
 
 -- | Destroy player entity
-killPlayer :: (MonadIO m
+killPlayer :: forall w m . (MonadIO m
   , Has w m Player
   , Has w m Mass
   , Has w m Position
   , Has w m Rotation
   , Has w m Velocity
   ) => SystemT w m ()
-killPlayer = cmapM_ $ \(Player _ _, e) -> destroy e (Proxy :: Proxy (Player, Mass, Position, Rotation, Velocity))
+killPlayer = cmapM_ $ \(Player _ _, Immutable e :: ImmutableEnt m) -> destroy_ e (Proxy :: Proxy (Player, Mass, Position, Rotation, Velocity))
 
 -- | Mark engines on-off
 setPlayerThursting :: (MonadIO m
@@ -123,7 +130,7 @@ updatePlayerCooldown = do
 {-# INLINE updatePlayerCooldown #-}
 
 -- | Spawn new bullet if cooldown is passed
-playerFire :: (MonadIO m
+playerFire :: forall w m . (MonadIO m
   , Has w m Player
   , Has w m Bullet
   , Has w m Position
@@ -131,6 +138,6 @@ playerFire :: (MonadIO m
   , Has w m Velocity
   , Has w m EntityCounter
   ) => SystemT w m ()
-playerFire = cmapM_ $ \(Player f cd, Position p, Rotation a, Velocity v, e) -> when (cd == 0) $ do
+playerFire = cmapM_ $ \(Player f cd, Position p, Rotation a, Velocity v, Immutable e :: ImmutableEnt m) -> when (cd == 0) $ do
   set e (Player f playerFireCooldown)
   void $ spawnBullet p (v + rotateV2 a (V2 1 0) * V2 bulletSpeed bulletSpeed)

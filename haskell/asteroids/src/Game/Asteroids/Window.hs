@@ -2,7 +2,7 @@ module Game.Asteroids.Window(
     renderLoop
   ) where
 
-import Apecs (runWith, Has)
+import Kecsik (runWith, Has)
 import Control.Concurrent.STM
 import Control.Monad (unless, when)
 import Data.Foldable (traverse_)
@@ -19,7 +19,7 @@ import Game.Asteroids.Render
 import Game.Asteroids.World.Event
 import Game.Asteroids.World.Audio
 
-renderLoop :: forall world . (WorldRender world, Has world IO AudioState)
+renderLoop :: forall world . (WorldRender IO world, Has world IO AudioState)
   => world -> ([InputEvent] -> world -> IO world) -> IO ()
 renderLoop w0 nextWorld = do
   ddir <- getDataDir
@@ -38,7 +38,7 @@ renderLoop w0 nextWorld = do
     rightRef <- newIORef False
     thrustRef <- newIORef False
     fireRef <- newIORef False
-    let loop :: WorldRender world => Int -> world -> IO ()
+    let loop :: WorldRender IO world => Int -> world -> IO ()
         loop !i w = do
           t1 <- ticks
           events <- pollEvents

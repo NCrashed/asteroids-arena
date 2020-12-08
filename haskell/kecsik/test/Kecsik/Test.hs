@@ -43,28 +43,28 @@ data World3 s = World3 !(Storage s EntityCounter) !(Storage s Position) !(Storag
 instance Mutable s (World3 s) where
   type Ref s (World3 s) = GRef s (World3 s)
 
-instance (PrimMonad m, s ~ PrimState m) => Has (World1 s) m EntityCounter where
+instance (PrimMonad m, s ~ PrimState m) => HasStore (World1 s) m EntityCounter where
   getStore = freezePart (posMut @1) =<< ask
-instance (PrimMonad m, s ~ PrimState m) => Has (World2 s) m EntityCounter where
+instance (PrimMonad m, s ~ PrimState m) => HasStore (World2 s) m EntityCounter where
   getStore = freezePart (posMut @1) =<< ask
-instance (PrimMonad m, s ~ PrimState m) => Has (World3 s) m EntityCounter where
+instance (PrimMonad m, s ~ PrimState m) => HasStore (World3 s) m EntityCounter where
   getStore = freezePart (posMut @1) =<< ask
 
-instance (PrimMonad m, s ~ PrimState m, Typeable s) => Has (World1 s) m (EntityComponents s) where
+instance (PrimMonad m, s ~ PrimState m, Typeable s) => HasStore (World1 s) m (EntityComponents s) where
   getStore = freezePart (posMut @3) =<< ask
-instance (PrimMonad m, s ~ PrimState m, Typeable s) => Has (World2 s) m (EntityComponents s) where
+instance (PrimMonad m, s ~ PrimState m, Typeable s) => HasStore (World2 s) m (EntityComponents s) where
   getStore = freezePart (posMut @3) =<< ask
-instance (PrimMonad m, s ~ PrimState m, Typeable s) => Has (World3 s) m (EntityComponents s) where
+instance (PrimMonad m, s ~ PrimState m, Typeable s) => HasStore (World3 s) m (EntityComponents s) where
   getStore = freezePart (posMut @4) =<< ask
 
-instance (PrimMonad m, s ~ PrimState m) => Has (World1 s) m Position where
+instance (PrimMonad m, s ~ PrimState m) => HasStore (World1 s) m Position where
   getStore = freezePart (posMut @2) =<< ask
-instance (PrimMonad m, s ~ PrimState m) => Has (World3 s) m Position where
+instance (PrimMonad m, s ~ PrimState m) => HasStore (World3 s) m Position where
   getStore = freezePart (posMut @2) =<< ask
 
-instance (PrimMonad m, s ~ PrimState m) => Has (World2 s) m Velocity where
+instance (PrimMonad m, s ~ PrimState m) => HasStore (World2 s) m Velocity where
   getStore = freezePart (posMut @2) =<< ask
-instance (PrimMonad m, s ~ PrimState m) => Has (World3 s) m Velocity where
+instance (PrimMonad m, s ~ PrimState m) => HasStore (World3 s) m Velocity where
   getStore = freezePart (posMut @3) =<< ask
 
 instance (s ~ PrimState m, PrimMonad m) => WorldComponents (World1 s) m where
@@ -125,16 +125,16 @@ spec_createEntity :: Spec
 spec_createEntity = describe "creates entities" $ do
   it "allocates entity" $ do
     w <- newWorld1
-    e <- execSystem_ newEntity w
+    e <- execSystem_ allocEntity w
     shouldBe e 0
   it "allocates two entities" $ do
     w <- newWorld1
-    (e1, e2) <- execSystem_ ((,) <$> newEntity <*> newEntity) w
+    (e1, e2) <- execSystem_ ((,) <$> allocEntity <*> allocEntity) w
     shouldBe e1 0
     shouldBe e2 1
   it "allocates 1000 entities" $ do
     w <- newWorld1
-    es <- execSystem_ (replicateM 1000 newEntity) w
+    es <- execSystem_ (replicateM 1000 allocEntity) w
     shouldBe (last es) 999
 
 spec_addComponents :: Spec
@@ -142,7 +142,7 @@ spec_addComponents = describe "creates components" $ do
   it "single component" $ do
     w  <- newWorld1
     (r1, r2, r3) <- runWith_ w $ do
-      e <- newEntity
+      e <- allocEntity
       r1 :: Maybe Position <- get e
       set e (Position 1 2)
       r2 :: Maybe Position <- get e
@@ -155,7 +155,7 @@ spec_addComponents = describe "creates components" $ do
   it "composite component fst" $ do
     w <- newWorld3
     (r1, r2, r3) <- runWith_ w $ do
-      e <- newEntity
+      e <- allocEntity
       r1 :: Maybe Position <- get e
       set e (Position 1 2)
       r2 :: Maybe Position <- get e
@@ -168,7 +168,7 @@ spec_addComponents = describe "creates components" $ do
   it "composite component snd" $ do
     w <- newWorld3
     (r1, r2, r3) <- runWith_ w $ do
-      e <- newEntity
+      e <- allocEntity
       r1 :: Maybe Velocity <- get e
       set e (Velocity 1 2)
       r2 :: Maybe Velocity <- get e
@@ -181,7 +181,7 @@ spec_addComponents = describe "creates components" $ do
   it "composite component both" $ do
     w <- newWorld3
     (r1, r2, r3) <- runWith_ w $ do
-      e <- newEntity
+      e <- allocEntity
       r1 :: Maybe (Velocity, Position) <- get e
       set e (Velocity 1 2, Position 2 2)
       r2 :: Maybe (Velocity, Position) <- get e
@@ -197,7 +197,7 @@ spec_modifyOperations = describe "modification utilities operate normally" $ do
   it "modify" $ do
     w <- newWorld3
     (r1, r2) <- runWith_ w $ do
-      e <- newEntity
+      e <- allocEntity
       set e (Velocity 1 2)
       r1 <- get e
       modify e $ \(Velocity x y) -> Velocity (x*2) (y*2)
@@ -208,7 +208,7 @@ spec_modifyOperations = describe "modification utilities operate normally" $ do
   it "update" $ do
     w <- newWorld3
     (r1, r2, a) <- runWith_ w $ do
-      e <- newEntity
+      e <- allocEntity
       set e (Velocity 1 2)
       r1 <- get e
       a <- update e $ \(Velocity x y) -> (Velocity (x*2) (y*2), x*y)
@@ -223,7 +223,7 @@ spec_existsOperations = describe "existence checks" $ do
   it "exists create" $ do
     w <- newWorld3
     (r1, r2) <- runWith_ w $ do
-      e <- newEntity
+      e <- allocEntity
       r1 <- exists e (Proxy @Position)
       set e (Position 1 2)
       r2 <- exists e (Proxy @Position)
@@ -233,7 +233,7 @@ spec_existsOperations = describe "existence checks" $ do
   it "exists destroy" $ do
     w <- newWorld3
     (r1, r2) <- runWith_ w $ do
-      e <- newEntity
+      e <- allocEntity
       set e (Position 1 2)
       r1 <- exists e (Proxy @Position)
       destroy e (Proxy @Position)
@@ -244,7 +244,7 @@ spec_existsOperations = describe "existence checks" $ do
   it "exists destroy all" $ do
     w <- newWorld3
     (r1, r2) <- runWith_ w $ do
-      e <- newEntity
+      e <- allocEntity
       set e (Position 1 2)
       r1 <- exists e (Proxy @Position)
       destroyAll e

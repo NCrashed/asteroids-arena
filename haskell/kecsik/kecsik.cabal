@@ -16,7 +16,7 @@ source-repository head
   location: https://github.com/NCrashed/asteroids-arena(haskell/sobolecs)
 
 flag liquidhaskell
-  default: True
+  default: False
   manual: True
   description: Use liquid haskell to check sources
 
@@ -32,6 +32,7 @@ library
     Kecsik.Core.Storage
     Kecsik.Core.System
     Kecsik.Storage
+    Kecsik.Storage.Entity
     Kecsik.Storage.Global
     Kecsik.Storage.HashTable
     Kecsik.Storage.Tuple

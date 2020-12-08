@@ -2,9 +2,12 @@ module Game.Asteroids.World.Mass(
     Mass(..)
   ) where
 
-import Apecs
+import Kecsik
 
-newtype Mass = Mass { unMass :: Float } deriving (Show, Num)
+newtype Mass = Mass { unMass :: Float } deriving (Show, Num, Generic)
 
-instance Component Mass where
-  type Storage Mass = Cache 500 (Map Mass)
+instance Mutable s Mass where
+  type Ref s Mass = GRef s Mass
+
+instance Component s Mass where
+  type Storage s Mass = HashTable s Mass

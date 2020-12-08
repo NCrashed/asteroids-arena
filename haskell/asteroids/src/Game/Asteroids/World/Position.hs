@@ -2,10 +2,14 @@ module Game.Asteroids.World.Position(
     Position(..)
   ) where
 
-import Apecs
+import Kecsik
 import Linear
+import Game.Asteroids.Mutable
 
-newtype Position = Position { unPosition :: V2 Float } deriving (Show, Num)
+newtype Position = Position { unPosition :: V2 Float } deriving (Show, Num, Generic)
 
-instance Component Position where
-  type Storage Position = Cache 500 (Map Position)
+instance Mutable s Position where
+  type Ref s Position = GRef s Position
+
+instance Component s Position where
+  type Storage s Position = HashTable s Position

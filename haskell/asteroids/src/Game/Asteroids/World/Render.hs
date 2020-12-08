@@ -2,9 +2,10 @@
 module Game.Asteroids.World.Render(
   ) where
 
-import Apecs as A
+import Kecsik as A
 import Control.Monad
 import Control.Monad.IO.Class
+import Data.Typeable
 import Foreign.C.Types
 import Game.Asteroids.Render
 import Game.Asteroids.Vector
@@ -20,10 +21,10 @@ import SDL
 
 import qualified Data.Vector.Storable as V
 
-instance WorldRender World where
-  getRenderSize w = runWith w $ fmap (fmap ceiling) getWorldSize
+instance (MonadIO m, PrimMonad m, s ~ PrimState m, Typeable s) => WorldRender m (World s) where
+  getRenderSize w = runWith_ w $ fmap (fmap ceiling) getWorldSize
 
-instance CanRender World World where
+instance (MonadIO m, PrimMonad m, s ~ PrimState m, Typeable s) => CanRender (World s) m (World s) where
   render r _ = do
     cmapM_ (renderPlayer r)
     cmapM_ (renderAsteroid r)

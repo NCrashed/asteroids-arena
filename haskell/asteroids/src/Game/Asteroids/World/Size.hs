@@ -5,26 +5,38 @@ module Game.Asteroids.World.Size(
   , getWorldSize
   ) where
 
-import Apecs
+import Kecsik
 import Control.Monad.IO.Class
 import Linear
 
-newtype WorldWidth = WorldWidth { unWorldWidth :: Float } deriving (Show, Num)
+newtype WorldWidth = WorldWidth { unWorldWidth :: Float } deriving (Show, Num, Generic)
 
-instance Component WorldWidth where
-  type Storage WorldWidth = Unique WorldWidth
+instance Default WorldWidth where
+  def = 1496
 
-newtype WorldHeight = WorldHeight { unWorldHeight :: Float } deriving (Show, Num)
+instance Mutable s WorldWidth where
+  type Ref s WorldWidth = GRef s WorldWidth
 
-instance Component WorldHeight where
-  type Storage WorldHeight = Unique WorldHeight
+instance Component s WorldWidth where
+  type Storage s WorldWidth = Global s WorldWidth
+
+newtype WorldHeight = WorldHeight { unWorldHeight :: Float } deriving (Show, Num, Generic)
+
+instance Default WorldHeight where
+  def = 1024
+
+instance Mutable s WorldHeight where
+  type Ref s WorldHeight = GRef s WorldHeight
+
+instance Component s WorldHeight where
+  type Storage s WorldHeight = Global s WorldHeight
 
 initSizes :: (MonadIO m, Has w m WorldWidth, Has w m WorldHeight) => SystemT w m ()
 initSizes = do
-  set global $ WorldWidth 1496
-  set global $ WorldHeight 1024
+  set global (def :: WorldWidth)
+  set global (def :: WorldHeight)
 
 getWorldSize :: (MonadIO m, Has w m WorldWidth, Has w m WorldHeight) => SystemT w m (V2 Float)
 getWorldSize = V2
-  <$> (fmap unWorldWidth $ get global)
-  <*> (fmap unWorldHeight $ get global)
+  <$> (maybe 0 unWorldWidth <$> get global)
+  <*> (maybe 0 unWorldHeight <$> get global)

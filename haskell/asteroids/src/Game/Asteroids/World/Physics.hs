@@ -6,7 +6,7 @@ module Game.Asteroids.World.Physics(
   , bulletCollide
   ) where
 
-import Apecs
+import Kecsik
 import Control.Monad.IO.Class
 import Linear
 
@@ -19,7 +19,7 @@ import Game.Asteroids.World.Velocity
 
 import Debug.Trace
 
-applyMotion :: (MonadIO m
+applyMotion :: forall w m . (MonadIO m
   , Has w m Position
   , Has w m Velocity
   , Has w m Timer
@@ -27,17 +27,17 @@ applyMotion :: (MonadIO m
 applyMotion = do
   dt <- getDelta
   -- traceShowM dt
-  cmapM_ $ \(Position p, Velocity v, e) -> set e $ Position (p + v * V2 dt dt)
+  cmapM_ $ \(Position p, Velocity v, Immutable e :: ImmutableEnt m) -> set e $ Position (p + v * V2 dt dt)
 {-# INLINE applyMotion #-}
 
-wrapSpace :: (MonadIO m
+wrapSpace :: forall w m . (MonadIO m
   , Has w m Position
   , Has w m WorldWidth
   , Has w m WorldHeight
   ) => SystemT w m ()
 wrapSpace = do
   V2 w h <- getWorldSize
-  cmapM_ $ \(Position (V2 x y), e) -> if
+  cmapM_ $ \(Position (V2 x y), Immutable e :: ImmutableEnt m) -> if
     | x < 0 && y < 0 -> set e $ Position (V2 (w+x) (h+y))
     | x < 0          -> set e $ Position (V2 (w+x) y)
     | y < 0          -> set e $ Position (V2 x (h+y))
@@ -61,13 +61,13 @@ playerCollide = do
   cfold checkAsteroid False
 
 -- | Check collision of player with any of asteroids
-bulletCollide :: (MonadIO m
+bulletCollide :: forall w m . (MonadIO m
   , Has w m Asteroid
   , Has w m Position
   ) => V2 Float -> SystemT w m (Maybe Entity)
 bulletCollide pos = do
   let checkAsteroid (Just a) _ = Just a
-      checkAsteroid _ (Asteroid _ r, Position apos, e) = if quadrance (pos - apos) <= r*r
+      checkAsteroid _ (Asteroid _ r, Position apos, Immutable e :: ImmutableEnt m) = if quadrance (pos - apos) <= r*r
         then Just e
         else Nothing
   cfold checkAsteroid Nothing

@@ -51,7 +51,7 @@ instance Mutable s (EntityComponents s) where
 instance Typeable s => Component s (EntityComponents s) where
   type Storage s (EntityComponents s) = HashTable s (EntityComponents s)
 
-type HasEntityComponents w m = Store w m (EntityComponents (PrimState m))
+type HasEntityComponents w m = HasStore w m (EntityComponents (PrimState m))
 
 registryComponent :: forall w m . HasEntityComponents w m => Entity -> ComponentId -> SystemT w m ()
 registryComponent e i = do

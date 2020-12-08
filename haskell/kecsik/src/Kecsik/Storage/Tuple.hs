@@ -40,31 +40,31 @@ instance (Component s a, Component s b, Component s c, Component s d, Component 
 instance (Component s a, Component s b, Component s c, Component s d, Component s e, Component s f, Component s g, Component s k) => Component s (a, b, c, d, e, f, g, k) where
   type Storage s (a, b, c, d, e, f, g, k) = (Storage s a, Storage s b, Storage s c, Storage s d, Storage s e, Storage s f, Storage s g, Storage s k)
 
-instance (Has w m a, Has w m b) => Has w m (a, b) where
+instance (HasStore w m a, HasStore w m b) => HasStore w m (a, b) where
   getStore = (,) <$> getStore <*> getStore
   {-# INLINABLE getStore #-}
 
-instance (Has w m a, Has w m b, Has w m c) => Has w m (a, b, c) where
+instance (HasStore w m a, HasStore w m b, HasStore w m c) => HasStore w m (a, b, c) where
   getStore = (,,) <$> getStore <*> getStore <*> getStore
   {-# INLINABLE getStore #-}
 
-instance (Has w m a, Has w m b, Has w m c, Has w m d) => Has w m (a, b, c, d) where
+instance (HasStore w m a, HasStore w m b, HasStore w m c, HasStore w m d) => HasStore w m (a, b, c, d) where
   getStore = (,,,) <$> getStore <*> getStore <*> getStore <*> getStore
   {-# INLINABLE getStore #-}
 
-instance (Has w m a, Has w m b, Has w m c, Has w m d, Has w m e) => Has w m (a, b, c, d, e) where
+instance (HasStore w m a, HasStore w m b, HasStore w m c, HasStore w m d, HasStore w m e) => HasStore w m (a, b, c, d, e) where
   getStore = (,,,,) <$> getStore <*> getStore <*> getStore <*> getStore <*> getStore
   {-# INLINABLE getStore #-}
 
-instance (Has w m a, Has w m b, Has w m c, Has w m d, Has w m e, Has w m f) => Has w m (a, b, c, d, e, f) where
+instance (HasStore w m a, HasStore w m b, HasStore w m c, HasStore w m d, HasStore w m e, HasStore w m f) => HasStore w m (a, b, c, d, e, f) where
   getStore = (,,,,,) <$> getStore <*> getStore <*> getStore <*> getStore <*> getStore <*> getStore
   {-# INLINABLE getStore #-}
 
-instance (Has w m a, Has w m b, Has w m c, Has w m d, Has w m e, Has w m f, Has w m g) => Has w m (a, b, c, d, e, f, g) where
+instance (HasStore w m a, HasStore w m b, HasStore w m c, HasStore w m d, HasStore w m e, HasStore w m f, HasStore w m g) => HasStore w m (a, b, c, d, e, f, g) where
   getStore = (,,,,,,) <$> getStore <*> getStore <*> getStore <*> getStore <*> getStore <*> getStore <*> getStore
   {-# INLINABLE getStore #-}
 
-instance (Has w m a, Has w m b, Has w m c, Has w m d, Has w m e, Has w m f, Has w m g, Has w m k) => Has w m (a, b, c, d, e, f, g, k) where
+instance (HasStore w m a, HasStore w m b, HasStore w m c, HasStore w m d, HasStore w m e, HasStore w m f, HasStore w m g, HasStore w m k) => HasStore w m (a, b, c, d, e, f, g, k) where
   getStore = (,,,,,,,) <$> getStore <*> getStore <*> getStore <*> getStore <*> getStore <*> getStore <*> getStore <*> getStore
   {-# INLINABLE getStore #-}
 

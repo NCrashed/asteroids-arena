@@ -3,13 +3,13 @@ module Game.Asteroids.Render(
   , CanRender(..)
   ) where
 
-import Apecs
+import Kecsik
 import Control.Monad.IO.Class
 import Foreign.C.Types
 import SDL
 
-class CanRender world world => WorldRender world where
-  getRenderSize :: MonadIO m => world -> m (V2 CInt)
+class (PrimMonad m, CanRender w m w) => WorldRender m w where
+  getRenderSize :: w -> m (V2 CInt)
 
-class CanRender w a where
-  render :: MonadIO m => Renderer -> a -> SystemT w m ()
+class PrimMonad m => CanRender w m a where
+  render :: Renderer -> a -> SystemT w m ()
