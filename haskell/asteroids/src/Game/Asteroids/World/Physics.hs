@@ -6,8 +6,9 @@ module Game.Asteroids.World.Physics(
   , bulletCollide
   ) where
 
-import Kecsik
 import Control.Monad.IO.Class
+import Data.Maybe
+import Kecsik
 import Linear
 
 import Game.Asteroids.World.Asteroid
@@ -17,50 +18,46 @@ import Game.Asteroids.World.Size
 import Game.Asteroids.World.Timer
 import Game.Asteroids.World.Velocity
 
-import Debug.Trace
-
 applyMotion :: forall w m . (MonadIO m
   , Has w m Position
   , Has w m Velocity
   , Has w m Timer
-  ) => SystemT w m ()
-applyMotion = do
+  ) => Entity -> SystemT w m ()
+applyMotion e = do
   dt <- getDelta
-  -- traceShowM dt
-  cmapM_ $ \(Position p, Velocity v, Immutable e :: ImmutableEnt m) -> set e $ Position (p + v * V2 dt dt)
+  modify e $ \(Position p, Velocity v) -> Position (p + v * V2 dt dt)
 {-# INLINE applyMotion #-}
 
 wrapSpace :: forall w m . (MonadIO m
   , Has w m Position
   , Has w m WorldWidth
   , Has w m WorldHeight
-  ) => SystemT w m ()
-wrapSpace = do
+  ) => Entity -> SystemT w m ()
+wrapSpace e = do
   V2 w h <- getWorldSize
-  cmapM_ $ \(Position (V2 x y), Immutable e :: ImmutableEnt m) -> if
-    | x < 0 && y < 0 -> set e $ Position (V2 (w+x) (h+y))
-    | x < 0          -> set e $ Position (V2 (w+x) y)
-    | y < 0          -> set e $ Position (V2 x (h+y))
-    | x > w && y > h -> set e $ Position (V2 (x-w) (y-h))
-    | x > w          -> set e $ Position (V2 (x-w) y)
-    | y > h          -> set e $ Position (V2 x (y-h))
-    | otherwise      -> pure ()
+  modifyMay e $ \(Position (V2 x y)) -> if
+    | x < 0 && y < 0 -> Just $ Position (V2 (w+x) (h+y))
+    | x < 0          -> Just $ Position (V2 (w+x) y)
+    | y < 0          -> Just $ Position (V2 x (h+y))
+    | x > w && y > h -> Just $ Position (V2 (x-w) (y-h))
+    | x > w          -> Just $ Position (V2 (x-w) y)
+    | y > h          -> Just $ Position (V2 x (y-h))
+    | otherwise      -> Nothing
 
 -- | Check collision of player with any of asteroids
 playerCollide :: (MonadIO m
   , Has w m Player
   , Has w m Asteroid
   , Has w m Position
-  ) => SystemT w m Bool
-playerCollide = do
-  pos <- cfold (\_ (Player _ _, Position pos) -> pos) 0
+  ) => Entity -> SystemT w m Bool
+playerCollide e = fmap (fromMaybe False) $ withCM e $ \(Player{}, Position pos) -> do
   let checkAsteroid True _ = True
       checkAsteroid _ (Asteroid _ r, Position apos) = let
         r' = r+playerCollideRadius
         in quadrance (pos - apos) <= r'*r'
   cfold checkAsteroid False
 
--- | Check collision of player with any of asteroids
+-- | Check collision of bullet with any of asteroids
 bulletCollide :: forall w m . (MonadIO m
   , Has w m Asteroid
   , Has w m Position

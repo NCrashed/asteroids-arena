@@ -161,7 +161,7 @@ newWorld = do
     spawnPlayer
   pure w
 
-simulateWorld :: (MonadIO m, Typeable (PrimState m), PrimMonad m) => [InputEvent] -> (World (PrimState m)) -> m (World (PrimState m))
+simulateWorld :: forall m . (MonadIO m, Typeable (PrimState m), PrimMonad m) => [InputEvent] -> (World (PrimState m)) -> m (World (PrimState m))
 simulateWorld es w = do
   t <- liftIO $ getTime Monotonic
   runWith w $ do
@@ -170,11 +170,12 @@ simulateWorld es w = do
     updateAudioCooldowns
     updatePlayerCooldown
     traverse_ reactInputEvent es
-    applyMotion
-    wrapSpace
-    collidePlayer
-    collideBullets
-    ageBullets
+    cmapM_ $ \(Position{}, Immutable e :: ImmutableEnt m) -> do
+      applyMotion e
+      wrapSpace e
+      collidePlayer e
+      collideBullets e
+      ageBullets e
   pure w
 
 collidePlayer :: (MonadIO m
@@ -187,9 +188,9 @@ collidePlayer :: (MonadIO m
   , Has w m WorldWidth
   , Has w m WorldHeight
   , Has w m EntityCounter
-  ) => SystemT w m ()
-collidePlayer = do
-  collided <- playerCollide
+  ) => Entity -> SystemT w m ()
+collidePlayer e = do
+  collided <- playerCollide e
   when collided $ do
     killPlayer
     void $ spawnPlayer
@@ -205,12 +206,11 @@ collideBullets :: forall w m . (MonadIO m
   , Has w m WorldWidth
   , Has w m WorldHeight
   , Has w m EntityCounter
-  ) => SystemT w m ()
-collideBullets = do
-  cmapM_ $ \(Bullet _, Position bpos, Immutable e :: ImmutableEnt m) -> do
-    collided <- bulletCollide bpos
-    case collided of
-      Nothing -> pure ()
-      Just ae -> do
-        breakAsteroid ae
-        void $ destroyBullet e
+  ) => Entity -> SystemT w m ()
+collideBullets e = withCM_ e $ \(Bullet{}, Position bpos) -> do
+  collided <- bulletCollide bpos
+  case collided of
+    Nothing -> pure ()
+    Just ae -> do
+      breakAsteroid ae
+      void $ destroyBullet e

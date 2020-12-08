@@ -58,10 +58,10 @@ ageBullets :: forall w m . (MonadIO m
   , Has w m Position
   , Has w m Velocity
   , Has w m Timer
-  ) => SystemT w m ()
-ageBullets = do
+  ) => Entity -> SystemT w m ()
+ageBullets e = do
   dt <- getDelta
-  cmapM_ $ \(Bullet l, Immutable e :: ImmutableEnt m) -> do
+  withCM_ e $ \(Bullet l) -> do
     let l' = l - dt
     if(l' <= 0) then void $ destroyBullet e
       else set e (Bullet l')

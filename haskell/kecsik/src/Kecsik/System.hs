@@ -6,7 +6,15 @@ module Kecsik.System(
   , set
   , exists
   , modify
+  , modify1
+  , modifyM
+  , modify1M
+  , modifyMay
+  , modify1May
+  , modifyMayM
+  , modify1MayM
   , update
+  , updateM
   , destroy
   , destroy_
   , destroyAll
@@ -14,6 +22,9 @@ module Kecsik.System(
   , ctraverse_
   , cmapM_
   , cfold
+  , withC
+  , withCM
+  , withCM_
   ) where
 
 import Control.Monad
@@ -63,12 +74,71 @@ exists e _ = do
   storeExists sa e
 {-# INLINABLE exists #-}
 
-modify :: forall w m a . Has w m a => Entity -> (a -> a) -> SystemT w m ()
-modify ety f = do
+modify1 :: forall w m a . Has w m a => Entity -> (a -> a) -> SystemT w m ()
+modify1 ety f = do
   sx :: Storage (PrimState m) a <- getStore
   mref <- storeRef sx ety
   flip traverse_ mref $ \r -> modifyRef' r f
+{-# INLINABLE modify1 #-}
+
+modify :: forall w m a b . (Has w m a, Has w m b) => Entity -> (a -> b) -> SystemT w m ()
+modify ety f = do
+  sx :: Storage (PrimState m) a <- getStore
+  sy :: Storage (PrimState m) b <- getStore
+  ma <- storeGet sx ety
+  traverse_ (storeSet sy ety . f) ma
 {-# INLINABLE modify #-}
+
+modify1M :: forall w m a . Has w m a => Entity -> (a -> SystemT w m a) -> SystemT w m ()
+modify1M ety f = do
+  sx :: Storage (PrimState m) a <- getStore
+  mref <- storeRef sx ety
+  flip traverse_ mref $ \r -> do
+    a <- f =<< freezeRef r
+    modifyRef' r $ const a
+{-# INLINABLE modify1M #-}
+
+modifyM :: forall w m a b . (Has w m a, Has w m b) => Entity -> (a -> SystemT w m b) -> SystemT w m ()
+modifyM ety f = do
+  sx :: Storage (PrimState m) a <- getStore
+  sy :: Storage (PrimState m) b <- getStore
+  ma <- storeGet sx ety
+  traverse_ (storeSet sy ety <=< f) ma
+{-# INLINABLE modifyM #-}
+
+modify1May :: forall w m a . Has w m a => Entity -> (a -> Maybe a) -> SystemT w m ()
+modify1May ety f = do
+  sx :: Storage (PrimState m) a <- getStore
+  mref <- storeRef sx ety
+  for_ mref $ \r -> do
+    a <- freezeRef r
+    traverse_ (modifyRef' r . const) $ f a
+{-# INLINABLE modify1May #-}
+
+modifyMay :: forall w m a b . (Has w m a, Has w m b) => Entity -> (a -> Maybe b) -> SystemT w m ()
+modifyMay ety f = do
+  sx :: Storage (PrimState m) a <- getStore
+  sy :: Storage (PrimState m) b <- getStore
+  ma <- storeGet sx ety
+  traverse_ (traverse_ (storeSet sy ety) . f) ma
+{-# INLINABLE modifyMay #-}
+
+modify1MayM :: forall w m a . Has w m a => Entity -> (a -> SystemT w m (Maybe a)) -> SystemT w m ()
+modify1MayM ety f = do
+  sx :: Storage (PrimState m) a <- getStore
+  mref <- storeRef sx ety
+  for_ mref $ \r -> do
+    ma <- f =<< freezeRef r
+    traverse_ (modifyRef' r . const) ma
+{-# INLINABLE modify1MayM #-}
+
+modifyMayM :: forall w m a b . (Has w m a, Has w m b) => Entity -> (a -> SystemT w m (Maybe b)) -> SystemT w m ()
+modifyMayM ety f = do
+  sx :: Storage (PrimState m) a <- getStore
+  sy :: Storage (PrimState m) b <- getStore
+  ma <- storeGet sx ety
+  traverse_ (traverse_ (storeSet sy ety) <=< f) ma
+{-# INLINABLE modifyMayM #-}
 
 update :: forall w m a b . Has w m a => Entity -> (a -> (a, b)) -> SystemT w m (Maybe b)
 update ety f = do
@@ -76,6 +146,16 @@ update ety f = do
   mref <- storeRef sx ety
   flip traverse mref $ \r -> updateRef' r f
 {-# INLINABLE update #-}
+
+updateM :: forall w m a b . Has w m a => Entity -> (a -> SystemT w m (a, b)) -> SystemT w m (Maybe b)
+updateM ety f = do
+  sx :: Storage (PrimState m) a <- getStore
+  mref <- storeRef sx ety
+  flip traverse mref $ \r -> do
+    (a, b) <- f =<< freezeRef r
+    modifyRef' r $ const a
+    pure b
+{-# INLINABLE updateM #-}
 
 -- | Destroy component for given entity. Return 'True' if there was a component.
 destroy :: forall w m a . Has w m a => Entity -> Proxy a -> SystemT w m Bool
@@ -131,3 +211,33 @@ cfold f a0 = do
       mc <- storeGet sx e
       pure $ maybe a (f a) mc
 {-# INLINABLE cfold #-}
+
+withC :: forall w m a b . (Has w m a)
+  => Entity
+  -> (a -> b)
+  -> SystemT w m (Maybe b)
+withC e f = do
+  sx :: Storage (PrimState m) a <- getStore
+  ma <- storeGet sx e
+  pure $ f <$> ma
+{-# INLINABLE withC #-}
+
+withCM :: forall w m a b . (Has w m a)
+  => Entity
+  -> (a -> SystemT w m b)
+  -> SystemT w m (Maybe b)
+withCM e f = do
+  sx :: Storage (PrimState m) a <- getStore
+  ma <- storeGet sx e
+  traverse f ma
+{-# INLINABLE withCM #-}
+
+withCM_ :: forall w m a b . (Has w m a)
+  => Entity
+  -> (a -> SystemT w m ())
+  -> SystemT w m ()
+withCM_ e f = do
+  sx :: Storage (PrimState m) a <- getStore
+  ma <- storeGet sx e
+  traverse_ f ma
+{-# INLINABLE withCM_ #-}
