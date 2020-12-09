@@ -1,1 +1,1 @@
-cabal new-run asteroids -- +RTS -xn
+cabal new-run asteroids -O2 -- +RTS -xn
