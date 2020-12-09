@@ -8,3 +8,6 @@ edition = "2018"
 
 [dependencies]
 sdl2 = "^0.34"
+specs = "^0.16"
+specs-derive = "^0.4"
+glam = "^0.11"
