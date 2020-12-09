@@ -4,6 +4,7 @@ module Game.Asteroids.World.Rotation(
 
 import Apecs
 import Data.Mutable
+import Game.Asteroids.Storage.Judy
 import GHC.Generics
 import Linear
 
@@ -14,4 +15,4 @@ instance Mutable s Rotation where
   type Ref s Rotation = GRef s Rotation
 
 instance Component Rotation where
-  type Storage Rotation = Cache 1000 (Map Rotation)
+  type Storage Rotation = Judy 1000 Rotation

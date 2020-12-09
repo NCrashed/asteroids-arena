@@ -5,6 +5,7 @@ module Game.Asteroids.World.Velocity(
 import Apecs
 import Data.Mutable
 import Game.Asteroids.Mutable
+import Game.Asteroids.Storage.Judy
 import GHC.Generics
 import Linear
 
@@ -14,4 +15,4 @@ instance Mutable s Velocity where
   type Ref s Velocity = GRef s Velocity
 
 instance Component Velocity where
-  type Storage Velocity = Cache 1000 (Map Velocity)
+  type Storage Velocity = Judy 1000 Velocity

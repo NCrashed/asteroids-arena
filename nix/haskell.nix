@@ -5,4 +5,7 @@ let
   pkgs = self;
   lib = pkgs.haskell.lib;
 in
-ghc-override compiler (lib.packagesFromDirectory { directory = ./pkgs; }) super
+ghc-override compiler (self: super: lib.packagesFromDirectory { directory = ./pkgs; } self super //
+  {
+    Judy = pkgs.judy;
+  }) super

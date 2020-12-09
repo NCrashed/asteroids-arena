@@ -10,6 +10,7 @@ import Apecs
 import Control.Monad.IO.Class
 import Data.Mutable
 import Game.Asteroids.System
+import Game.Asteroids.Storage.Judy
 import Game.Asteroids.World.Mass
 import Game.Asteroids.World.Position
 import Game.Asteroids.World.Rotation
@@ -26,7 +27,7 @@ instance Mutable s Bullet where
   type Ref s Bullet = GRef s Bullet
 
 instance Component Bullet where
-  type Storage Bullet = Cache 100 (Map Bullet)
+  type Storage Bullet = Judy 100 Bullet
 
 -- | Bullet speed m per second
 bulletSpeed :: Float

@@ -10,6 +10,7 @@ import GHC.Generics
 import Data.Foldable (for_)
 import Control.Monad
 import Control.Monad.IO.Class
+import Game.Asteroids.Storage.Judy
 import Game.Asteroids.World.Audio
 import Game.Asteroids.World.Mass
 import Game.Asteroids.World.Position
@@ -27,7 +28,7 @@ instance Mutable s Asteroid where
   type Ref s Asteroid = GRef s Asteroid
 
 instance Component Asteroid where
-  type Storage Asteroid = Cache 1000 (Map Asteroid)
+  type Storage Asteroid = Judy 1000 Asteroid
 
 -- | Asteroid possible amount of edges in generation
 asteroidEdgesRange :: (Int, Int)

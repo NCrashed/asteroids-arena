@@ -4,8 +4,8 @@
 }:
 mkDerivation {
   pname = "grow-vector";
-  version = "0.1.2.0";
-  sha256 = "8fb51ea6ee502236c3f5e6ca2af8f43fc43a5f7e6ab2a630ef80364492a22ff8";
+  version = "0.1.3.0";
+  sha256 = "afa93fd026cefbdc6886a2d48c2f792805b1127bc87294d4d3d31a0f9f2f678d";
   configureFlags = [ "-fliquidhaskell" ];
   enableSeparateDataOutput = true;
   libraryHaskellDepends = [

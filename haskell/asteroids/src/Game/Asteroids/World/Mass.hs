@@ -4,6 +4,7 @@ module Game.Asteroids.World.Mass(
 
 import Apecs
 import Data.Mutable
+import Game.Asteroids.Storage.Judy
 import GHC.Generics
 
 newtype Mass = Mass { unMass :: Float } deriving (Show, Num, Generic)
@@ -12,4 +13,4 @@ instance Mutable s Mass where
   type Ref s Mass = GRef s Mass
 
 instance Component Mass where
-  type Storage Mass = Cache 1000 (Map Mass)
+  type Storage Mass = Judy 1000 Mass

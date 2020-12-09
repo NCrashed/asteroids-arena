@@ -63,7 +63,7 @@ simulateWorld es w = do
     updateAudioCooldowns
     updatePlayerCooldown
     traverse_ reactInputEvent es
-    cmapM_ $ \(Position{}, e) -> do
+    citerate_ (Proxy @Position) $ \e -> do
       applyMotion e
       wrapSpace e
       collidePlayer e

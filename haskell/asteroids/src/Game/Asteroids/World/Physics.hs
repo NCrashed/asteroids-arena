@@ -9,6 +9,7 @@ module Game.Asteroids.World.Physics(
 import Control.Monad.IO.Class
 import Data.Maybe
 import Apecs
+import Apecs.Core
 import Linear
 
 import Game.Asteroids.System
@@ -18,6 +19,8 @@ import Game.Asteroids.World.Position
 import Game.Asteroids.World.Size
 import Game.Asteroids.World.Timer
 import Game.Asteroids.World.Velocity
+
+import qualified Data.Vector.Unboxed as U
 
 applyMotion :: forall w m . (MonadIO m
   , Has w m Position
@@ -64,8 +67,15 @@ bulletCollide :: forall w m . (MonadIO m
   , Has w m Position
   ) => V2 Float -> SystemT w m (Maybe Entity)
 bulletCollide pos = do
-  let checkAsteroid (Just a) _ = Just a
-      checkAsteroid _ (Asteroid _ r, Position apos, e) = if quadrance (pos - apos) <= r*r
-        then Just e
-        else Nothing
-  cfold checkAsteroid Nothing
+  as :: Storage Asteroid <- getStore
+  is <- {-# SCC "asteroidMembers" #-} explMembers as
+  go is
+  where
+    go !is
+      | U.null is = pure Nothing
+      | otherwise = do
+        let i = U.head is
+        (Asteroid _ r, Position apos) <- {-# SCC "getAsteroid" #-} get (Entity i)
+        if quadrance (pos - apos) <= r*r
+          then pure . Just $! Entity i
+          else go $ U.drop 1 is

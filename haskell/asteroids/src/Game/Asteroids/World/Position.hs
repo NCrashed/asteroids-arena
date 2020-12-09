@@ -5,6 +5,7 @@ module Game.Asteroids.World.Position(
 import Apecs
 import Data.Mutable
 import Game.Asteroids.Mutable
+import Game.Asteroids.Storage.Judy
 import GHC.Generics
 import Linear
 
@@ -14,4 +15,4 @@ instance Mutable s Position where
   type Ref s Position = GRef s Position
 
 instance Component Position where
-  type Storage Position = Cache 500 (Map Position)
+  type Storage Position = Judy 1000 Position
