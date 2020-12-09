@@ -4,12 +4,16 @@ extern crate glam;
 #[macro_use]
 extern crate specs_derive;
 
+use asteroids::components::size::WorldSize;
+use asteroids::components::time::DeltaTime;
 use asteroids::systems::init_systems;
 use asteroids::world::init_world;
 use sdl2::event::Event;
+use sdl2::event::WindowEvent::SizeChanged;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use specs::WorldExt;
+use std::time::Instant;
 
 mod asteroids;
 
@@ -32,9 +36,7 @@ pub fn main() {
     canvas.present();
     let mut event_pump = sdl_context.event_pump().unwrap();
     'running: loop {
-        dispatcher.dispatch(&world);
-        world.maintain();
-
+        let frame_begin = Instant::now();
         canvas.set_draw_color(Color::RGB(0, 0, 0));
         canvas.clear();
         for event in event_pump.poll_iter() {
@@ -43,10 +45,17 @@ pub fn main() {
                 Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
                     break 'running
                 },
+                Event::Window { win_event: SizeChanged(w, h), .. } => {
+                    world.insert(WorldSize(w, h));
+                },
                 _ => {}
             }
         }
-
         canvas.present();
+
+        let frame_end = Instant::now();
+        world.insert(DeltaTime(frame_end.duration_since(frame_begin)));
+        dispatcher.dispatch(&world);
+        world.maintain();
     }
 }
