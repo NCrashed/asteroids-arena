@@ -4,7 +4,7 @@ extern crate glam;
 #[macro_use]
 extern crate specs_derive;
 
-use asteroids::components::size::WorldSize;
+use asteroids::components::size::*;
 use asteroids::components::time::DeltaTime;
 use asteroids::systems::init_systems;
 use asteroids::world::init_world;
@@ -24,7 +24,7 @@ pub fn main() {
     let mut world = init_world();
     let mut dispatcher = init_systems(&mut world);
 
-    let window = video_subsystem.window("Asteroids game", 800, 600)
+    let window = video_subsystem.window("Asteroids game", DEF_WORLD_WIDTH, DEF_WORLD_HEIGHT)
         .position_centered()
         .build()
         .unwrap();
@@ -46,7 +46,7 @@ pub fn main() {
                     break 'running
                 },
                 Event::Window { win_event: SizeChanged(w, h), .. } => {
-                    world.insert(WorldSize(w, h));
+                    world.insert(WorldSize(w as u32, h as u32));
                 },
                 _ => {}
             }
