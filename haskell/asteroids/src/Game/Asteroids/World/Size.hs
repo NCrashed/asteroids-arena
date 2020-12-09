@@ -5,7 +5,10 @@ module Game.Asteroids.World.Size(
   , getWorldSize
   ) where
 
-import Kecsik
+import Apecs
+import Data.Default
+import Data.Mutable
+import GHC.Generics
 import Control.Monad.IO.Class
 import Linear
 
@@ -14,22 +17,34 @@ newtype WorldWidth = WorldWidth { unWorldWidth :: Float } deriving (Show, Num, G
 instance Default WorldWidth where
   def = 1496
 
+instance Semigroup WorldWidth where
+  _ <> a = a
+
+instance Monoid WorldWidth where
+  mempty = def
+
 instance Mutable s WorldWidth where
   type Ref s WorldWidth = GRef s WorldWidth
 
-instance Component s WorldWidth where
-  type Storage s WorldWidth = Global s WorldWidth
+instance Component WorldWidth where
+  type Storage WorldWidth = Global WorldWidth
 
 newtype WorldHeight = WorldHeight { unWorldHeight :: Float } deriving (Show, Num, Generic)
 
 instance Default WorldHeight where
   def = 1024
 
+instance Semigroup WorldHeight where
+  _ <> a = a
+
+instance Monoid WorldHeight where
+  mempty = def
+
 instance Mutable s WorldHeight where
   type Ref s WorldHeight = GRef s WorldHeight
 
-instance Component s WorldHeight where
-  type Storage s WorldHeight = Global s WorldHeight
+instance Component WorldHeight where
+  type Storage WorldHeight = Global WorldHeight
 
 initSizes :: (MonadIO m, Has w m WorldWidth, Has w m WorldHeight) => SystemT w m ()
 initSizes = do

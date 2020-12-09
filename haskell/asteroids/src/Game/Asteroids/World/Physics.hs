@@ -8,9 +8,10 @@ module Game.Asteroids.World.Physics(
 
 import Control.Monad.IO.Class
 import Data.Maybe
-import Kecsik
+import Apecs
 import Linear
 
+import Game.Asteroids.System
 import Game.Asteroids.World.Asteroid
 import Game.Asteroids.World.Player
 import Game.Asteroids.World.Position
@@ -64,7 +65,7 @@ bulletCollide :: forall w m . (MonadIO m
   ) => V2 Float -> SystemT w m (Maybe Entity)
 bulletCollide pos = do
   let checkAsteroid (Just a) _ = Just a
-      checkAsteroid _ (Asteroid _ r, Position apos, Immutable e :: ImmutableEnt m) = if quadrance (pos - apos) <= r*r
+      checkAsteroid _ (Asteroid _ r, Position apos, e) = if quadrance (pos - apos) <= r*r
         then Just e
         else Nothing
   cfold checkAsteroid Nothing

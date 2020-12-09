@@ -4,7 +4,9 @@ module Game.Asteroids.World.Asteroid(
   , breakAsteroid
   ) where
 
-import Kecsik
+import Apecs
+import Data.Mutable
+import GHC.Generics
 import Data.Foldable (for_)
 import Control.Monad
 import Control.Monad.IO.Class
@@ -24,8 +26,8 @@ data Asteroid = Asteroid !Int !Float
 instance Mutable s Asteroid where
   type Ref s Asteroid = GRef s Asteroid
 
-instance Component s Asteroid where
-  type Storage s Asteroid = HashTable s Asteroid
+instance Component Asteroid where
+  type Storage Asteroid = Cache 1000 (Map Asteroid)
 
 -- | Asteroid possible amount of edges in generation
 asteroidEdgesRange :: (Int, Int)
@@ -89,9 +91,9 @@ destroyAsteroid :: (MonadIO m
   , Has w m Rotation
   , Has w m Velocity
   ) => Entity -> SystemT w m ()
-destroyAsteroid e = destroy_ e (Proxy :: Proxy (Asteroid, Mass, Position, Rotation, Velocity))
+destroyAsteroid e = destroy e (Proxy :: Proxy (Asteroid, Mass, Position, Rotation, Velocity))
 
-breakAsteroid :: (MonadIO m
+breakAsteroid :: forall w m . (MonadIO m
   , Has w m WorldWidth
   , Has w m WorldHeight
   , Has w m Asteroid
@@ -103,17 +105,16 @@ breakAsteroid :: (MonadIO m
   , Has w m EntityCounter
   ) => Entity -> SystemT w m ()
 breakAsteroid e = do
-  mc <- get e
-  for_ mc $ \(Asteroid n r, Mass m, Position pos, Rotation a, Velocity vel) -> do
-    destroyAsteroid e
-    playSound audioBang 2 50 0.2
-    let r' = r * 0.5
-    when (r' > fst asteroidSizeRange) $ do
-      let m' = m * 0.5
-      vx <- liftIO $ randomRIO asteroidVelocityRange
-      vy <- liftIO $ randomRIO asteroidVelocityRange
-      let dv1 = V2 vx vy
-          dv2 = negate dv1
-      _ <- newEntity (Asteroid n r', Mass m', Position pos, Rotation a, Velocity (vel + dv1))
-      _ <- newEntity (Asteroid n r', Mass m', Position pos, Rotation a, Velocity (vel + dv2))
-      pure ()
+  (Asteroid n r, Mass m, Position pos, Rotation a, Velocity vel) <- get e
+  destroyAsteroid e
+  playSound audioBang 2 50 0.2
+  let r' = r * 0.5
+  when (r' > fst asteroidSizeRange) $ do
+    let m' = m * 0.5
+    vx <- liftIO $ randomRIO asteroidVelocityRange
+    vy <- liftIO $ randomRIO asteroidVelocityRange
+    let dv1 = V2 vx vy
+        dv2 = negate dv1
+    _ <- newEntity (Asteroid n r', Mass m', Position pos, Rotation a, Velocity (vel + dv1))
+    _ <- newEntity (Asteroid n r', Mass m', Position pos, Rotation a, Velocity (vel + dv2))
+    pure ()

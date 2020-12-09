@@ -2,12 +2,13 @@
 module Game.Asteroids.World.Render(
   ) where
 
-import Kecsik as A
+import Apecs as A
 import Control.Monad
 import Control.Monad.IO.Class
 import Data.Typeable
 import Foreign.C.Types
 import Game.Asteroids.Render
+import Game.Asteroids.System
 import Game.Asteroids.Vector
 import Game.Asteroids.World
 import Game.Asteroids.World.Asteroid
@@ -21,19 +22,18 @@ import SDL
 
 import qualified Data.Vector.Storable as V
 
-instance (MonadIO m, PrimMonad m, s ~ PrimState m, Typeable s) => WorldRender m (World s) where
-  getRenderSize w = runWith_ w $ fmap (fmap ceiling) getWorldSize
+instance MonadIO m => WorldRender m World where
+  getRenderSize w = runWith w $ fmap (fmap ceiling) getWorldSize
 
-instance (MonadIO m, PrimMonad m, s ~ PrimState m, Typeable s) => CanRender (World s) m (World s) where
-  render r _ = do
-    cmapM_ (renderPlayer r)
-    cmapM_ (renderAsteroid r)
-    cmapM_ (renderBullet r)
-    pure ()
+instance MonadIO m => CanRender World m World where
+  render r _ = cmapM_ $ \(Position{}, e) -> do
+    renderPlayer r e
+    renderAsteroid r e
+    renderBullet r e
   {-# INLINE render #-}
 
-renderPlayer :: MonadIO m => Renderer -> (Player, Position, Rotation) -> m ()
-renderPlayer rd (Player isThrust _, Position p, Rotation r) = do
+renderPlayer :: MonadIO m => Renderer -> Entity -> SystemT World m ()
+renderPlayer rd e = withCM_ e $ \(Player isThrust _, Position p, Rotation r) -> do
   let V2 dx dy = playerSize * 0.5
   rendererDrawColor rd SDL.$= 255
   let mkPoints = V.map (P . fmap round . (p +) . rotateV2 r)
@@ -49,8 +49,8 @@ renderPlayer rd (Player isThrust _, Position p, Rotation r) = do
     ]
 {-# INLINE renderPlayer #-}
 
-renderAsteroid :: MonadIO m => Renderer -> (Asteroid, Position, Rotation) -> m ()
-renderAsteroid rd (Asteroid n r, Position p, Rotation a) = do
+renderAsteroid :: MonadIO m => Renderer -> Entity -> SystemT World m ()
+renderAsteroid rd e = withCM_ e $ \(Asteroid n r, Position p, Rotation a) -> do
   rendererDrawColor rd SDL.$= 255
   drawCircloid rd n a (fmap round p) (round r)
 {-# INLINE renderAsteroid #-}
@@ -65,8 +65,8 @@ drawCircloid rd n a0 (V2 x0 y0) r = drawLines rd $ V.fromList [
   ]
 {-# INLINE drawCircloid #-}
 
-renderBullet :: MonadIO m => Renderer -> (Bullet, Position) -> m ()
-renderBullet rd (Bullet _, Position p) = do
+renderBullet :: MonadIO m => Renderer -> Entity -> SystemT World m ()
+renderBullet rd e = withCM_ e $ \(Bullet _, Position p) -> do
   rendererDrawColor rd SDL.$= 255
   drawPoint rd (P $ fmap round p)
 {-# INLINE renderBullet #-}

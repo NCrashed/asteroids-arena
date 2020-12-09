@@ -6,7 +6,10 @@ module Game.Asteroids.World.Timer(
   ) where
 
 import Control.Monad.IO.Class
-import Kecsik
+import Apecs
+import Data.Mutable
+import Data.Default
+import GHC.Generics
 import System.Clock
 
 -- | Holds time passed since previous tick
@@ -20,11 +23,17 @@ instance Mutable s TimeSpec
 instance Mutable s Timer where
   type Ref s Timer = GRef s Timer
 
-instance Component s Timer where
-  type Storage s Timer = Global s Timer
+instance Component Timer where
+  type Storage Timer = Global Timer
 
 instance Default Timer where
   def = Timer 0 0
+
+instance Semigroup Timer where
+  _ <> a = a
+
+instance Monoid Timer where
+  mempty = def
 
 initTimer :: (MonadIO m, Has w m Timer) => SystemT w m ()
 initTimer = do

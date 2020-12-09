@@ -3,7 +3,7 @@ module Game.Asteroids.World.Event(
   , reactInputEvent
   ) where
 
-import Kecsik
+import Apecs
 import Control.Monad.IO.Class
 import Game.Asteroids.World.Audio
 import Game.Asteroids.World.Bullet

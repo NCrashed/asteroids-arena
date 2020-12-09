@@ -6,12 +6,17 @@ module Game.Asteroids.World.Audio(
   , updateAudioCooldowns
   ) where
 
-import Kecsik
+import Apecs
 import Control.Monad
 import Control.Monad.IO.Class
+import Data.Default
 import Data.Foldable (foldr')
 import Data.IntMap (IntMap)
+import Data.Maybe
+import Data.Mutable
 import Game.Asteroids.Audio
+import GHC.Generics
+import Game.Asteroids.System
 import Game.Asteroids.World.Timer
 import SDL.Mixer
 
@@ -20,15 +25,21 @@ import qualified Data.IntMap.Strict as IM
 data AudioState = AudioState {
   audioResources :: !(Maybe AudioResources)
 , audioDelays    :: !(IntMap Float)
-}
+} deriving (Generic)
 
 instance Default AudioState where
   def = AudioState Nothing IM.empty
 
+instance Semigroup AudioState where
+  _ <> a = a
+
+instance Monoid AudioState where
+  mempty = def
+
 instance Mutable s AudioState
 
-instance Component s AudioState where
-  type Storage s AudioState = Global s AudioState
+instance Component AudioState where
+  type Storage AudioState = Global AudioState
 
 setupAudioResources :: (MonadIO m
   , Has w m AudioState
@@ -36,13 +47,13 @@ setupAudioResources :: (MonadIO m
 setupAudioResources r = set global $ AudioState (Just r) IM.empty
 
 playSound :: (MonadIO m
-  , Has w m AudioState
+  , Get w m AudioState
   ) => (AudioResources -> Chunk) -- ^ Which sound to play
   -> Channel
   -> Volume
   -> Float
   -> SystemT w m ()
-playSound sound ch v cd = cmapM_ $ \(AudioState mas _) -> case mas of
+playSound sound ch v cd = withCM_ global $ \(AudioState mas _) -> case mas of
   Nothing -> pure ()
   Just as -> do
     setVolume v $ sound as
@@ -54,17 +65,13 @@ playSound sound ch v cd = cmapM_ $ \(AudioState mas _) -> case mas of
 isAudioCooldown :: (MonadIO m
   , Has w m AudioState
   ) => Channel -> SystemT w m Bool
-isAudioCooldown ch = cfold f False
-  where
-    f True _ = True
-    f _ (AudioState _ dm) = case IM.lookup (fromIntegral ch) dm of
-      Nothing -> False
-      Just v -> v > 0
+isAudioCooldown ch = fmap (fromMaybe False) $ withC global $ \(AudioState _ dm) ->
+  maybe False (> 0) $ IM.lookup (fromIntegral ch) dm
 
 setAudioCooldown :: (MonadIO m
   , Has w m AudioState
   ) => Channel -> Float -> SystemT w m ()
-setAudioCooldown ch v = cmap $ \(AudioState r dm) -> AudioState r $ IM.insert (fromIntegral ch) v dm
+setAudioCooldown ch v = modify global $ \(AudioState r dm) -> AudioState r $ IM.insert (fromIntegral ch) v dm
 
 updateAudioCooldowns :: (MonadIO m
   , Has w m AudioState
@@ -73,4 +80,4 @@ updateAudioCooldowns :: (MonadIO m
 updateAudioCooldowns = do
   dt <- getDelta
   let f v = if v - dt < 0 then Nothing else Just (v - dt)
-  cmap $ \(AudioState r dm) -> AudioState r $ foldr' (IM.update f) dm $ IM.keys dm
+  modify global $ \(AudioState r dm) -> AudioState r $ foldr' (IM.update f) dm $ IM.keys dm

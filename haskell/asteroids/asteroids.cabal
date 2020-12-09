@@ -40,6 +40,7 @@ library
     Game.Asteroids.Audio
     Game.Asteroids.Mutable
     Game.Asteroids.Render
+    Game.Asteroids.System
     Game.Asteroids.Vector
     Game.Asteroids.Window
     Game.Asteroids.World
@@ -58,7 +59,8 @@ library
     Game.Asteroids.World.Velocity
   build-depends:
       clock           >= 0.8      && < 0.9
-    , kecsik          >= 0.1      && < 0.2
+    , apecs
+    , data-default
     , linear          >= 1.20     && < 1.22
     , mutable         >= 0.2      && < 0.3
     , random          >= 1.0      && < 1.2

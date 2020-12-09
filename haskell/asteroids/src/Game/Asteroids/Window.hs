@@ -2,7 +2,7 @@ module Game.Asteroids.Window(
     renderLoop
   ) where
 
-import Kecsik (runWith, Has)
+import Apecs (runWith, Has)
 import Control.Concurrent.STM
 import Control.Monad (unless, when)
 import Data.Foldable (traverse_)

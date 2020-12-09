@@ -14,7 +14,10 @@ module Game.Asteroids.World.Player(
   , playerFire
   ) where
 
-import Kecsik
+import Apecs
+import GHC.Generics
+import Data.Mutable
+import Data.Default
 import Control.Monad
 import Control.Monad.IO.Class
 import Game.Asteroids.Vector
@@ -38,8 +41,8 @@ instance Default Player where
 instance Mutable s Player where
   type Ref s Player = GRef s Player
 
-instance Component s Player where
-  type Storage s Player = Unique s Player
+instance Component Player where
+  type Storage Player = Unique Player
 
 -- | Player size in pixels (1 px == 1 meter)
 playerSize :: V2 Float
@@ -110,7 +113,7 @@ killPlayer :: forall w m . (MonadIO m
   , Has w m Rotation
   , Has w m Velocity
   ) => SystemT w m ()
-killPlayer = cmapM_ $ \(Player _ _, Immutable e :: ImmutableEnt m) -> destroy_ e (Proxy :: Proxy (Player, Mass, Position, Rotation, Velocity))
+killPlayer = cmapM_ $ \(Player _ _, e) -> destroy e (Proxy :: Proxy (Player, Mass, Position, Rotation, Velocity))
 
 -- | Mark engines on-off
 setPlayerThursting :: (MonadIO m
@@ -138,6 +141,6 @@ playerFire :: forall w m . (MonadIO m
   , Has w m Velocity
   , Has w m EntityCounter
   ) => SystemT w m ()
-playerFire = cmapM_ $ \(Player f cd, Position p, Rotation a, Velocity v, Immutable e :: ImmutableEnt m) -> when (cd == 0) $ do
+playerFire = cmapM_ $ \(Player f cd, Position p, Rotation a, Velocity v, e) -> when (cd == 0) $ do
   set e (Player f playerFireCooldown)
   void $ spawnBullet p (v + rotateV2 a (V2 1 0) * V2 bulletSpeed bulletSpeed)
