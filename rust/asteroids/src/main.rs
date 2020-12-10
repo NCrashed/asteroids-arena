@@ -14,13 +14,14 @@ use asteroids::systems::init_systems;
 use asteroids::world::init_world;
 use sdl2::event::Event;
 use sdl2::event::WindowEvent::SizeChanged;
+use sdl2::EventPump;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use sdl2::EventPump;
 use sdl2::render::WindowCanvas;
+use specs::Dispatcher;
 use specs::World;
 use specs::WorldExt;
-use specs::Dispatcher;
+use std::collections::HashSet;
 use std::time::Instant;
 
 mod asteroids;
@@ -72,10 +73,6 @@ fn game_loop<'a, 'b>(mut canvas: WindowCanvas, mut event_pump: EventPump, mut wo
         // Render all
         render_world(&mut canvas, world.system_data())?;
 
-        // Wipe input for next frame
-        let mut pinput = world.write_resource::<Vec<PlayerInput>>();
-        *pinput = Vec::new();
-
         // Write delta time and report FPS
         let mut delta = world.write_resource::<DeltaTime>();
         *delta = calc_fps(frame_begin, &mut i);
@@ -98,23 +95,30 @@ fn calc_fps(frame_begin: Instant, i: &mut i32) -> DeltaTime {
 /// Iterate over all occured events from system and user and feed them inside game logic
 fn process_events(world: &mut World, event_pump: &mut EventPump) -> Result<bool, String> {
     let mut wsize = world.write_resource::<WorldSize>();
-    let mut pinput = world.write_resource::<Vec<PlayerInput>>();
+    let mut pinput = world.write_resource::<HashSet<PlayerInput>>();
 
     for event in event_pump.poll_iter() {
         match event {
             Event::Quit {..} => return Ok(true),
             Event::KeyDown { keycode: Some(kc), .. } => match kc {
                 Keycode::Escape => return Ok(true),
-                Keycode::Up => pinput.push(PlayerInput::Thrust),
-                Keycode::Left => pinput.push(PlayerInput::RotateLeft),
-                Keycode::Right => pinput.push(PlayerInput::RotateRight),
-                Keycode::Space => pinput.push(PlayerInput::Fire),
+                Keycode::Up => { pinput.insert(PlayerInput::Thrust); },
+                Keycode::Left => { pinput.insert(PlayerInput::RotateLeft); },
+                Keycode::Right => { pinput.insert(PlayerInput::RotateRight); },
+                Keycode::Space => { pinput.insert(PlayerInput::Fire); },
+                _ => ()
+            },
+            Event::KeyUp { keycode: Some(kc), .. } => match kc {
+                Keycode::Up => { pinput.remove(&PlayerInput::Thrust); },
+                Keycode::Left => { pinput.remove(&PlayerInput::RotateLeft); },
+                Keycode::Right => { pinput.remove(&PlayerInput::RotateRight); },
+                Keycode::Space => { pinput.remove(&PlayerInput::Fire); },
                 _ => ()
             },
             Event::Window { win_event: SizeChanged(w, h), .. } => {
                 *wsize = WorldSize(w as u32, h as u32);
             },
-            _ => {}
+            _ => ()
         }
     }
     Ok(false)

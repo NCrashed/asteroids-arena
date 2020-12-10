@@ -32,6 +32,7 @@ pub const PLAYER_ROTATE_SPEED : f32 = std::f32::consts::PI;
 pub const PLAYER_FIRE_COOLDOWN : f32 = 0.3;
 
 /// Possible inputs from player
+#[derive(PartialEq, Eq, Hash)]
 pub enum PlayerInput {
     Thrust,
     RotateLeft,
@@ -49,4 +50,10 @@ pub fn spawn_player(w : &mut World) -> Entity {
         .with(Rot(0.0))
         .with(Vel(Vec2 { x: 0.0, y: 0.0 }))
         .build();
+}
+
+/// Add velocity to direction the rotation has
+pub fn add_vel_forward(vel: &mut Vel, rot: &Rot, dv: f32) {
+    let r = rot.0;
+    *vel = Vel(vel.0 + Vec2::new(dv * r.cos(), dv * r.sin()))
 }

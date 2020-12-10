@@ -49,7 +49,7 @@ fn render_player(canvas: &mut WindowCanvas, player: &Player, pos: &Pos, rot: &Ro
         let mut points = [
               Point::new(-dx, dy / 2)
             , Point::new(-dx-10, 0)
-            , Point::new(-dx, dy / 2)
+            , Point::new(-dx, -dy / 2)
             ];
         transform(&mat, &mut points[..]);
         canvas.draw_lines(&points[..])?;

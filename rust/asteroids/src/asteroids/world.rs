@@ -1,4 +1,5 @@
 use specs::prelude::*;
+use std::collections::HashSet;
 use std::default::default;
 use std::time::Duration;
 
@@ -20,7 +21,7 @@ pub fn init_world() -> World {
 
     world.insert(DeltaTime(Duration::new(0, 0)));
     world.insert(default::<WorldSize>());
-    world.insert(default::<Vec<PlayerInput>>());
+    world.insert(default::<HashSet<PlayerInput>>());
 
     spawn_player(&mut world);
     return world;
