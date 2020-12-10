@@ -20,6 +20,7 @@ pub fn init_world() -> World {
 
     world.insert(DeltaTime(Duration::new(0, 0)));
     world.insert(default::<WorldSize>());
+    world.insert(default::<Vec<PlayerInput>>());
 
     spawn_player(&mut world);
     return world;

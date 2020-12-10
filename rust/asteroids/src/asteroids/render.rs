@@ -15,9 +15,12 @@ pub type SystemData<'a> = (
     ReadStorage<'a, Player>);
 
 pub fn render_world(canvas: &mut WindowCanvas, (pos, rot, player): SystemData) -> Result<(), String> {
+    canvas.set_draw_color(Color::RGB(0, 0, 0));
+    canvas.clear();
     for (player, pos, rot) in (&player, &pos, &rot).join() {
-        render_player(canvas, player, pos, rot);
+        render_player(canvas, player, pos, rot)?;
     }
+    canvas.present();
     Ok(())
 }
 
@@ -40,26 +43,16 @@ fn render_player(canvas: &mut WindowCanvas, player: &Player, pos: &Pos, rot: &Ro
         , Point::new(dx, 0)
         ];
     transform(&mat, &mut points[..]);
-    canvas.draw_lines(&points[..]);
-    // let points : Vec<Point> = [
-    //       Vec2::new(dx, 0.)
-    //     , Vec2::new(-dx, -dy)
-    //     , Vec2::new(-dx, dy)
-    //     , Vec2::new(dx, 0.)
-    //     ].iter().map(|v| {
-    //         let tv = mat.transform_point2(*v);
-    //         Point::new(tv.x as i32, tv.y as i32)
-    //     }
-    //     ).collect();
-    // canvas.draw_lines(&points[..]);
+    canvas.draw_lines(&points[..])?;
 
-    // if player.0 {
-    //     let points = [
-    //           Vec2::new(-dx, 0.5 * dy)
-    //         , Vec2::new(-dx-10.0, 0.0)
-    //         , Vec2::new(-dx, -0.5 * dy)
-    //         ];
-    //     canvas.draw_lines(transform(&points));
-    // }
+    if player.0 {
+        let mut points = [
+              Point::new(-dx, dy / 2)
+            , Point::new(-dx-10, 0)
+            , Point::new(-dx, dy / 2)
+            ];
+        transform(&mat, &mut points[..]);
+        canvas.draw_lines(&points[..])?;
+    }
     Ok(())
 }

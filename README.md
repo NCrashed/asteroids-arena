@@ -42,7 +42,7 @@ cabal new-run plotting -- fps.out
 In haskell nix-shell.
 
 ### Haskell
-FPS drops to unplayable values very often.
+FPS now stable 40-100, smooth gameplay.
 ![Haskell FPS](./haskell/fps.png)
 
 ### C

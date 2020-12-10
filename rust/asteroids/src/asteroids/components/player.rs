@@ -31,8 +31,16 @@ pub const PLAYER_ROTATE_SPEED : f32 = std::f32::consts::PI;
 /// Amount of seconds between spawn of two player bullets
 pub const PLAYER_FIRE_COOLDOWN : f32 = 0.3;
 
+/// Possible inputs from player
+pub enum PlayerInput {
+    Thrust,
+    RotateLeft,
+    RotateRight,
+    Fire
+}
+
 /// Allocate components for the player
-pub fn spawn_player(mut w : &mut World) -> Entity {
+pub fn spawn_player(w : &mut World) -> Entity {
     let ws : WorldSize = *w.read_resource::<WorldSize>();
     return w.create_entity()
         .with(Player(false, PLAYER_FIRE_COOLDOWN))
