@@ -30,10 +30,10 @@ impl<'a> System<'a> for SysPlayer {
                         player.0 = true;
                     },
                     PlayerInput::RotateLeft => {
-
+                        rotation_increase(rot, -dt*PLAYER_ROTATE_SPEED);
                     },
                     PlayerInput::RotateRight => {
-
+                        rotation_increase(rot, dt*PLAYER_ROTATE_SPEED);
                     },
                     PlayerInput::Fire => {
 

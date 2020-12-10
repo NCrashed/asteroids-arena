@@ -1,5 +1,6 @@
 use specs::prelude::*;
 use glam::Vec2;
+use std::f32::consts::PI;
 
 use super::pos::*;
 use super::size::*;
@@ -26,7 +27,7 @@ pub const PLAYER_MASS : f32 = 1000.0;
 pub const PLAYER_THRUST : f32 = 100000.0;
 
 /// Rotation speed in radians per second
-pub const PLAYER_ROTATE_SPEED : f32 = std::f32::consts::PI;
+pub const PLAYER_ROTATE_SPEED : f32 = PI;
 
 /// Amount of seconds between spawn of two player bullets
 pub const PLAYER_FIRE_COOLDOWN : f32 = 0.3;
@@ -56,4 +57,16 @@ pub fn spawn_player(w : &mut World) -> Entity {
 pub fn add_vel_forward(vel: &mut Vel, rot: &Rot, dv: f32) {
     let r = rot.0;
     *vel = Vel(vel.0 + Vec2::new(dv * r.cos(), dv * r.sin()))
+}
+
+/// Increase rotation of the component by given amount of radians
+pub fn rotation_increase(rot: &mut Rot, da: f32) {
+    *rot = Rot(clamp_angle(rot.0 + da));
+}
+
+/// Make angle lie in range [0 .. 2*PI)
+fn clamp_angle(a: f32) -> f32 {
+    if a < 0. { 2.*PI + a }
+    else if a > 2.*PI { a - 2.*PI }
+    else { a }
 }
