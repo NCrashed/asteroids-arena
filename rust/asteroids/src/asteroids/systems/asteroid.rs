@@ -55,12 +55,12 @@ impl<'a> System<'a> for SysAsteroid {
                 let dv = Vec2::new(vx, vy);
                 let a1 = spawn_asteroid(&entities, &mut asteroid, &mut mass, &mut pos, &mut vel, &mut rot, child_radius, p, v+dv, r);
                 match a1 {
-                    Err(msg) => println!("Failed to spawn asteroid: {}", msg),
+                    Err(msg) => println!("Failed to spawn first child asteroid: {}", msg),
                     _ => ()
                 }
                 let a2 = spawn_asteroid(&entities, &mut asteroid, &mut mass, &mut pos, &mut vel, &mut rot, child_radius, p, v-dv, r);
                 match a2 {
-                    Err(msg) => println!("Failed to spawn asteroid: {}", msg),
+                    Err(msg) => println!("Failed to spawn second child asteroid: {}", msg),
                     _ => ()
                 }
             }
