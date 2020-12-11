@@ -1,4 +1,3 @@
-use glam::Vec2;
 use shrev::EventChannel;
 use specs::prelude::*;
 use std::fmt::Display;
@@ -33,6 +32,7 @@ impl<'a> System<'a> for SysBullet {
     fn run(&mut self, (chan, delta, entities, mut bullet, mut pos, mut vel): Self::SystemData) {
         let dt = delta.0.as_secs_f32();
 
+        // Spawn bullets
         for event in chan.read(&mut self.reader) {
             let res = spawn_bullet(&entities, &mut bullet, &mut pos, &mut vel, event);
             match res {
@@ -41,8 +41,15 @@ impl<'a> System<'a> for SysBullet {
             }
         }
 
-        for bullet in (&mut bullet).join() {
-
+        // Destroy bullets
+        for (bullet, e) in (&mut bullet, &entities).join() {
+            bullet.0 -= dt;
+            if bullet.0 <= 0.0 {
+                match entities.delete(e).stringify() {
+                    Err(msg) => println!("Failed to delete bullet {:?}: {}", e, msg),
+                    _ => ()
+                }
+            }
         }
     }
 }

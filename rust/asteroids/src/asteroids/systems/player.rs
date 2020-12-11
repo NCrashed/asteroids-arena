@@ -27,7 +27,14 @@ impl<'a> System<'a> for SysPlayer {
     fn run(&mut self, (mut bullet_chan, pinput, delta, mut player, pos, mut vel_store, mut rot, mass): Self::SystemData) {
         let dt = delta.0.as_secs_f32();
         for (player, pos, vel, rot, mass) in (&mut player, &pos, &mut vel_store, &mut rot, &mass).join() {
+            // Drop thrusting flag. That disables rendering of engine when there is not pressed up key by player.
             player.0 = false;
+            // Process cooldown for firing
+            if player.1 > 0.0 {
+                player.1 -= dt;
+                if player.1 < 0.0 { player.1 = 0.0; }
+            }
+            // Process inputs
             for ie in pinput.iter() {
                 match ie {
                     PlayerInput::Thrust => {

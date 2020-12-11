@@ -8,17 +8,22 @@ use glam::Mat3;
 use super::components::player::*;
 use super::components::pos::*;
 use super::components::rot::*;
+use super::components::bullet::*;
 
 pub type SystemData<'a> = (
     ReadStorage<'a, Pos>,
     ReadStorage<'a, Rot>,
-    ReadStorage<'a, Player>);
+    ReadStorage<'a, Player>,
+    ReadStorage<'a, Bullet>);
 
-pub fn render_world(canvas: &mut WindowCanvas, (pos, rot, player): SystemData) -> Result<(), String> {
+pub fn render_world(canvas: &mut WindowCanvas, (pos, rot, player, bullet): SystemData) -> Result<(), String> {
     canvas.set_draw_color(Color::RGB(0, 0, 0));
     canvas.clear();
     for (player, pos, rot) in (&player, &pos, &rot).join() {
         render_player(canvas, player, pos, rot)?;
+    }
+    for (_, pos) in (&bullet, &pos).join() {
+        render_bullet(canvas, pos)?;
     }
     canvas.present();
     Ok(())
@@ -55,4 +60,8 @@ fn render_player(canvas: &mut WindowCanvas, player: &Player, pos: &Pos, rot: &Ro
         canvas.draw_lines(&points[..])?;
     }
     Ok(())
+}
+
+fn render_bullet(canvas: &mut WindowCanvas, pos: &Pos) -> Result<(), String> {
+    canvas.draw_point(Point::new(pos.0.x as i32, pos.0.y as i32))
 }
