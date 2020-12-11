@@ -8,10 +8,9 @@ use super::mass::*;
 use super::rot::*;
 use super::vel::*;
 
+/// Player component that has thrust engine flag (`true` for on) and bullet cooldown time left.
 #[derive(Component, Copy, Clone, Debug, Default)]
 #[storage(HashMapStorage)]
-
-/// Player component that has thrust engine flag (`true` for on) and bullet cooldown time left.
 pub struct Player(pub bool, pub f32);
 
 /// Player size in pixels
@@ -39,6 +38,13 @@ pub enum PlayerInput {
     RotateLeft,
     RotateRight,
     Fire
+}
+
+/// Event that fires when player collides with asteroid
+#[derive(Debug)]
+pub struct PlayerCollide{
+    pub player: Entity,
+    pub obstacle: Entity
 }
 
 /// Allocate components for the player
