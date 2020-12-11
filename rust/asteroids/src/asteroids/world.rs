@@ -27,7 +27,7 @@ pub fn init_world() -> World {
     world.insert(default::<WorldSize>());
     world.insert(default::<HashSet<PlayerInput>>());
 
-    spawn_player(&mut world);
-    spawn_asteroids(&mut world);
+    create_player(&mut world);
+    create_asteroids(&mut world);
     return world;
 }

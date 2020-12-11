@@ -42,7 +42,7 @@ pub enum PlayerInput {
 }
 
 /// Allocate components for the player
-pub fn spawn_player(w : &mut World) -> Entity {
+pub fn create_player(w : &mut World) -> Entity {
     let ws : WorldSize = *w.read_resource::<WorldSize>();
     return w.create_entity()
         .with(Player(false, PLAYER_FIRE_COOLDOWN))

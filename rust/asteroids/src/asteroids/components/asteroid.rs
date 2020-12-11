@@ -37,14 +37,14 @@ pub const ASTEROID_DENSITY : f32 = 1.0;
 pub const ASTEROIDS_AMOUNT : u32 = 20;
 
 /// Spawn all asteroids at generation time
-pub fn spawn_asteroids(world: &mut World) {
+pub fn create_asteroids(world: &mut World) {
     for _ in 0 .. ASTEROIDS_AMOUNT {
-        spawn_asteroid(world);
+        create_asteroid(world);
     }
 }
 
 /// Create new asteroid with random component values
-pub fn spawn_asteroid(world: &mut World) -> Entity {
+pub fn create_asteroid(world: &mut World) -> Entity {
     let mut rng = rand::thread_rng();
     let ws : WorldSize = *world.read_resource::<WorldSize>();
     let r = rng.gen_range(ASTEROID_SIZE_RANGE.0, ASTEROID_SIZE_RANGE.1);
