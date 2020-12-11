@@ -17,6 +17,10 @@ pub struct Asteroid{
     pub radius: f32,
 }
 
+/// Event that is fired when asteroid should break (bullet collision)
+#[derive(Debug)]
+pub struct AsteroidBreak(pub Entity);
+
 /// Amount of possible edges for asteroid
 pub const ASTEROID_EDGES_RANGE : (u32, u32) = (8, 20);
 

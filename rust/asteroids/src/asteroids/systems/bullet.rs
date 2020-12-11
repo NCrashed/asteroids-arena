@@ -1,7 +1,7 @@
 use shrev::EventChannel;
 use specs::prelude::*;
-use std::fmt::Display;
 
+use super::super::stringify::*;
 use super::super::components::bullet::*;
 use super::super::components::pos::*;
 use super::super::components::time::*;
@@ -51,17 +51,6 @@ impl<'a> System<'a> for SysBullet {
                 }
             }
         }
-    }
-}
-
-/// Helper to transform results from specific type of errors to string one without data
-trait Stringify {
-    fn stringify(self) -> Result<(), String>;
-}
-
-impl<T, E:Display> Stringify for Result<T, E> {
-    fn stringify(self) -> Result<(), String> {
-        self.map_err(|x| format!("{}", x)).map(|_| ())
     }
 }
 
