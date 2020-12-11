@@ -1,10 +1,12 @@
+use glam::Mat3;
+use glam::Vec2;
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
 use sdl2::render::*;
 use specs::prelude::*;
-use glam::Vec2;
-use glam::Mat3;
+use std::f32::consts::PI;
 
+use super::components::asteroid::*;
 use super::components::player::*;
 use super::components::pos::*;
 use super::components::rot::*;
@@ -14,9 +16,10 @@ pub type SystemData<'a> = (
     ReadStorage<'a, Pos>,
     ReadStorage<'a, Rot>,
     ReadStorage<'a, Player>,
-    ReadStorage<'a, Bullet>);
+    ReadStorage<'a, Bullet>,
+    ReadStorage<'a, Asteroid>);
 
-pub fn render_world(canvas: &mut WindowCanvas, (pos, rot, player, bullet): SystemData) -> Result<(), String> {
+pub fn render_world(canvas: &mut WindowCanvas, (pos, rot, player, bullet, asteroid): SystemData) -> Result<(), String> {
     canvas.set_draw_color(Color::RGB(0, 0, 0));
     canvas.clear();
     for (player, pos, rot) in (&player, &pos, &rot).join() {
@@ -24,6 +27,9 @@ pub fn render_world(canvas: &mut WindowCanvas, (pos, rot, player, bullet): Syste
     }
     for (_, pos) in (&bullet, &pos).join() {
         render_bullet(canvas, pos)?;
+    }
+    for (asteroid, pos, rot) in (&asteroid, &pos, &rot).join() {
+        render_asteroid(canvas, asteroid, pos, rot)?;
     }
     canvas.present();
     Ok(())
@@ -64,4 +70,20 @@ fn render_player(canvas: &mut WindowCanvas, player: &Player, pos: &Pos, rot: &Ro
 
 fn render_bullet(canvas: &mut WindowCanvas, pos: &Pos) -> Result<(), String> {
     canvas.draw_point(Point::new(pos.0.x as i32, pos.0.y as i32))
+}
+
+fn circloid_point(i: u32, n: u32, r: f32, p: Vec2, a0: f32) -> Point {
+    let a = i as f32 * (2.0 * PI / (n as f32));
+    let x = (r * (1.0 + a.sin() * 0.3) * (a0 + a).cos()) as i32;
+    let y = (r * (1.0 + a.cos() * 0.3) * (a0 + a).sin()) as i32;
+    Point::new(p.x as i32 + x, p.y as i32 + y)
+}
+
+fn render_asteroid(canvas: &mut WindowCanvas, asteroid: &Asteroid, pos: &Pos, rot: &Rot) -> Result<(), String> {
+    for i in 0 .. asteroid.edges {
+        let p1 = circloid_point(i, asteroid.edges, asteroid.radius, pos.0, rot.0);
+        let p2 = circloid_point(i+1, asteroid.edges, asteroid.radius, pos.0, rot.0);
+        canvas.draw_line(p1, p2)?;
+    }
+    Ok(())
 }
