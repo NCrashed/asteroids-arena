@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use std::default::default;
 use std::time::Duration;
 
+use super::components::asteroid::*;
 use super::components::mass::*;
 use super::components::bullet::*;
 use super::components::player::*;
@@ -14,6 +15,7 @@ use super::components::vel::*;
 
 pub fn init_world() -> World {
     let mut world = World::new();
+    world.register::<Asteroid>();
     world.register::<Bullet>();
     world.register::<Mass>();
     world.register::<Player>();
@@ -26,5 +28,6 @@ pub fn init_world() -> World {
     world.insert(default::<HashSet<PlayerInput>>());
 
     spawn_player(&mut world);
+    spawn_asteroids(&mut world);
     return world;
 }
