@@ -21,17 +21,22 @@ impl<'a> System<'a> for SysPhysics {
             // Apply all velocities
             pos.0 += vel.0 * dt;
             // Wrap space
-            let Vec2{x, y} = pos.0;
-            if x > wsize.0 as f32 {
-                pos.0.x = 0.0;
-            } else if x < 0.0 {
-                pos.0.x = wsize.0 as f32;
-            }
-            if y > wsize.1 as f32 {
-                pos.0.y = 0.0;
-            } else if y < 0.0 {
-                pos.0.y = wsize.1 as f32;
-            }
+            wrap_space(&wsize, pos);
         }
+    }
+}
+
+/// If some entity goes offscreen, teleport it to other side.
+fn wrap_space(wsize: &WorldSize, pos: &mut Pos) {
+    let Vec2{x, y} = pos.0;
+    if x > wsize.0 as f32 {
+        pos.0.x = 0.0;
+    } else if x < 0.0 {
+        pos.0.x = wsize.0 as f32;
+    }
+    if y > wsize.1 as f32 {
+        pos.0.y = 0.0;
+    } else if y < 0.0 {
+        pos.0.y = wsize.1 as f32;
     }
 }

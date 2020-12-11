@@ -5,6 +5,7 @@ extern crate specs;
 extern crate glam;
 #[macro_use]
 extern crate specs_derive;
+extern crate shrev;
 
 use asteroids::components::player::*;
 use asteroids::components::size::*;

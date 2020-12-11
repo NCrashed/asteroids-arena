@@ -1,8 +1,11 @@
+use shrev::EventChannel;
 use specs::prelude::*;
 use std::collections::HashSet;
 
+use super::super::components::bullet::*;
 use super::super::components::mass::*;
 use super::super::components::player::*;
+use super::super::components::pos::*;
 use super::super::components::rot::*;
 use super::super::components::time::*;
 use super::super::components::vel::*;
@@ -11,16 +14,19 @@ use super::super::components::vel::*;
 pub struct SysPlayer;
 
 impl<'a> System<'a> for SysPlayer {
-    type SystemData = (Read<'a, HashSet<PlayerInput>>,
+    type SystemData = (
+        Write<'a, EventChannel<BulletSpawn>>,
+        Read<'a, HashSet<PlayerInput>>,
         Read<'a, DeltaTime>,
         WriteStorage<'a, Player>,
+        ReadStorage<'a, Pos>,
         WriteStorage<'a, Vel>,
         WriteStorage<'a, Rot>,
         ReadStorage<'a, Mass>);
 
-    fn run(&mut self, (pinput, delta, mut player, mut vel, mut rot, mass): Self::SystemData) {
+    fn run(&mut self, (mut bullet_chan, pinput, delta, mut player, pos, mut vel_store, mut rot, mass): Self::SystemData) {
         let dt = delta.0.as_secs_f32();
-        for (player, vel, rot, mass) in (&mut player, &mut vel, &mut rot, &mass).join() {
+        for (player, pos, vel, rot, mass) in (&mut player, &pos, &mut vel_store, &mut rot, &mass).join() {
             player.0 = false;
             for ie in pinput.iter() {
                 match ie {
@@ -36,7 +42,11 @@ impl<'a> System<'a> for SysPlayer {
                         rotation_increase(rot, dt*PLAYER_ROTATE_SPEED);
                     },
                     PlayerInput::Fire => {
-
+                        if player.1 == 0. {
+                            player.1 = PLAYER_FIRE_COOLDOWN;
+                            let bv = vel.0 + rot_vec(rot) * BULLET_SPEED;
+                            bullet_chan.single_write(BulletSpawn{ pos: pos.0, vel: bv });
+                        }
                     },
                 }
             }

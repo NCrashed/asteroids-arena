@@ -1,3 +1,4 @@
+pub mod bullet;
 pub mod mass;
 pub mod player;
 pub mod pos;

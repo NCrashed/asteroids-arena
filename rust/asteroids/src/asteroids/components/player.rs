@@ -52,21 +52,3 @@ pub fn spawn_player(w : &mut World) -> Entity {
         .with(Vel(Vec2 { x: 0.0, y: 0.0 }))
         .build();
 }
-
-/// Add velocity to direction the rotation has
-pub fn add_vel_forward(vel: &mut Vel, rot: &Rot, dv: f32) {
-    let r = rot.0;
-    *vel = Vel(vel.0 + Vec2::new(dv * r.cos(), dv * r.sin()))
-}
-
-/// Increase rotation of the component by given amount of radians
-pub fn rotation_increase(rot: &mut Rot, da: f32) {
-    *rot = Rot(clamp_angle(rot.0 + da));
-}
-
-/// Make angle lie in range [0 .. 2*PI)
-fn clamp_angle(a: f32) -> f32 {
-    if a < 0. { 2.*PI + a }
-    else if a > 2.*PI { a - 2.*PI }
-    else { a }
-}
