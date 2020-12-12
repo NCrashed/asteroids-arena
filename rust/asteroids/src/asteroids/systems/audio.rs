@@ -32,9 +32,9 @@ impl SysAudio {
     fn play_sounds(&mut self, audio_chan: &EventChannel<PlayAudio>) -> Result<(), String> {
         for event in audio_chan.read(&mut self.reader) {
             match event {
-                PlayAudio::BangSound => play_with_cooldown(&mut self.sounds.bang, 0.5)?,
-                PlayAudio::FireSound => play_with_cooldown(&mut self.sounds.fire, 0.4)?,
-                PlayAudio::ThrustSound => play_with_cooldown(&mut self.sounds.thrust, 0.5)?,
+                PlayAudio::BangSound => play_with_cooldown(&mut self.sounds.bang, 0.4)?,
+                PlayAudio::FireSound => play_with_cooldown(&mut self.sounds.fire, 0.2)?,
+                PlayAudio::ThrustSound => play_with_cooldown(&mut self.sounds.thrust, 0.2)?,
             }
         }
         Ok(())
@@ -62,7 +62,7 @@ impl<'a> System<'a> for SysAudio {
 fn play_with_cooldown(ch: &mut CooledChunk, dt: f32) -> Result<(), String> {
     if ch.cooldown == 0.0 {
         ch.cooldown = dt;
-        Channel::all().play(&ch.chunk, 1).map(|_| ())?;
+        Channel::all().play(&ch.chunk, 0).map(|_| ())?;
     }
     Ok(())
 }
