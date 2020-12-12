@@ -23,10 +23,12 @@ use sdl2::mixer::{InitFlag, AUDIO_S16LSB, DEFAULT_CHANNELS};
 use sdl2::pixels::Color;
 use sdl2::render::WindowCanvas;
 use specs::Dispatcher;
+use specs::System;
 use specs::World;
 use specs::WorldExt;
-use specs::System;
 use std::collections::HashSet;
+use std::fs::File;
+use std::io::Write;
 use std::time::Instant;
 
 mod asteroids;
@@ -80,6 +82,7 @@ fn game_loop<'a, 'b>(mut canvas: WindowCanvas, mut event_pump: EventPump, mut wo
     // audio device is opened.
     let mut audio_sys = SysAudio::new(&mut world)?;
     let mut i = 0; // counter for fps reporting
+    let mut file = File::create("fps.out").map_err(|x| format!("{}", x))?; // fps reporting file
     'running: loop {
         // Start frame, save current time for FPS counter and physics delta time
         let frame_begin = Instant::now();
@@ -101,21 +104,22 @@ fn game_loop<'a, 'b>(mut canvas: WindowCanvas, mut event_pump: EventPump, mut wo
 
         // Write delta time and report FPS
         let mut delta = world.write_resource::<DeltaTime>();
-        *delta = calc_fps(frame_begin, &mut i);
+        *delta = calc_fps(frame_begin, &mut i, &mut file)?;
     }
 }
 
 /// Helper to report FPS counter and calculation of delta time for physics. The second counter
 /// tracks count of frames to report about FPS not every frame.
-fn calc_fps(frame_begin: Instant, i: &mut i32) -> DeltaTime {
+fn calc_fps(frame_begin: Instant, i: &mut i32, file: &mut File) -> Result<DeltaTime, String> {
     let frame_end = Instant::now();
     let dt = frame_end.duration_since(frame_begin);
     let fps = 1.0 / dt.as_secs_f64();
     if *i == 0 {
         println!("{} FPS", fps);
+        write!(file, "{}\n", fps).map_err(|x| format!("{}", x))?;
     }
     *i = (*i + 1) % 2000;
-    DeltaTime(dt)
+    Ok(DeltaTime(dt))
 }
 
 /// Iterate over all occured events from system and user and feed them inside game logic
