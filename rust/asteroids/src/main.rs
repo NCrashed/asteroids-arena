@@ -13,16 +13,19 @@ use asteroids::components::size::*;
 use asteroids::components::time::DeltaTime;
 use asteroids::render::render_world;
 use asteroids::systems::init_systems;
+use asteroids::systems::audio::*;
 use asteroids::world::init_world;
 use sdl2::event::Event;
 use sdl2::event::WindowEvent::SizeChanged;
 use sdl2::EventPump;
 use sdl2::keyboard::Keycode;
+use sdl2::mixer::{InitFlag, AUDIO_S16LSB, DEFAULT_CHANNELS};
 use sdl2::pixels::Color;
 use sdl2::render::WindowCanvas;
 use specs::Dispatcher;
 use specs::World;
 use specs::WorldExt;
+use specs::System;
 use std::collections::HashSet;
 use std::time::Instant;
 
@@ -33,10 +36,18 @@ fn initialize<'a, 'b>() -> Result<(WindowCanvas, EventPump, World, Dispatcher<'a
     // Initialize libraries
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
+    let _audio = sdl_context.audio()?;
+
+    let _mixer_context =
+        sdl2::mixer::init(InitFlag::MP3 | InitFlag::FLAC | InitFlag::MOD | InitFlag::OGG)?;
+
+    // Number of mixing channels available for sound effect `Chunk`s to play
+    // simultaneously.
+    sdl2::mixer::allocate_channels(20);
 
     // Initialize world
     let mut world = init_world();
-    let dispatcher : Dispatcher<'a, 'b> = init_systems(&mut world);
+    let dispatcher : Dispatcher<'a, 'b> = init_systems(&mut world)?;
 
     // Initialize window systems
     let window = video_subsystem.window("Asteroids game", DEF_WORLD_WIDTH, DEF_WORLD_HEIGHT)
@@ -58,6 +69,16 @@ fn initialize<'a, 'b>() -> Result<(WindowCanvas, EventPump, World, Dispatcher<'a
 
 /// Main game loop where game runs 99% of time. It does processing of input events, rendering and execution of game logic.
 fn game_loop<'a, 'b>(mut canvas: WindowCanvas, mut event_pump: EventPump, mut world: World, mut dispatcher: Dispatcher<'a, 'b>) -> Result<(), String>  {
+    // Initialize audio here, as audio device will be deallocated if we initialize it outside the function.
+    let frequency = 44_100;
+    let format = AUDIO_S16LSB; // signed 16 bit samples, in little-endian byte order
+    let channels = DEFAULT_CHANNELS; // Stereo
+    let chunk_size = 1_024;
+    sdl2::mixer::open_audio(frequency, format, channels, chunk_size)?;
+
+    // Audio system is somewhat special, it should be thread local and must be initialized after
+    // audio device is opened.
+    let mut audio_sys = SysAudio::new(&mut world)?;
     let mut i = 0; // counter for fps reporting
     'running: loop {
         // Start frame, save current time for FPS counter and physics delta time
@@ -71,6 +92,9 @@ fn game_loop<'a, 'b>(mut canvas: WindowCanvas, mut event_pump: EventPump, mut wo
         // Execute all game logic
         dispatcher.dispatch(&world);
         world.maintain();
+
+        // Play sounds
+        audio_sys.run(world.system_data());
 
         // Render all
         render_world(&mut canvas, world.system_data())?;

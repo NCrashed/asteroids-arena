@@ -6,6 +6,7 @@ use std::f32::consts::PI;
 
 use super::super::stringify::*;
 use super::super::components::asteroid::*;
+use super::super::components::audio::*;
 use super::super::components::mass::*;
 use super::super::components::pos::*;
 use super::super::components::rot::*;
@@ -27,6 +28,7 @@ impl SysAsteroid {
 impl<'a> System<'a> for SysAsteroid {
     type SystemData = (
         Read<'a, EventChannel<AsteroidBreak>>,
+        Write<'a, EventChannel<PlayAudio>>,
         Entities<'a>,
         WriteStorage<'a, Asteroid>,
         WriteStorage<'a, Mass>,
@@ -35,10 +37,11 @@ impl<'a> System<'a> for SysAsteroid {
         WriteStorage<'a, Rot>,
     );
 
-    fn run(&mut self, (chan, entities, mut asteroid, mut mass, mut pos, mut vel, mut rot): Self::SystemData) {
+    fn run(&mut self, (chan, mut audio_chan, entities, mut asteroid, mut mass, mut pos, mut vel, mut rot): Self::SystemData) {
         let mut rng = rand::thread_rng();
         // Break and destroy asteroids on event
         for event in chan.read(&mut self.reader) {
+            audio_chan.single_write(PlayAudio::BangSound);
             let e = event.0;
             let radius = asteroid.get(e).map(|a| a.radius).unwrap_or(0.0);
             let p = pos.get(e).map(|a| a.0).unwrap_or(Vec2::new(0.0, 0.0));

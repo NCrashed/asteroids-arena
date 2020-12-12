@@ -7,9 +7,13 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-sdl2 = "^0.34"
 glam = "^0.11"
 shrev = "^1.1"
 specs = "^0.16"
 specs-derive = "^0.4"
 rand = "^0.7"
+
+[dependencies.sdl2]
+version = "^0.34"
+default-features = false
+features = ["mixer"]

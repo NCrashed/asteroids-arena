@@ -1,4 +1,5 @@
 pub mod asteroid;
+pub mod audio;
 pub mod bullet;
 pub mod mass;
 pub mod player;

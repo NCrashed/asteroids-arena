@@ -1,4 +1,5 @@
 pub mod asteroid;
+pub mod audio;
 pub mod bullet;
 pub mod physics;
 pub mod player;
@@ -9,7 +10,7 @@ use self::physics::SysPhysics;
 use self::player::SysPlayer;
 use specs::prelude::*;
 
-pub fn init_systems<'a, 'b>(mut w : &mut World) -> Dispatcher<'a, 'b> {
+pub fn init_systems<'a, 'b>(mut w : &mut World) -> Result<Dispatcher<'a, 'b>, String> {
     let mut dispatcher = DispatcherBuilder::new()
         .with(SysPlayer::new(w), "player", &[])
         .with(SysBullet::new(w), "bullet", &[])
@@ -18,5 +19,5 @@ pub fn init_systems<'a, 'b>(mut w : &mut World) -> Dispatcher<'a, 'b> {
         .build();
 
     dispatcher.setup(&mut w);
-    return dispatcher;
+    Ok(dispatcher)
 }
