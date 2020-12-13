@@ -1,5 +1,5 @@
-use specs::prelude::*;
 use glam::Vec2;
+use specs::prelude::*;
 
 #[derive(Component, Copy, Clone, Debug, Default)]
 #[storage(VecStorage)]

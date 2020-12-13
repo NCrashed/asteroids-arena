@@ -1,21 +1,23 @@
 use shrev::EventChannel;
 use specs::prelude::*;
 
-use super::super::stringify::*;
 use super::super::components::bullet::*;
 use super::super::components::pos::*;
 use super::super::components::time::*;
 use super::super::components::vel::*;
+use super::super::stringify::*;
 
 /// System that spawns bullets and destroys them when they live timer is over.
 pub struct SysBullet {
-    reader: ReaderId<BulletSpawn>
+    reader: ReaderId<BulletSpawn>,
 }
 
 impl SysBullet {
     pub fn new(world: &mut World) -> Self {
         <Self as System<'_>>::SystemData::setup(world);
-        let reader_id = world.fetch_mut::<EventChannel<BulletSpawn>>().register_reader();
+        let reader_id = world
+            .fetch_mut::<EventChannel<BulletSpawn>>()
+            .register_reader();
         Self { reader: reader_id }
     }
 }
@@ -27,7 +29,8 @@ impl<'a> System<'a> for SysBullet {
         Entities<'a>,
         WriteStorage<'a, Bullet>,
         WriteStorage<'a, Pos>,
-        WriteStorage<'a, Vel>);
+        WriteStorage<'a, Vel>,
+    );
 
     fn run(&mut self, (chan, delta, entities, mut bullet, mut pos, mut vel): Self::SystemData) {
         let dt = delta.0.as_secs_f32();
@@ -37,7 +40,7 @@ impl<'a> System<'a> for SysBullet {
             let res = spawn_bullet(&entities, &mut bullet, &mut pos, &mut vel, event);
             match res {
                 Err(msg) => println!("Failed to spawn bullet: {}", msg),
-                _ => ()
+                _ => (),
             }
         }
 
@@ -47,7 +50,7 @@ impl<'a> System<'a> for SysBullet {
             if bullet.0 <= 0.0 {
                 match entities.delete(e).stringify() {
                     Err(msg) => println!("Failed to delete bullet {:?}: {}", e, msg),
-                    _ => ()
+                    _ => (),
                 }
             }
         }
@@ -59,9 +62,8 @@ fn spawn_bullet<'a>(
     bullet: &mut WriteStorage<'a, Bullet>,
     pos: &mut WriteStorage<'a, Pos>,
     vel: &mut WriteStorage<'a, Vel>,
-    ev: &BulletSpawn
-    ) -> Result<(), String>
-{
+    ev: &BulletSpawn,
+) -> Result<(), String> {
     let e = entities.create();
     bullet.insert(e, Bullet(BULLET_LIFE_TIME)).stringify()?;
     pos.insert(e, Pos(ev.pos)).stringify()?;

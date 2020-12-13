@@ -1,27 +1,27 @@
 #![feature(default_free_fn)]
 
+extern crate glam;
 extern crate sdl2;
 extern crate specs;
-extern crate glam;
 #[macro_use]
 extern crate specs_derive;
-extern crate shrev;
 extern crate rand;
+extern crate shrev;
 
 use asteroids::components::player::*;
 use asteroids::components::size::*;
 use asteroids::components::time::DeltaTime;
 use asteroids::render::render_world;
-use asteroids::systems::init_systems;
 use asteroids::systems::audio::*;
+use asteroids::systems::init_systems;
 use asteroids::world::init_world;
 use sdl2::event::Event;
 use sdl2::event::WindowEvent::SizeChanged;
-use sdl2::EventPump;
 use sdl2::keyboard::Keycode;
 use sdl2::mixer::{InitFlag, AUDIO_S16LSB, DEFAULT_CHANNELS};
 use sdl2::pixels::Color;
 use sdl2::render::WindowCanvas;
+use sdl2::EventPump;
 use specs::Dispatcher;
 use specs::System;
 use specs::World;
@@ -49,15 +49,19 @@ fn initialize<'a, 'b>() -> Result<(WindowCanvas, EventPump, World, Dispatcher<'a
 
     // Initialize world
     let mut world = init_world();
-    let dispatcher : Dispatcher<'a, 'b> = init_systems(&mut world)?;
+    let dispatcher: Dispatcher<'a, 'b> = init_systems(&mut world)?;
 
     // Initialize window systems
-    let window = video_subsystem.window("Asteroids game", DEF_WORLD_WIDTH, DEF_WORLD_HEIGHT)
+    let window = video_subsystem
+        .window("Asteroids game", DEF_WORLD_WIDTH, DEF_WORLD_HEIGHT)
         .position_centered()
         .build()
         .expect("could not initialize video subsystem");
 
-    let mut canvas = window.into_canvas().build().expect("could not make a canvas");
+    let mut canvas = window
+        .into_canvas()
+        .build()
+        .expect("could not make a canvas");
 
     // Render first empty frame
     canvas.set_draw_color(Color::RGB(0, 0, 0));
@@ -70,7 +74,12 @@ fn initialize<'a, 'b>() -> Result<(WindowCanvas, EventPump, World, Dispatcher<'a
 }
 
 /// Main game loop where game runs 99% of time. It does processing of input events, rendering and execution of game logic.
-fn game_loop<'a, 'b>(mut canvas: WindowCanvas, mut event_pump: EventPump, mut world: World, mut dispatcher: Dispatcher<'a, 'b>) -> Result<(), String>  {
+fn game_loop<'a, 'b>(
+    mut canvas: WindowCanvas,
+    mut event_pump: EventPump,
+    mut world: World,
+    mut dispatcher: Dispatcher<'a, 'b>,
+) -> Result<(), String> {
     // Initialize audio here, as audio device will be deallocated if we initialize it outside the function.
     let frequency = 44_100;
     let format = AUDIO_S16LSB; // signed 16 bit samples, in little-endian byte order
@@ -89,7 +98,7 @@ fn game_loop<'a, 'b>(mut canvas: WindowCanvas, mut event_pump: EventPump, mut wo
 
         // Process all events, if function returns true
         if process_events(&mut world, &mut event_pump)? {
-            break 'running Ok(())
+            break 'running Ok(());
         }
 
         // Execute all game logic
@@ -129,32 +138,55 @@ fn process_events(world: &mut World, event_pump: &mut EventPump) -> Result<bool,
 
     for event in event_pump.poll_iter() {
         match event {
-            Event::Quit {..} => return Ok(true),
-            Event::KeyDown { keycode: Some(kc), .. } => match kc {
+            Event::Quit { .. } => return Ok(true),
+            Event::KeyDown {
+                keycode: Some(kc), ..
+            } => match kc {
                 Keycode::Escape => return Ok(true),
-                Keycode::Up => { pinput.insert(PlayerInput::Thrust); },
-                Keycode::Left => { pinput.insert(PlayerInput::RotateLeft); },
-                Keycode::Right => { pinput.insert(PlayerInput::RotateRight); },
-                Keycode::Space => { pinput.insert(PlayerInput::Fire); },
-                _ => ()
+                Keycode::Up => {
+                    pinput.insert(PlayerInput::Thrust);
+                }
+                Keycode::Left => {
+                    pinput.insert(PlayerInput::RotateLeft);
+                }
+                Keycode::Right => {
+                    pinput.insert(PlayerInput::RotateRight);
+                }
+                Keycode::Space => {
+                    pinput.insert(PlayerInput::Fire);
+                }
+                _ => (),
             },
-            Event::KeyUp { keycode: Some(kc), .. } => match kc {
-                Keycode::Up => { pinput.remove(&PlayerInput::Thrust); },
-                Keycode::Left => { pinput.remove(&PlayerInput::RotateLeft); },
-                Keycode::Right => { pinput.remove(&PlayerInput::RotateRight); },
-                Keycode::Space => { pinput.remove(&PlayerInput::Fire); },
-                _ => ()
+            Event::KeyUp {
+                keycode: Some(kc), ..
+            } => match kc {
+                Keycode::Up => {
+                    pinput.remove(&PlayerInput::Thrust);
+                }
+                Keycode::Left => {
+                    pinput.remove(&PlayerInput::RotateLeft);
+                }
+                Keycode::Right => {
+                    pinput.remove(&PlayerInput::RotateRight);
+                }
+                Keycode::Space => {
+                    pinput.remove(&PlayerInput::Fire);
+                }
+                _ => (),
             },
-            Event::Window { win_event: SizeChanged(w, h), .. } => {
+            Event::Window {
+                win_event: SizeChanged(w, h),
+                ..
+            } => {
                 *wsize = WorldSize(w as u32, h as u32);
-            },
-            _ => ()
+            }
+            _ => (),
         }
     }
     Ok(false)
 }
 
-pub fn main() -> Result<(), String>  {
+pub fn main() -> Result<(), String> {
     let (canvas, event_pump, world, dispatcher) = initialize()?;
     game_loop(canvas, event_pump, world, dispatcher)
 }

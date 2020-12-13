@@ -10,7 +10,7 @@ use self::physics::SysPhysics;
 use self::player::SysPlayer;
 use specs::prelude::*;
 
-pub fn init_systems<'a, 'b>(mut w : &mut World) -> Result<Dispatcher<'a, 'b>, String> {
+pub fn init_systems<'a, 'b>(mut w: &mut World) -> Result<Dispatcher<'a, 'b>, String> {
     let mut dispatcher = DispatcherBuilder::new()
         .with(SysPlayer::new(w), "player", &[])
         .with(SysBullet::new(w), "bullet", &[])
