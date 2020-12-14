@@ -5,6 +5,24 @@ const assert = @import("std").debug.assert;
 
 extern fn SDL_PollEvent(event: *c.SDL_Event) c_int;
 
+pub fn process_events() bool {
+    var event: c.SDL_Event = undefined;
+    while (SDL_PollEvent(&event) != 0) {
+        switch (event.@"type") {
+            c.SDL_QUIT => {
+                return true;
+            },
+            c.SDL_KEYDOWN => {
+                if (event.key.keysym.sym == c.SDLK_ESCAPE) {
+                    return true;
+                }
+            },
+            else => {},
+        }
+    }
+    return false;
+}
+
 pub fn main() !void {
     if (c.SDL_Init(c.SDL_INIT_VIDEO) != 0) {
         c.SDL_Log("Unable to initialize SDL: %s", c.SDL_GetError());
@@ -27,15 +45,7 @@ pub fn main() !void {
 
     var quit = false;
     while (!quit) {
-        var event: c.SDL_Event = undefined;
-        while (SDL_PollEvent(&event) != 0) {
-            switch (event.@"type") {
-                c.SDL_QUIT => {
-                    quit = true;
-                },
-                else => {},
-            }
-        }
+        quit = process_events();
 
         _ = c.SDL_RenderClear(renderer);
 
