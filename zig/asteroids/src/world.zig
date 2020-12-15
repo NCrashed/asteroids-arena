@@ -30,7 +30,7 @@ pub const World = struct {
     }
 
     ///  Make one tick of world simulation with given inputs. Return non zero if failed.
-    pub fn step(self: *World, dt: f32, events: *const input.Events) !void {
+    pub fn step(self: *World, dt: f64, events: *const input.Events) !void {
 
     }
 };

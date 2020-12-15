@@ -55,6 +55,7 @@ pub fn main() !void {
         c.SDL_Log("Unable to start timer");
         return error.TimerInitFail;
     };
+    var i : i32 = 1;
     var quit = false;
     var input_events = input.Events.init();
     while (!quit) {
@@ -64,12 +65,16 @@ pub fn main() !void {
 
         c.SDL_RenderPresent(renderer);
 
-        const dt = @intToFloat(f32, timer.lap()) * 0.000_000_001;
+        const dt = @intToFloat(f64, timer.lap()) * 0.000_000_001;
         w.step(dt, &input_events) catch |err| {
             c.SDL_Log("Unable to step world: %s", err);
             return error.WorldStepFail;
         };
 
-        c.SDL_Delay(17);
+        const fps = 1 / dt;
+        i += 1;
+        if (@mod(i, 1000) == 0) {
+            c.SDL_Log("%f", fps);
+        }
     }
 }
