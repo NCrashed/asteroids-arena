@@ -51,6 +51,12 @@ pub fn main() !void {
     };
     defer w.deinit();
 
+    var fps_file = std.fs.cwd().createFile("fps.out", std.fs.File.CreateFlags {}) catch |err| {
+        c.SDL_Log("Unable to open file fps.out for writing");
+        return err;
+    };
+    defer fps_file.close();
+
     var timer = std.time.Timer.start() catch |_| {
         c.SDL_Log("Unable to start timer");
         return error.TimerInitFail;
@@ -75,6 +81,10 @@ pub fn main() !void {
         i += 1;
         if (@mod(i, 1000) == 0) {
             c.SDL_Log("%f", fps);
+            fps_file.writer().print("{}\n", .{fps}) catch |_| {
+                c.SDL_Log("Failed to dump FPS to file");
+                return error.FpsWriteError;
+            };
         }
     }
 }
