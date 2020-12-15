@@ -2,6 +2,7 @@ const input = @import("input.zig");
 const storage = @import("storage.zig");
 const entity = @import("entity.zig");
 const Entity = entity.Entity;
+const Vec2 = @import("v2.zig").Vec2;
 
 const mass = @import("component/mass.zig");
 const player = @import("component/player.zig");
@@ -68,8 +69,13 @@ pub const World = struct {
     pub fn spawn_player(self: *World) !Entity {
         const x = @intToFloat(f32, self.size.global.width) * 0.5;
         const y = @intToFloat(f32, self.size.global.height) * 0.5;
-        const e = self.entities.new();
-
+        const e = try self.entities.new();
+        self.player.insert(e, player.Player { .thrust = false, .fire_cooldown = 0 });
+        try self.position.insert(e, Vec2 { .x = x, .y = y });
+        try self.velocity.insert(e, Vec2 { .x = 0, .y = 0 });
+        try self.rotation.insert(e, 0);
+        try self.mass.insert(e, player.mass);
+        try self.radius.insert(e, player.collision_radius);
         return e;
     }
 };

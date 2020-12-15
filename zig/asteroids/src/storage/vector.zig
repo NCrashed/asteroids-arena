@@ -1,4 +1,5 @@
 const std = @import("std");
+const Entity = @import("../entity.zig").Entity;
 
 /// Memory storage for component of type 'T' in growing array.
 pub fn VecStorage(comptime T: type) type {
@@ -19,6 +20,14 @@ pub fn VecStorage(comptime T: type) type {
         /// Deallocate memory of the storage
         pub fn deinit(self: *Self) void {
             self.components.deinit();
+        }
+
+        /// Insert component inside the storage.
+        pub fn insert(self: *Self, e: Entity, c: T) !void {
+            if (self.components.items.len <= e) {
+                try self.components.resize(e+1);
+            }
+            self.components.items[e] = c;
         }
     };
 }

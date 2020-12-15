@@ -20,5 +20,10 @@ pub fn GlobalStorage(comptime T: type, comptime default: T) type {
         pub fn deinit(self: *Self) void {
 
         }
+
+        /// Insert component inside the storage.
+        pub fn insert(self: *Self, e: Entity, c: T) void {
+            self.global = c;
+        }
     };
 }

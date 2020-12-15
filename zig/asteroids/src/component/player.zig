@@ -9,4 +9,10 @@ pub const Player = struct {
 };
 
 /// We store only one player component in world
-pub const Storage = st.UniqueStorage(f32);
+pub const Storage = st.UniqueStorage(Player);
+
+/// Mass of player ship in kg
+pub const mass : f32 = 100000;
+
+/// Player collision radius in meters
+pub const collision_radius : f32 = 15;
