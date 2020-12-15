@@ -60,7 +60,7 @@ pub fn main() !void {
     defer c.SDL_DestroyRenderer(renderer);
 
     var w = world.World.init() catch |err| {
-        c.SDL_Log("Unable to create world: %s", err);
+        c.SDL_Log("Unable to create world");
         return error.WorldInitFail;
     };
     defer w.deinit();

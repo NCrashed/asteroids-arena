@@ -1,6 +1,7 @@
 const input = @import("input.zig");
 const storage = @import("storage.zig");
 const entity = @import("entity.zig");
+const Entity = entity.Entity;
 
 const mass = @import("component/mass.zig");
 const player = @import("component/player.zig");
@@ -32,7 +33,7 @@ pub const World = struct {
     /// Initialize internal storages, allocates memory for them. Return non zero
     /// result on error.
     pub fn init() !World {
-        return World {
+        var w = World {
             .entities = entity.Entities.init(),
             .position = position.Storage.init(),
             .velocity = velocity.Storage.init(),
@@ -42,6 +43,8 @@ pub const World = struct {
             .player = player.Storage.init(),
             .size = size.Storage.init(),
         };
+        _ = try w.spawn_player();
+        return w;
     }
 
     /// Deallocate internal storages and free memory.
@@ -62,9 +65,11 @@ pub const World = struct {
     }
 
     /// Create entity for player and fill it with initial values
-    pub fn spawn_player(self: *World) void {
+    pub fn spawn_player(self: *World) !Entity {
         const x = @intToFloat(f32, self.size.global.width) * 0.5;
         const y = @intToFloat(f32, self.size.global.height) * 0.5;
+        const e = self.entities.new();
 
+        return e;
     }
 };
