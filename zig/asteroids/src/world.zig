@@ -2,6 +2,7 @@ const input = @import("input.zig");
 const storage = @import("storage.zig");
 
 const mass = @import("components/mass.zig");
+const player = @import("components/player.zig");
 const position = @import("components/position.zig");
 const radius = @import("components/radius.zig");
 const rotation = @import("components/rotation.zig");
@@ -23,6 +24,7 @@ pub const World = struct {
     rotation: rotation.Storage,
     mass: mass.Storage,
     radius: radius.Storage,
+    player: player.Storage,
 
     /// Initialize internal storages, allocates memory for them. Return non zero
     /// result on error.
@@ -34,6 +36,7 @@ pub const World = struct {
             .rotation = rotation.Storage.init(),
             .mass = mass.Storage.init(),
             .radius = radius.Storage.init(),
+            .player = player.Storage.init(),
         };
     }
 
@@ -44,6 +47,7 @@ pub const World = struct {
         self.rotation.deinit();
         self.mass.deinit();
         self.radius.deinit();
+        self.player.deinit();
     }
 
     ///  Make one tick of world simulation with given inputs. Return non zero if failed.
