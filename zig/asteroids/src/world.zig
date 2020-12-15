@@ -1,6 +1,11 @@
 const input = @import("input.zig");
-const position = @import("components/position.zig");
 const storage = @import("storage.zig");
+
+const mass = @import("components/mass.zig");
+const position = @import("components/position.zig");
+const radius = @import("components/radius.zig");
+const rotation = @import("components/rotation.zig");
+const velocity = @import("components/velocity.zig");
 
 /// Initial world width in pixels
 pub const width : i32 = 1480;
@@ -14,6 +19,10 @@ pub const height : i32 = 1024;
 pub const World = struct {
     entity_counter: usize,
     position: position.Storage,
+    velocity: velocity.Storage,
+    rotation: rotation.Storage,
+    mass: mass.Storage,
+    radius: radius.Storage,
 
     /// Initialize internal storages, allocates memory for them. Return non zero
     /// result on error.
@@ -21,12 +30,20 @@ pub const World = struct {
         return World {
             .entity_counter = 0,
             .position = position.Storage.init(),
+            .velocity = velocity.Storage.init(),
+            .rotation = rotation.Storage.init(),
+            .mass = mass.Storage.init(),
+            .radius = radius.Storage.init(),
         };
     }
 
     /// Deallocate internal storages and free memory.
     pub fn deinit(self: *World) void {
         self.position.deinit();
+        self.velocity.deinit();
+        self.rotation.deinit();
+        self.mass.deinit();
+        self.radius.deinit();
     }
 
     ///  Make one tick of world simulation with given inputs. Return non zero if failed.
