@@ -4,10 +4,11 @@ const c = @cImport({
 const std = @import("std");
 const world = @import("world.zig");
 const input = @import("input.zig");
+const size = @import("component/size.zig");
 
 extern fn SDL_PollEvent(event: *c.SDL_Event) c_int;
 
-pub fn process_events(input_events: *input.Events) bool {
+pub fn process_events(input_events: *input.Events, world_size: *size.WorldSize) bool {
     var event: c.SDL_Event = undefined;
     while (SDL_PollEvent(&event) != 0) {
         switch (event.@"type") {
@@ -17,6 +18,19 @@ pub fn process_events(input_events: *input.Events) bool {
             c.SDL_KEYDOWN => {
                 if (event.key.keysym.sym == c.SDLK_ESCAPE) {
                     return true;
+                }
+            },
+            c.SDL_WINDOWEVENT => {
+                switch (event.window.event) {
+                    c.SDL_WINDOWEVENT_RESIZED => {
+                        world_size.width = event.window.data1;
+                        world_size.height = event.window.data2;
+                    },
+                    c.SDL_WINDOWEVENT_SIZE_CHANGED => {
+                        world_size.width = event.window.data1;
+                        world_size.height = event.window.data2;
+                    },
+                    else => {},
                 }
             },
             else => {},
@@ -65,7 +79,7 @@ pub fn main() !void {
     var quit = false;
     var input_events = input.Events.init();
     while (!quit) {
-        quit = process_events(&input_events);
+        quit = process_events(&input_events, &w.size.global);
 
         _ = c.SDL_RenderClear(renderer);
 

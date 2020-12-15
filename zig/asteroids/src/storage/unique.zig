@@ -2,7 +2,7 @@ const std = @import("std");
 const entity = @import("../entity.zig");
 
 /// Memory storage for component of type 'T' that can have only one component
-/// across all entities.
+/// across all entities or none. 
 pub fn UniqueStorage(comptime T: type) type {
     return struct {
         unique: ?T,
