@@ -38,5 +38,14 @@ pub fn VecStorage(comptime T: type) type {
                 return self.components.items[e];
             }
         }
+
+        /// Getting component pointer from storage. Valid until reallocation.
+        pub fn get_ptr(self: *const Self, e: Entity) ?*T {
+            if (e >= self.components.items.len) {
+                return null;
+            } else {
+                return &self.components.items[e];
+            }
+        }
     };
 }

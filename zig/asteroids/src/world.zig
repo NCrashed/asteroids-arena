@@ -65,7 +65,7 @@ pub const World = struct {
 
     ///  Make one tick of world simulation with given inputs. Return non zero if failed.
     pub fn step(self: *World, dt: f64, events: *const input.Events) !void {
-
+        try self.apply_events(dt, events);
     }
 
     /// Render world in current frame
@@ -74,6 +74,27 @@ pub const World = struct {
             const pos = self.position.get(self.player.owner) orelse unreachable;
             const rot = self.rotation.get(self.player.owner) orelse unreachable;
             r.render_player(renderer, p, pos, rot);
+        }
+    }
+
+    /// Apply input events to simulation
+    fn apply_events(self: *World, dt: f64, events: *const input.Events) !void {
+        if (self.player.unique) |p| {
+            const e = self.player.owner;
+            if (events.ship_left) {
+                var rot = self.rotation.get_ptr(e) orelse unreachable;
+                rot.* -= player.rotation_speed * @floatCast(f32, dt);
+            }
+            if (events.ship_right) {
+                var rot = self.rotation.get_ptr(e) orelse unreachable;
+                rot.* += player.rotation_speed * @floatCast(f32, dt);
+            }
+            if (events.ship_thrust) {
+                self.player.unique.?.thrust = true;
+            }
+            if (events.ship_fire and p.fire_cooldown <= 0) {
+
+            }
         }
     }
 

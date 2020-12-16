@@ -6,7 +6,7 @@ const size = @import("component/size.zig");
 
 extern fn SDL_PollEvent(event: *c.SDL_Event) c_int;
 
-pub fn process_events(input_events: *input.Events, world_size: *size.WorldSize) bool {
+pub fn process_events(events: *input.Events, world_size: *size.WorldSize) bool {
     var event: c.SDL_Event = undefined;
     while (SDL_PollEvent(&event) != 0) {
         switch (event.@"type") {
@@ -14,8 +14,29 @@ pub fn process_events(input_events: *input.Events, world_size: *size.WorldSize) 
                 return true;
             },
             c.SDL_KEYDOWN => {
-                if (event.key.keysym.sym == c.SDLK_ESCAPE) {
+                const sym = event.key.keysym.sym;
+                if (sym == c.SDLK_ESCAPE) {
                     return true;
+                } else if (sym == c.SDLK_UP) {
+                    events.ship_thrust = true;
+                } else if (sym == c.SDLK_LEFT) {
+                    events.ship_left = true;
+                } else if (sym == c.SDLK_RIGHT) {
+                    events.ship_right = true;
+                } else if (sym == c.SDLK_SPACE) {
+                    events.ship_fire = true;
+                }
+            },
+            c.SDL_KEYUP => {
+                const sym = event.key.keysym.sym;
+                if (sym == c.SDLK_UP) {
+                    events.ship_thrust = false;
+                } else if (sym == c.SDLK_LEFT) {
+                    events.ship_left = false;
+                } else if (sym == c.SDLK_RIGHT) {
+                    events.ship_right = false;
+                } else if (sym == c.SDLK_SPACE) {
+                    events.ship_fire = false;
                 }
             },
             c.SDL_WINDOWEVENT => {

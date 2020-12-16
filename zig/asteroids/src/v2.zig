@@ -13,7 +13,7 @@ pub const Vec2 = struct {
     /// Rotate the vector around 0 to given angle
     pub fn rotate(self: *Vec2, angle: f32) *Vec2 {
         const x = self.x * @cos(angle) - self.y * @sin(angle);
-        const y = self.x * @sin(angle) - self.y * @cos(angle);
+        const y = self.x * @sin(angle) + self.y * @cos(angle);
         self.x = x;
         self.y = y;
         return self;

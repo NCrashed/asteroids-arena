@@ -1,4 +1,5 @@
 const st = @import("../storage/unique.zig");
+const std = @import("std");
 
 /// Player component that is unique per world
 pub const Player = struct {
@@ -16,6 +17,12 @@ pub const mass : f32 = 100000;
 
 /// Player collision radius in meters
 pub const collision_radius : f32 = 15;
+
+/// Player rotation speed in radians per second
+pub const rotation_speed : f32 = std.math.pi;
+
+/// Player thrust in newtons
+pub const thrust : f32 = 20000000;
 
 /// Visual X size of ship in meters
 pub const render_width : f32 = 30.0;
