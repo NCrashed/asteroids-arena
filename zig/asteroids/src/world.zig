@@ -15,6 +15,8 @@ const rotation = @import("component/rotation.zig");
 const velocity = @import("component/velocity.zig");
 const size = @import("component/size.zig");
 
+const player_sys = @import("system/player.zig");
+
 /// Initial world width in pixels
 pub const width = size.initial_width;
 /// Initial world height in pixels
@@ -65,6 +67,7 @@ pub const World = struct {
 
     ///  Make one tick of world simulation with given inputs. Return non zero if failed.
     pub fn step(self: *World, dt: f64, events: *const input.Events) !void {
+        player_sys.step(&self.player, &self.rotation, &self.velocity, &self.mass, dt);
         try self.apply_events(dt, events);
     }
 
