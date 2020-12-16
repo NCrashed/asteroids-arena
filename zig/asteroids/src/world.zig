@@ -1,7 +1,10 @@
-const input = @import("input.zig");
-const storage = @import("storage.zig");
+const c = @import("sdl.zig").c;
+const r = @import("render.zig");
+
 const entity = @import("entity.zig");
 const Entity = entity.Entity;
+const input = @import("input.zig");
+const storage = @import("storage.zig");
 const Vec2 = @import("v2.zig").Vec2;
 
 const mass = @import("component/mass.zig");
@@ -63,6 +66,15 @@ pub const World = struct {
     ///  Make one tick of world simulation with given inputs. Return non zero if failed.
     pub fn step(self: *World, dt: f64, events: *const input.Events) !void {
 
+    }
+
+    /// Render world in current frame
+    pub fn render(self: *const World, renderer: *c.SDL_Renderer) void {
+        if (self.player.unique) |p| {
+            const pos = self.position.get(self.player.owner) orelse unreachable;
+            const rot = self.rotation.get(self.player.owner) orelse unreachable;
+            r.render_player(renderer, p, pos, rot);
+        }
     }
 
     /// Create entity for player and fill it with initial values

@@ -29,5 +29,14 @@ pub fn VecStorage(comptime T: type) type {
             }
             self.components.items[e] = c;
         }
+
+        /// Getting component from storage
+        pub fn get(self: *const Self, e: Entity) ?T {
+            if (e >= self.components.items.len) {
+                return null;
+            } else {
+                return self.components.items[e];
+            }
+        }
     };
 }

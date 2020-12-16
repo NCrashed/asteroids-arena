@@ -1,6 +1,4 @@
-const c = @cImport({
-    @cInclude("SDL2/SDL.h");
-});
+const c = @import("sdl.zig").c;
 const std = @import("std");
 const world = @import("world.zig");
 const input = @import("input.zig");
@@ -81,8 +79,10 @@ pub fn main() !void {
     while (!quit) {
         quit = process_events(&input_events, &w.size.global);
 
+        _ = c.SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         _ = c.SDL_RenderClear(renderer);
-
+        _ = c.SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        w.render(renderer);
         c.SDL_RenderPresent(renderer);
 
         const dt = @intToFloat(f64, timer.lap()) * 0.000_000_001;
