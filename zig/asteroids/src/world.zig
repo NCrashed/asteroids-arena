@@ -1,5 +1,6 @@
 const c = @import("sdl.zig").c;
 const r = @import("render.zig");
+const std = @import("std");
 
 const entity = @import("entity.zig");
 const Entity = entity.Entity;
@@ -8,6 +9,7 @@ const storage = @import("storage.zig");
 const Vec2 = @import("v2.zig").Vec2;
 const Component = @import("component.zig").Component;
 
+const asteroid = @import("component/asteroid.zig");
 const mass = @import("component/mass.zig");
 const player = @import("component/player.zig");
 const position = @import("component/position.zig");
@@ -29,6 +31,7 @@ pub const height = size.initial_height;
 /// in structure-of-arrays style and an entity is a simple integer that points
 /// to the arrays.
 pub const World = struct {
+    rng: std.rand.DefaultPrng,
     entities: entity.Entities,
     position: position.Storage,
     velocity: velocity.Storage,
@@ -37,11 +40,18 @@ pub const World = struct {
     radius: radius.Storage,
     player: player.Storage,
     size: size.Storage,
+    asteroid: asteroid.Storage,
 
     /// Initialize internal storages, allocates memory for them. Return non zero
     /// result on error.
     pub fn init() !World {
+        // Init random number generator
+        var buf: [8]u8 = undefined;
+        try std.crypto.randomBytes(buf[0..]);
+        const seed = std.mem.readIntLittle(u64, buf[0..8]);
+
         var w = World {
+            .rng = std.rand.DefaultPrng.init(seed),
             .entities = entity.Entities.init(),
             .position = position.Storage.init(),
             .velocity = velocity.Storage.init(),
@@ -50,8 +60,10 @@ pub const World = struct {
             .radius = radius.Storage.init(),
             .player = player.Storage.init(),
             .size = size.Storage.init(),
+            .asteroid = asteroid.Storage.init(),
         };
         _ = try w.spawn_player();
+        _ = try w.spawn_asteroids();
         return w;
     }
 
@@ -65,6 +77,7 @@ pub const World = struct {
         self.radius.deinit();
         self.player.deinit();
         self.size.deinit();
+        self.asteroid.deinit();
     }
 
     ///  Make one tick of world simulation with given inputs. Return non zero if failed.
@@ -116,6 +129,44 @@ pub const World = struct {
         try self.mass.insert(e, player.mass);
         try self.radius.insert(e, player.collision_radius);
         const components = Component.combine(.{Component.player,
+            Component.position,
+            Component.velocity,
+            Component.rotation,
+            Component.mass,
+            Component.radius });
+        try self.entities.add_component(e, components);
+        return e;
+    }
+
+    /// Spawn all asteroids
+    fn spawn_asteroids(self: *World) !void {
+        var i : usize = 0;
+        while (i < asteroid.amount) {
+            _ = try spawn_asteroid(self);
+            i += 1;
+        }
+    }
+
+    /// Create entity for asteroid with random values
+    fn spawn_asteroid(self: *World) !Entity {
+        const mkint = self.rng.random.intRangeLessThan;
+        const edges = mkint(i32, asteroid.edges_min, asteroid.edges_max);
+        const x = @intToFloat(f32, mkint(i32, 0, self.size.global.width));
+        const y = @intToFloat(f32, mkint(i32, 0, self.size.global.height));
+        const vx = @intToFloat(f32, mkint(i32, asteroid.velocity_min, asteroid.velocity_max));
+        const vy = @intToFloat(f32, mkint(i32, asteroid.velocity_min, asteroid.velocity_max));
+        const rad = @intToFloat(f32, mkint(i32, asteroid.size_min, asteroid.size_max));
+        const rot = @intToFloat(f32, mkint(i32, 0, 3141)) * 0.001;
+        const m = std.math.pi * rad * rad * asteroid.density;
+
+        const e = try self.entities.new();
+        try self.asteroid.insert(e, asteroid.Asteroid { .edges = edges });
+        try self.position.insert(e, Vec2 { .x = x, .y = y });
+        try self.velocity.insert(e, Vec2 { .x = vx, .y = vy });
+        try self.rotation.insert(e, rot);
+        try self.mass.insert(e, m);
+        try self.radius.insert(e, rad);
+        const components = Component.combine(.{Component.asteroid,
             Component.position,
             Component.velocity,
             Component.rotation,
