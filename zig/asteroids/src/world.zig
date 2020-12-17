@@ -70,7 +70,7 @@ pub const World = struct {
     ///  Make one tick of world simulation with given inputs. Return non zero if failed.
     pub fn step(self: *World, dt: f64, events: *const input.Events) !void {
         player_sys.step(&self.player, &self.rotation, &self.velocity, &self.mass, dt);
-        try physics_sys.step(&self.entities, &self.position, &self.velocity, dt);
+        try physics_sys.step(&self.entities, &self.position, &self.velocity, self.size.global, dt);
         try self.apply_events(dt, events);
     }
 
