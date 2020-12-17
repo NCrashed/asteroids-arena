@@ -30,5 +30,6 @@ pub const Vec2 = struct {
     pub fn scale(self: *Vec2, scalar: f32) *Vec2 {
         self.x *= scalar;
         self.y *= scalar;
+        return self;
     }
 };

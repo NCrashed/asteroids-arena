@@ -6,6 +6,7 @@ const Entity = entity.Entity;
 const input = @import("input.zig");
 const storage = @import("storage.zig");
 const Vec2 = @import("v2.zig").Vec2;
+const Component = @import("component.zig").Component;
 
 const mass = @import("component/mass.zig");
 const player = @import("component/player.zig");
@@ -16,6 +17,7 @@ const velocity = @import("component/velocity.zig");
 const size = @import("component/size.zig");
 
 const player_sys = @import("system/player.zig");
+const physics_sys = @import("system/physics.zig");
 
 /// Initial world width in pixels
 pub const width = size.initial_width;
@@ -68,6 +70,7 @@ pub const World = struct {
     ///  Make one tick of world simulation with given inputs. Return non zero if failed.
     pub fn step(self: *World, dt: f64, events: *const input.Events) !void {
         player_sys.step(&self.player, &self.rotation, &self.velocity, &self.mass, dt);
+        try physics_sys.step(&self.entities, &self.position, &self.velocity, dt);
         try self.apply_events(dt, events);
     }
 
@@ -112,6 +115,13 @@ pub const World = struct {
         try self.rotation.insert(e, 0);
         try self.mass.insert(e, player.mass);
         try self.radius.insert(e, player.collision_radius);
+        const components = Component.combine(.{Component.player,
+            Component.position,
+            Component.velocity,
+            Component.rotation,
+            Component.mass,
+            Component.radius });
+        try self.entities.add_component(e, components);
         return e;
     }
 };

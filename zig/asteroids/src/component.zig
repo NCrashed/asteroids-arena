@@ -15,4 +15,13 @@ pub const Component = enum(u16) {
     pub fn none() Component {
         return @intToEnum(Component, 0);
     }
+
+    /// Combine several component tags into single one
+    pub fn combine(comptime args: anytype) Component {
+        comptime var acc = 0;
+        inline for (args) |c, i| {
+            acc = acc | @enumToInt(args[i]);
+        }
+        return @intToEnum(Component, acc);
+    }
 };

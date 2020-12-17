@@ -108,7 +108,7 @@ pub fn main() !void {
 
         const dt = @intToFloat(f64, timer.lap()) * 0.000_000_001;
         w.step(dt, &input_events) catch |err| {
-            c.SDL_Log("Unable to step world: %s", err);
+            std.log.err("Unable to step world: {}", .{err});
             return error.WorldStepFail;
         };
 
