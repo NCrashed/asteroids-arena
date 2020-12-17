@@ -103,7 +103,10 @@ pub fn main() !void {
         _ = c.SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         _ = c.SDL_RenderClear(renderer);
         _ = c.SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        w.render(renderer);
+        w.render(renderer) catch |err| {
+            std.log.err("Unable to draw world: {}", .{err});
+            return error.WorldRenderFail;
+        };
         c.SDL_RenderPresent(renderer);
 
         const dt = @intToFloat(f64, timer.lap()) * 0.000_000_001;

@@ -88,11 +88,30 @@ pub const World = struct {
     }
 
     /// Render world in current frame
-    pub fn render(self: *const World, renderer: *c.SDL_Renderer) void {
+    pub fn render(self: *const World, renderer: *c.SDL_Renderer) !void {
         if (self.player.unique) |p| {
             const pos = self.position.get(self.player.owner) orelse unreachable;
             const rot = self.rotation.get(self.player.owner) orelse unreachable;
             r.render_player(renderer, p, pos, rot);
+        }
+
+        var i: usize = 0;
+        while (i < self.entities.alive.items.len) {
+            const e = self.entities.alive.items[i];
+
+            const ac = Component.combine(.{
+                Component.asteroid,
+                Component.position,
+                Component.rotation,
+                Component.radius });
+            if (try self.entities.has(e, ac)) {
+                const ast = self.asteroid.get(e) orelse unreachable;
+                const pos = self.position.get(e) orelse unreachable;
+                const rot = self.rotation.get(e) orelse unreachable;
+                const rad = self.radius.get(e) orelse unreachable;
+                r.render_asteroid(renderer, ast, pos, rot, rad);
+            }
+            i += 1;
         }
     }
 
