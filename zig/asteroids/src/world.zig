@@ -19,6 +19,7 @@ const rotation = @import("component/rotation.zig");
 const size = @import("component/size.zig");
 const velocity = @import("component/velocity.zig");
 
+const bullet_sys = @import("system/bullet.zig");
 const player_sys = @import("system/player.zig");
 const physics_sys = @import("system/physics.zig");
 
@@ -89,7 +90,9 @@ pub const World = struct {
         player_sys.step(&self.player, &self.rotation, &self.velocity, &self.mass, dt);
         try physics_sys.step(&self.entities, &self.position, &self.velocity,
             &self.asteroid, &self.player, &self.radius, &self.rotation, self.size.global, dt);
+        try bullet_sys.step(&self.bullet, &self.entities, dt);
         try self.apply_events(dt, events);
+
     }
 
     /// Render world in current frame
@@ -136,7 +139,10 @@ pub const World = struct {
                 self.player.unique.?.thrust = true;
             }
             if (events.ship_fire and p.fire_cooldown <= 0) {
-
+                var pos = self.position.get(e) orelse unreachable;
+                var rot = self.rotation.get(e) orelse unreachable;
+                var vel = self.velocity.get(e) orelse unreachable;
+                _ = try self.spawn_bullet(pos, rot, vel);
             }
         }
     }
@@ -196,6 +202,25 @@ pub const World = struct {
             Component.rotation,
             Component.mass,
             Component.radius });
+
+        try self.entities.add_component(e, components);
+        return e;
+    }
+
+    /// Spawn bullet at given position and direction with inherited velocity
+    fn spawn_bullet(self: *World, p: Vec2, a: f32, v: Vec2) !Entity {
+        var bvel = Vec2 { .x = bullet.speed * @cos(a), .y = bullet.speed * @sin(a) };
+        _ = bvel.add(v);
+
+        const e = try self.entities.new();
+        try self.bullet.insert(e, bullet.Bullet { .time = bullet.life_time });
+        try self.position.insert(e, p);
+        try self.velocity.insert(e, bvel);
+        const components = Component.combine(.{
+            Component.bullet,
+            Component.position,
+            Component.velocity,
+        });
 
         try self.entities.add_component(e, components);
         return e;

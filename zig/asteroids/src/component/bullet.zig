@@ -4,7 +4,7 @@ const std = @import("std");
 /// Marks that the entity is bullet
 pub const Bullet = struct {
     /// Amount of time left until despawn
-    edges: f32,
+    time: f32,
 };
 
 /// Store bullets in array

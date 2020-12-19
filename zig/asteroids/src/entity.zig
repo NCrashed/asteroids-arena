@@ -49,8 +49,8 @@ pub const Entities = struct {
         var i: usize = 0;
         while (i < self.alive.items.len) {
             if (self.alive.items[i] == e) {
-                self.alive.swapRemove(i);
-                self.tags.swapRemove(i);
+                _ = self.alive.swapRemove(i);
+                _ = self.tags.swapRemove(i);
             }
             i += 1;
         }
