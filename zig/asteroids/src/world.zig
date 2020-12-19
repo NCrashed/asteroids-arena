@@ -10,13 +10,14 @@ const Vec2 = @import("v2.zig").Vec2;
 const Component = @import("component.zig").Component;
 
 const asteroid = @import("component/asteroid.zig");
+const bullet = @import("component/bullet.zig");
 const mass = @import("component/mass.zig");
 const player = @import("component/player.zig");
 const position = @import("component/position.zig");
 const radius = @import("component/radius.zig");
 const rotation = @import("component/rotation.zig");
-const velocity = @import("component/velocity.zig");
 const size = @import("component/size.zig");
+const velocity = @import("component/velocity.zig");
 
 const player_sys = @import("system/player.zig");
 const physics_sys = @import("system/physics.zig");
@@ -41,6 +42,7 @@ pub const World = struct {
     player: player.Storage,
     size: size.Storage,
     asteroid: asteroid.Storage,
+    bullet: bullet.Storage,
 
     /// Initialize internal storages, allocates memory for them. Return non zero
     /// result on error.
@@ -61,6 +63,7 @@ pub const World = struct {
             .player = player.Storage.init(),
             .size = size.Storage.init(),
             .asteroid = asteroid.Storage.init(),
+            .bullet = bullet.Storage.init(),
         };
         _ = try w.spawn_player();
         _ = try w.spawn_asteroids();
@@ -78,6 +81,7 @@ pub const World = struct {
         self.player.deinit();
         self.size.deinit();
         self.asteroid.deinit();
+        self.bullet.deinit();
     }
 
     ///  Make one tick of world simulation with given inputs. Return non zero if failed.
