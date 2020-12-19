@@ -19,6 +19,26 @@ inline fn render_line(renderer: *c.SDL_Renderer, pos: Vec2, rot: f32, p1: *Vec2,
     _ = c.SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 }
 
+inline fn render_lines(renderer: *c.SDL_Renderer, comptime n: usize, k: usize, vs: [n]Vec2) void {
+    var points : [n]c.SDL_Point = undefined;
+    var i: usize = 0;
+    while (i < k) {
+        points[i].x = @floatToInt(c_int, vs[i].x);
+        points[i].y = @floatToInt(c_int, vs[i].y);
+        i += 1;
+    }
+
+    _ = c.SDL_RenderDrawLines(renderer, &points, @intCast(c_int, k));
+}
+
+inline fn transform_vecs(pos: Vec2, rot: f32, comptime n: usize, k: usize, vs: *[n]Vec2) void {
+    var i: usize = 0;
+    while (i < k) {
+        _ = vs[i].rotate(rot).add(pos);
+        i += 1;
+    }
+}
+
 pub fn render_player(renderer: *c.SDL_Renderer, pl: player.Player, pos: Vec2, rot: f32) void {
     var p1 = Vec2 { .x =  player_dx, .y =  0 };
     var p2 = Vec2 { .x = -player_dx, .y = -player_dy };
@@ -51,12 +71,16 @@ inline fn circloid_point(i: i32, n: i32, r: f32) Vec2 {
 }
 
 pub fn render_asteroid(renderer: *c.SDL_Renderer, a: asteroid.Asteroid, pos: Vec2, rot: f32, rad: f32) void {
-    var i: i32 = 0;
+    var i: usize = 0;
     const n = a.edges;
+    const maxn = asteroid.edges_max * 2;
+    var ps : [maxn]Vec2 = undefined;
     while (i <= n-1) {
-        var p1 = circloid_point(i, n, rad);
-        var p2 = circloid_point(i+1, n, rad);
-        render_line(renderer, pos, rot, &p1, &p2);
+        ps[2*i] = circloid_point(@intCast(i32, i), n, rad);
+        ps[2*i+1] = circloid_point(@intCast(i32, i+1), n, rad);
         i += 1;
     }
+    const k = @intCast(usize, 2*n);
+    transform_vecs(pos, rot, maxn, k, &ps);
+    render_lines(renderer, maxn, k, ps);
 }

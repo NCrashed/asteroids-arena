@@ -68,7 +68,7 @@ pub const Entities = struct {
         }
 
         const oldtag = @enumToInt(self.tags.items[mi.?]);
-        self.tags.items[mi.?] = @intToEnum(Component, oldtag & @enumToInt(c));
+        self.tags.items[mi.?] = @intToEnum(Component, oldtag | @enumToInt(c));
     }
 
     /// Mark that entity doesn't have given components
@@ -88,7 +88,7 @@ pub const Entities = struct {
             return error.BoundsViolation;
         }
         const tag = @enumToInt(self.tags.items[e]);
-        return tag & @enumToInt(c) == tag;
+        return tag & @enumToInt(c) == @enumToInt(c);
     }
 
     /// Function for iterating over all entities

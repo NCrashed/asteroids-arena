@@ -191,6 +191,7 @@ pub const World = struct {
             Component.rotation,
             Component.mass,
             Component.radius });
+
         try self.entities.add_component(e, components);
         return e;
     }
