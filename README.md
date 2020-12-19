@@ -26,7 +26,7 @@ Languages:
 - C. Control group for performance. **Done**.
 - ATS2. Low level FP language with dependent typing that will allow mutation in place, redundant checks elimination and zero cost abstractions. **On hold**.
 - D. Curious to test it with GC and without GC. Not started yet.
-- Zig. Low level alternative to pure C. Curious in performance and if it easy to bind to C libraries. Not started yet.
+- Zig. Low level alternative to pure C. Curious in performance and if it easy to bind to C libraries. **In progress**.
 - Rust. Curious in performance and expressive power comparing to Haskell. **Done**.
 
 # Results
@@ -42,11 +42,11 @@ cabal new-run plotting -- fps.out
 In haskell nix-shell.
 
 ### Haskell
-FPS now stable 40-100, smooth gameplay.
+FPS now stable 40-100, smooth gameplay, but there are noticable freezes at, possibly, major GCs.
 ![Haskell FPS](./haskell/fps.png)
 
 ### C
-There is smooth gameplay. I experienced drops to 500 FPS occasionally.
+There is smooth gameplay. Some drops can be explained by interference of other software in OS.
 ![C FPS](./c/asteroids/fps.png)
 
 ### Rust

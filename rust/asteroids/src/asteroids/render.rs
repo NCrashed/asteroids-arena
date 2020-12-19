@@ -7,19 +7,23 @@ use specs::prelude::*;
 use std::f32::consts::PI;
 
 use super::components::asteroid::*;
+use super::components::bullet::*;
 use super::components::player::*;
 use super::components::pos::*;
 use super::components::rot::*;
-use super::components::bullet::*;
 
 pub type SystemData<'a> = (
     ReadStorage<'a, Pos>,
     ReadStorage<'a, Rot>,
     ReadStorage<'a, Player>,
     ReadStorage<'a, Bullet>,
-    ReadStorage<'a, Asteroid>);
+    ReadStorage<'a, Asteroid>,
+);
 
-pub fn render_world(canvas: &mut WindowCanvas, (pos, rot, player, bullet, asteroid): SystemData) -> Result<(), String> {
+pub fn render_world(
+    canvas: &mut WindowCanvas,
+    (pos, rot, player, bullet, asteroid): SystemData,
+) -> Result<(), String> {
     canvas.set_draw_color(Color::RGB(0, 0, 0));
     canvas.clear();
     for (player, pos, rot) in (&player, &pos, &rot).join() {
@@ -42,26 +46,31 @@ fn transform(mat: &Mat3, vs: &mut [Point]) {
     });
 }
 
-fn render_player(canvas: &mut WindowCanvas, player: &Player, pos: &Pos, rot: &Rot) -> Result<(), String> {
+fn render_player(
+    canvas: &mut WindowCanvas,
+    player: &Player,
+    pos: &Pos,
+    rot: &Rot,
+) -> Result<(), String> {
     let dx = (PLAYER_SIZE.x * 0.5) as i32;
     let dy = (PLAYER_SIZE.y * 0.5) as i32;
     canvas.set_draw_color(Color::RGB(255, 255, 255));
     let mat = Mat3::from_scale_angle_translation(Vec2::new(1.0, 1.0), rot.0, pos.0);
     let mut points = [
-          Point::new(dx, 0)
-        , Point::new(-dx, -dy)
-        , Point::new(-dx, dy)
-        , Point::new(dx, 0)
-        ];
+        Point::new(dx, 0),
+        Point::new(-dx, -dy),
+        Point::new(-dx, dy),
+        Point::new(dx, 0),
+    ];
     transform(&mat, &mut points[..]);
     canvas.draw_lines(&points[..])?;
 
     if player.0 {
         let mut points = [
-              Point::new(-dx, dy / 2)
-            , Point::new(-dx-10, 0)
-            , Point::new(-dx, -dy / 2)
-            ];
+            Point::new(-dx, dy / 2),
+            Point::new(-dx - 10, 0),
+            Point::new(-dx, -dy / 2),
+        ];
         transform(&mat, &mut points[..]);
         canvas.draw_lines(&points[..])?;
     }
@@ -79,10 +88,15 @@ fn circloid_point(i: u32, n: u32, r: f32, p: Vec2, a0: f32) -> Point {
     Point::new(p.x as i32 + x, p.y as i32 + y)
 }
 
-fn render_asteroid(canvas: &mut WindowCanvas, asteroid: &Asteroid, pos: &Pos, rot: &Rot) -> Result<(), String> {
-    for i in 0 .. asteroid.edges {
+fn render_asteroid(
+    canvas: &mut WindowCanvas,
+    asteroid: &Asteroid,
+    pos: &Pos,
+    rot: &Rot,
+) -> Result<(), String> {
+    for i in 0..asteroid.edges {
         let p1 = circloid_point(i, asteroid.edges, asteroid.radius, pos.0, rot.0);
-        let p2 = circloid_point(i+1, asteroid.edges, asteroid.radius, pos.0, rot.0);
+        let p2 = circloid_point(i + 1, asteroid.edges, asteroid.radius, pos.0, rot.0);
         canvas.draw_line(p1, p2)?;
     }
     Ok(())

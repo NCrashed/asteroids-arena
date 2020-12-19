@@ -4,8 +4,8 @@ use std::default::default;
 use std::time::Duration;
 
 use super::components::asteroid::*;
-use super::components::mass::*;
 use super::components::bullet::*;
+use super::components::mass::*;
 use super::components::player::*;
 use super::components::pos::*;
 use super::components::rot::*;

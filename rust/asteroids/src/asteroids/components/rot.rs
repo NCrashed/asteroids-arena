@@ -1,6 +1,6 @@
+use glam::Vec2;
 use specs::prelude::*;
 use std::f32::consts::PI;
-use glam::Vec2;
 
 #[derive(Component, Copy, Clone, Debug, Default)]
 #[storage(VecStorage)]
@@ -13,9 +13,13 @@ pub fn rotation_increase(rot: &mut Rot, da: f32) {
 
 /// Make angle lie in range [0 .. 2*PI)
 fn clamp_angle(a: f32) -> f32 {
-    if a < 0. { 2.*PI + a }
-    else if a > 2.*PI { a - 2.*PI }
-    else { a }
+    if a < 0. {
+        2. * PI + a
+    } else if a > 2. * PI {
+        a - 2. * PI
+    } else {
+        a
+    }
 }
 
 /// Convert rotation to direction vector
