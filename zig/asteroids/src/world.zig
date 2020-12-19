@@ -8,6 +8,7 @@ const input = @import("input.zig");
 const storage = @import("storage.zig");
 const Vec2 = @import("v2.zig").Vec2;
 const Component = @import("component.zig").Component;
+const Allocator = std.mem.Allocator;
 
 const asteroid = @import("component/asteroid.zig");
 const bullet = @import("component/bullet.zig");
@@ -47,7 +48,7 @@ pub const World = struct {
 
     /// Initialize internal storages, allocates memory for them. Return non zero
     /// result on error.
-    pub fn init() !World {
+    pub fn init(allocator: *Allocator) !World {
         // Init random number generator
         var buf: [8]u8 = undefined;
         try std.os.getrandom(buf[0..]);
@@ -55,16 +56,16 @@ pub const World = struct {
 
         var w = World {
             .rng = std.rand.DefaultPrng.init(seed),
-            .entities = entity.Entities.init(),
-            .position = position.Storage.init(),
-            .velocity = velocity.Storage.init(),
-            .rotation = rotation.Storage.init(),
-            .mass = mass.Storage.init(),
-            .radius = radius.Storage.init(),
+            .entities = entity.Entities.init(allocator),
+            .position = position.Storage.init(allocator),
+            .velocity = velocity.Storage.init(allocator),
+            .rotation = rotation.Storage.init(allocator),
+            .mass = mass.Storage.init(allocator),
+            .radius = radius.Storage.init(allocator),
             .player = player.Storage.init(),
             .size = size.Storage.init(),
-            .asteroid = asteroid.Storage.init(),
-            .bullet = bullet.Storage.init(),
+            .asteroid = asteroid.Storage.init(allocator),
+            .bullet = bullet.Storage.init(allocator),
         };
         _ = try w.spawn_player();
         _ = try w.spawn_asteroids();

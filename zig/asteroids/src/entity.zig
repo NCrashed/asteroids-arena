@@ -1,6 +1,7 @@
 const std = @import("std");
 const Component = @import("component.zig").Component;
 const builtin = @import("builtin");
+const Allocator = std.mem.Allocator;
 
 /// Entity is simple ID that has associated components
 pub const Entity = u32;
@@ -17,14 +18,16 @@ pub const Entities = struct {
     alive: std.ArrayList(Entity),
     /// Component tags for iteration
     tags: std.ArrayList(Component),
+    /// Entities that should be deleted later
+    deleted: std.ArrayList(Entity),
 
     /// Initialize the storage with 0 entities
-    pub fn init() Entities {
-        const allocator = std.heap.page_allocator;
+    pub fn init(allocator: *Allocator) Entities {
         return Entities {
             .entity_counter = 0,
             .alive = std.ArrayList(Entity).init(allocator),
             .tags = std.ArrayList(Component).init(allocator),
+            .deleted = std.ArrayList(Entity).init(allocator),
         };
     }
 

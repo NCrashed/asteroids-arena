@@ -1,5 +1,6 @@
 const std = @import("std");
 const Entity = @import("../entity.zig").Entity;
+const Allocator = std.mem.Allocator;
 
 /// Memory storage for component of type 'T' in growing array.
 pub fn VecStorage(comptime T: type) type {
@@ -10,8 +11,7 @@ pub fn VecStorage(comptime T: type) type {
         pub const Element = T;
 
         /// Initialize the storage with 0 components
-        pub fn init() Self {
-            const allocator = std.heap.page_allocator;
+        pub fn init(allocator: *Allocator) Self {
             return Self {
                 .components = std.ArrayList(T).init(allocator),
             };

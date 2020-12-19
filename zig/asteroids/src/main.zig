@@ -59,6 +59,11 @@ pub fn process_events(events: *input.Events, world_size: *size.WorldSize) bool {
 }
 
 pub fn main() !void {
+    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer arena.deinit();
+
+    const allocator = &arena.allocator;
+
     if (c.SDL_Init(c.SDL_INIT_VIDEO) != 0) {
         c.SDL_Log("Unable to initialize SDL: %s", c.SDL_GetError());
         return error.SDLInitializationFailed;
@@ -78,7 +83,7 @@ pub fn main() !void {
     };
     defer c.SDL_DestroyRenderer(renderer);
 
-    var w = world.World.init() catch |err| {
+    var w = world.World.init(allocator) catch |err| {
         c.SDL_Log("Unable to create world");
         return error.WorldInitFail;
     };
