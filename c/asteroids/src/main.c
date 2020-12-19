@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
     SDL_RenderPresent(renderer);
     i += 1;
     float fps = 1 / dt;
-    if (i % 20000 == 0) {
+    if (i % 2000 == 0) {
       SDL_Log("FPS: %f", fps);
     }
     clock_t ptick1 = clock();
