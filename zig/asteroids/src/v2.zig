@@ -10,6 +10,13 @@ pub const Vec2 = struct {
         return self;
     }
 
+    /// Substract components of second vector from the firsts one
+    pub inline fn sub(self: *Vec2, v: Vec2) *Vec2 {
+        self.x -= v.x;
+        self.y -= v.y;
+        return self;
+    }
+
     /// Rotate the vector around 0 to given angle
     pub inline fn rotate(self: *Vec2, angle: f32) *Vec2 {
         const x = self.x * @cos(angle) - self.y * @sin(angle);
