@@ -47,7 +47,7 @@ pub const World = struct {
     pub fn init() !World {
         // Init random number generator
         var buf: [8]u8 = undefined;
-        try std.crypto.randomBytes(buf[0..]);
+        try std.os.getrandom(buf[0..]);
         const seed = std.mem.readIntLittle(u64, buf[0..8]);
 
         var w = World {

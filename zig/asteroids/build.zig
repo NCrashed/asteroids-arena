@@ -1,4 +1,6 @@
-const Builder = @import("std").build.Builder;
+const std = @import("std");
+const Builder = std.build.Builder;
+const builtin = @import("builtin");
 
 pub fn build(b: *Builder) void {
     // Standard target options allows the person running `zig build` to choose
@@ -14,6 +16,13 @@ pub fn build(b: *Builder) void {
     const exe = b.addExecutable("asteroids", "src/main.zig");
     exe.setTarget(target);
     exe.setBuildMode(mode);
+
+    // Adjust to your binary installation of SDL2
+    if (builtin.os.tag == std.Target.Os.Tag.windows) {
+        exe.addIncludeDir("C:\\SDL2-2.0.12\\include"); // I moved all .h files to SDL2 subfolder
+        exe.addLibPath("C:\\SDL2-2.0.12\\lib\\x64");
+    }
+
     exe.linkSystemLibrary("SDL2");
     exe.linkSystemLibrary("c");
     exe.install();
