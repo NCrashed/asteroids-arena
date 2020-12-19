@@ -17,13 +17,16 @@ pub fn step(entities: *const Entities,
     var i: usize = 0;
     while (i < entities.alive.items.len) {
         const e = entities.alive.items[i];
-        if (try entities.has(e, c)) {
+        if (try entities.has(e, Component.position)) {
             var pos = pos_store.get_ptr(e) orelse unreachable;
-            var vel = vel_store.get(e) orelse unreachable;
-            // Applying velocities
-            _ = vel.scale(@floatCast(f32, dt));
-            _ = pos.add(vel);
 
+            // Applying velocities
+            if (try entities.has(e, Component.velocity)) {
+                var vel = vel_store.get(e) orelse unreachable;
+                _ = vel.scale(@floatCast(f32, dt));
+                _ = pos.add(vel);
+            }
+        
             // Warping space
             const x = pos.x;
             const w = @intToFloat(f32, ws.width);
