@@ -51,6 +51,7 @@ pub const Entities = struct {
             if (self.alive.items[i] == e) {
                 _ = self.alive.swapRemove(i);
                 _ = self.tags.swapRemove(i);
+                return true;
             }
             i += 1;
         }
@@ -83,11 +84,20 @@ pub const Entities = struct {
 
     /// Return true if given entity has all requested components
     pub fn has(self: *const Entities, e: Entity, c: Component) !bool {
+        if (alive_index(self, e)) |i| {
+            return alive_has(self, i, c);
+        } else {
+            return false;
+        }
+    }
+
+    /// Return true if given alive entity by iteration index has all requested components
+    pub fn alive_has(self: *const Entities, i: usize, c: Component) !bool {
         comptime var dochecks = builtin.mode == builtin.Mode.Debug;
-        if (dochecks and e >= self.alive.items.len) {
+        if (dochecks and i >= self.alive.items.len) {
             return error.BoundsViolation;
         }
-        const tag = @enumToInt(self.tags.items[e]);
+        const tag = @enumToInt(self.tags.items[i]);
         return tag & @enumToInt(c) == @enumToInt(c);
     }
 

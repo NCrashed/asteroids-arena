@@ -107,17 +107,31 @@ pub const World = struct {
         while (i < self.entities.alive.items.len) {
             const e = self.entities.alive.items[i];
 
-            const ac = Component.combine(.{
+            comptime const ac = Component.combine(.{
                 Component.asteroid,
                 Component.position,
                 Component.rotation,
-                Component.radius });
-            if (try self.entities.has(e, ac)) {
+                Component.radius,
+            });
+            if (try self.entities.alive_has(i, ac)) {
                 const ast = self.asteroid.get(e) orelse unreachable;
                 const pos = self.position.get(e) orelse unreachable;
                 const rot = self.rotation.get(e) orelse unreachable;
                 const rad = self.radius.get(e) orelse unreachable;
                 r.render_asteroid(renderer, ast, pos, rot, rad);
+                i += 1;
+                continue;
+            }
+
+            comptime const bc = Component.combine(.{
+                Component.bullet,
+                Component.position,
+            });
+            if (try self.entities.alive_has(i, bc)) {
+                const pos = self.position.get(e) orelse unreachable;
+                r.render_bullet(renderer, pos);
+                i += 1;
+                continue;
             }
             i += 1;
         }
@@ -143,6 +157,7 @@ pub const World = struct {
                 var rot = self.rotation.get(e) orelse unreachable;
                 var vel = self.velocity.get(e) orelse unreachable;
                 _ = try self.spawn_bullet(pos, rot, vel);
+                self.player.unique.?.fire_cooldown = player.fire_cooldown;
             }
         }
     }

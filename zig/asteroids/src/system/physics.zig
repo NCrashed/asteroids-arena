@@ -25,11 +25,11 @@ pub fn step(entities: *const Entities,
     var i: usize = 0;
     while (i < entities.alive.items.len) {
         const e = entities.alive.items[i];
-        if (try entities.has(e, Component.position)) {
+        if (try entities.alive_has(i, Component.position)) {
             var pos = pos_store.get_ptr(e) orelse unreachable;
 
             // Applying velocities
-            if (try entities.has(e, Component.velocity)) {
+            if (try entities.alive_has(i, Component.velocity)) {
                 var vel = vel_store.get(e) orelse unreachable;
                 _ = vel.scale(@floatCast(f32, dt));
                 _ = pos.add(vel);
@@ -54,7 +54,7 @@ pub fn step(entities: *const Entities,
         }
         // Collisions for asteroids
         comptime const ac = Component.combine(.{Component.asteroid, Component.position, Component.radius});
-        if (try entities.has(e, ac)) {
+        if (try entities.alive_has(i, ac)) {
             var apos = pos_store.get(e) orelse unreachable;
             var arad = rad_store.get(e) orelse unreachable;
 
@@ -67,7 +67,7 @@ pub fn step(entities: *const Entities,
 
                 const r = arad + prad.*;
                 if (ppos.dist_squared(apos) <= r*r) {
-                    player_store.unique = player.Player { .thrust = false, .fire_cooldown = 0.0 };
+                    player_store.unique = player.Player { .thrust = false, .fire_cooldown = player.fire_cooldown };
                     ppos.x = @intToFloat(f32, ws.width) * 0.5;
                     ppos.y = @intToFloat(f32, ws.height) * 0.5;
                     prot.* = 0.0;

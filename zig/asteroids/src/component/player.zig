@@ -28,3 +28,5 @@ pub const thrust : f32 = 20000000;
 pub const render_width : f32 = 30.0;
 /// Visual Y size of ship in meters
 pub const render_height : f32 = 25.0;
+/// Amount of time between two bullets
+pub const fire_cooldown : f32 = 0.3;

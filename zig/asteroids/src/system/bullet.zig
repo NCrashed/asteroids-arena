@@ -15,7 +15,7 @@ pub fn step(bullet_store: *bullet.Storage
             b.time -= @floatCast(f32, dt);
             if (b.time < 0) {
                 _ = entities.destroy(e);
-                i -= 1; // As deletion is swap removal, the index already populated with another entity, recheck it
+                return; // one bullet at time
             }
         }
         i += 1;
