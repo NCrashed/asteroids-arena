@@ -9,6 +9,7 @@ const storage = @import("storage.zig");
 const Vec2 = @import("v2.zig").Vec2;
 const Component = @import("component.zig").Component;
 const Allocator = std.mem.Allocator;
+const Sound = sound.Sound;
 
 const asteroid = @import("component/asteroid.zig");
 const bullet = @import("component/bullet.zig");
@@ -97,6 +98,7 @@ pub const World = struct {
             &self.asteroid, &self.player, &self.radius, &self.mass, &self.rotation, &self.bullet, self.size.global, dt);
         try bullet_sys.step(&self.bullet, &self.entities, dt);
         try self.apply_events(dt, events);
+        self.sound.global.update_cooldowns(dt);
         self.entities.maintain();
     }
 
@@ -156,6 +158,7 @@ pub const World = struct {
             }
             if (events.ship_thrust) {
                 self.player.unique.?.thrust = true;
+                self.sound.global.play(Sound.thrust);
             }
             if (events.ship_fire and p.fire_cooldown <= 0) {
                 var pos = self.position.get(e) orelse unreachable;

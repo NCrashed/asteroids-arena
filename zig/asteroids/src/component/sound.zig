@@ -85,13 +85,19 @@ pub const SoundResources = struct {
 
     /// Update cooldown for sound channels
     pub fn update_cooldowns(self: *SoundResources, dt: f64) void {
-        for (self.cooldowns) |*c| {
-            if (c.* > 0) {
-                c.* -= dt;
-                if (c.* < 0) {
-                    c.* = 0;
-                }
+        for (self.cooldowns) |*v| {
+            if (v.* > 0) {
+                v.* -= @floatCast(f32, dt);
             }
+        }
+    }
+
+    /// Play given sound if cooldown is over
+    pub fn play(self: *SoundResources, sound: Sound) void {
+        const channel = @enumToInt(sound);
+        if (self.cooldowns[channel] <= 0) {
+            _ = c.Mix_PlayChannel(-1, self.sounds[channel], 0);
+            self.cooldowns[channel] = sound_cooldown(sound);
         }
     }
 };
