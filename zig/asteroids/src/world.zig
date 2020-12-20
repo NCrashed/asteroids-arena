@@ -19,6 +19,7 @@ const radius = @import("component/radius.zig");
 const rotation = @import("component/rotation.zig");
 const size = @import("component/size.zig");
 const velocity = @import("component/velocity.zig");
+const sound = @import("component/sound.zig");
 
 const bullet_sys = @import("system/bullet.zig");
 const player_sys = @import("system/player.zig");
@@ -45,10 +46,11 @@ pub const World = struct {
     size: size.Storage,
     asteroid: asteroid.Storage,
     bullet: bullet.Storage,
+    sound: sound.Storage,
 
     /// Initialize internal storages, allocates memory for them. Return non zero
     /// result on error.
-    pub fn init(allocator: *Allocator) !World {
+    pub fn init(allocator: *Allocator, sounds_dir: []const u8) !World {
         // Init random number generator
         var buf: [8]u8 = undefined;
         try std.os.getrandom(buf[0..]);
@@ -63,9 +65,10 @@ pub const World = struct {
             .mass = mass.Storage.init(allocator),
             .radius = radius.Storage.init(allocator),
             .player = player.Storage.init(),
-            .size = size.Storage.init(),
+            .size = size.Storage.init(size.WorldSize.default()),
             .asteroid = asteroid.Storage.init(allocator),
             .bullet = bullet.Storage.init(allocator),
+            .sound = sound.Storage.init(try sound.SoundResources.init(allocator, sounds_dir)),
         };
         _ = try w.spawn_player();
         _ = try w.spawn_asteroids();
@@ -84,6 +87,7 @@ pub const World = struct {
         self.size.deinit();
         self.asteroid.deinit();
         self.bullet.deinit();
+        self.sound.deinit();
     }
 
     ///  Make one tick of world simulation with given inputs. Return non zero if failed.

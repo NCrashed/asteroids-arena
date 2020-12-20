@@ -19,7 +19,11 @@ pub const WorldSize = struct {
             .height = initial_height,
         };
     }
+
+    pub fn deinit(self: *WorldSize) void {
+
+    }
 };
 
 /// We store global single component in world
-pub const Storage = st.GlobalStorage(WorldSize, WorldSize.default());
+pub const Storage = st.GlobalStorage(WorldSize, WorldSize.deinit);

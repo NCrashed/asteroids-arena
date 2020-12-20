@@ -31,6 +31,7 @@ pub fn build(b: *Builder) void {
     // });
 
     exe.linkSystemLibrary("SDL2");
+    exe.linkSystemLibrary("SDL2_mixer");
     exe.linkSystemLibrary("c");
     exe.install();
 

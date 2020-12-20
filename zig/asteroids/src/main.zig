@@ -70,6 +70,21 @@ pub fn main() !void {
     }
     defer c.SDL_Quit();
 
+    const flags = 0;
+    const initted = c.Mix_Init(flags);
+    if ((initted & flags) != flags) {
+        c.SDL_Log("Unable to initialize SDL Mixer: %s", c.SDL_GetError());
+        return error.SDLInitializationFailed;
+    }
+    defer c.Mix_Quit();
+
+    const audio_init = c.Mix_OpenAudio(11025, c.AUDIO_S16SYS, 2, 1024);
+    if (audio_init < 0) {
+        c.SDL_Log("Unable to create audio device: %s", c.Mix_GetError());
+        return error.SDLInitializationFailed;
+    }
+    defer c.Mix_CloseAudio();
+
     const screen = c.SDL_CreateWindow("My Game Window", c.SDL_WINDOWPOS_UNDEFINED, c.SDL_WINDOWPOS_UNDEFINED, world.width, world.height, c.SDL_WINDOW_OPENGL) orelse
         {
         c.SDL_Log("Unable to create window: %s", c.SDL_GetError());
@@ -83,7 +98,7 @@ pub fn main() !void {
     };
     defer c.SDL_DestroyRenderer(renderer);
 
-    var w = world.World.init(allocator) catch |err| {
+    var w = world.World.init(allocator, "./sounds") catch |err| {
         c.SDL_Log("Unable to create world");
         return error.WorldInitFail;
     };
