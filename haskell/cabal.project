@@ -1,4 +1,3 @@
 packages:
   ./asteroids
   ./plotting
-  ./kecsik
