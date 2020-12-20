@@ -4,6 +4,7 @@ const player = @import("../component/player.zig");
 const position = @import("../component/position.zig");
 const velocity = @import("../component/velocity.zig");
 const radius = @import("../component/radius.zig");
+const mass = @import("../component/mass.zig");
 const size = @import("../component/size.zig");
 const rotation = @import("../component/rotation.zig");
 const entity = @import("../entity.zig");
@@ -11,14 +12,20 @@ const v2 = @import("../v2.zig");
 const Component = @import("../component.zig").Component;
 const Entity = entity.Entity;
 const Entities = entity.Entities;
+const std = @import("std");
+
+const DefaultPrng = std.rand.DefaultPrng;
+const Vec2 = v2.Vec2;
 
 /// Apply velocities to positions and calculate collisions
 pub fn step(entities: *Entities,
+    rng: *DefaultPrng,
     pos_store: *position.Storage,
     vel_store: *velocity.Storage,
     asteroid_store: *asteroid.Storage,
     player_store: *player.Storage,
     rad_store: *radius.Storage,
+    mass_store: *mass.Storage,
     rot_store: *rotation.Storage,
     bullet_store: *bullet.Storage,
     ws: size.WorldSize,
@@ -28,11 +35,11 @@ pub fn step(entities: *Entities,
         // Apply vels and warping of space
         try process_movement(entities, pos_store, vel_store, ws, i, dt);
         // Collisions for asteroids
-        try process_asteroids(entities, pos_store, vel_store, rot_store,
-            rad_store, asteroid_store, bullet_store, player_store, ws, i);
+        try process_asteroids(entities, rng, pos_store, vel_store, rot_store,
+            rad_store, mass_store, asteroid_store, bullet_store, player_store, ws, i);
         // Collisions for bullets
-        try process_bullets(entities, pos_store, vel_store, rot_store,
-            rad_store, asteroid_store, bullet_store, player_store, ws, i);
+        try process_bullets(entities, rng, pos_store, vel_store, rot_store,
+            rad_store, mass_store, asteroid_store, bullet_store, player_store, ws, i);
     }
 }
 
@@ -76,10 +83,12 @@ fn process_movement(entities: *Entities,
 
 // Process collisions with asteroid
 fn process_asteroids(entities: *Entities,
+    rng: *DefaultPrng,
     pos_store: *position.Storage,
     vel_store: *velocity.Storage,
     rot_store: *rotation.Storage,
     rad_store: *radius.Storage,
+    mass_store: *mass.Storage,
     asteroid_store: *asteroid.Storage,
     bullet_store: *bullet.Storage,
     player_store: *player.Storage,
@@ -119,8 +128,8 @@ fn process_asteroids(entities: *Entities,
                 Component.bullet, Component.position
             });
             if (try entities.alive_has(k, bc)) {
-                try bullet_collision(entities, pos_store, vel_store,
-                    rot_store, rad_store, asteroid_store, bullet_store, ws,
+                try bullet_collision(entities, rng, pos_store, vel_store,
+                    rot_store, rad_store, mass_store, asteroid_store, bullet_store, ws,
                     be, e);
             }
             k += 1;
@@ -130,10 +139,12 @@ fn process_asteroids(entities: *Entities,
 
 // Process collisions with asteroid
 fn process_bullets(entities: *Entities,
+    rng: *DefaultPrng,
     pos_store: *position.Storage,
     vel_store: *velocity.Storage,
     rot_store: *rotation.Storage,
     rad_store: *radius.Storage,
+    mass_store: *mass.Storage,
     asteroid_store: *asteroid.Storage,
     bullet_store: *bullet.Storage,
     player_store: *player.Storage,
@@ -150,8 +161,8 @@ fn process_bullets(entities: *Entities,
             const ae = entities.alive.items[k];
             comptime const ac = Component.combine(.{Component.asteroid, Component.position, Component.radius});
             if (try entities.alive_has(k, ac)) {
-                try bullet_collision(entities, pos_store, vel_store,
-                    rot_store, rad_store, asteroid_store, bullet_store, ws,
+                try bullet_collision(entities, rng, pos_store, vel_store,
+                    rot_store, rad_store, mass_store, asteroid_store, bullet_store, ws,
                     be, ae);
             }
             k += 1;
@@ -162,10 +173,12 @@ fn process_bullets(entities: *Entities,
 /// Check collision between bullet and asteroid and break asteroid on
 // collision.
 fn bullet_collision(entities: *Entities,
+    rng: *DefaultPrng,
     pos_store: *position.Storage,
     vel_store: *velocity.Storage,
     rot_store: *rotation.Storage,
     rad_store: *radius.Storage,
+    mass_store: *mass.Storage,
     asteroid_store: *asteroid.Storage,
     bullet_store: *bullet.Storage,
     ws: size.WorldSize,
@@ -173,12 +186,65 @@ fn bullet_collision(entities: *Entities,
     ) !void
 {
     const apos = pos_store.get(ae) orelse unreachable;
+    const avel = vel_store.get(ae) orelse unreachable;
     const arad = rad_store.get(ae) orelse unreachable;
+    const arot = rot_store.get(ae) orelse unreachable;
     const bpos = pos_store.get(be) orelse unreachable;
 
     const r = arad + bullet.radius;
     if (bpos.dist_squared(apos) <= r*r) {
         try entities.destroy(ae);
         try entities.destroy(be);
+        _ = try spawn_shard(entities, rng, pos_store, vel_store, rot_store,
+            rad_store, mass_store, asteroid_store, apos, avel, arot, arad);
+        _ = try spawn_shard(entities, rng, pos_store, vel_store, rot_store,
+            rad_store, mass_store, asteroid_store, apos, avel, arot, arad);
+    }
+}
+
+/// Spawn shard of asteroid with inheritance of position and velocity
+fn spawn_shard(entities: *Entities,
+    rng: *DefaultPrng,
+    pos_store: *position.Storage,
+    vel_store: *velocity.Storage,
+    rot_store: *rotation.Storage,
+    rad_store: *radius.Storage,
+    mass_store: *mass.Storage,
+    asteroid_store: *asteroid.Storage,
+    parent_pos: Vec2,
+    parent_vel: Vec2,
+    parent_rot: f32,
+    parent_rad: f32,
+) !?Entity {
+    const rad = parent_rad*0.5;
+    if (rad >= asteroid.size_min) {
+        const mkint = rng.random.intRangeLessThan;
+
+        const m = std.math.pi * rad * rad * asteroid.density;
+        const edges = mkint(i32, asteroid.edges_min, asteroid.edges_max);
+
+        const vx = @intToFloat(f32, mkint(i32, asteroid.velocity_min, asteroid.velocity_max));
+        const vy = @intToFloat(f32, mkint(i32, asteroid.velocity_min, asteroid.velocity_max));
+        var vel = Vec2 { .x = vx, .y = vy };
+        _ = vel.add(parent_vel);
+
+        const e = try entities.new();
+        try asteroid_store.insert(e, asteroid.Asteroid { .edges = edges });
+        try pos_store.insert(e, parent_pos);
+        try vel_store.insert(e, vel);
+        try rot_store.insert(e, parent_rot);
+        try mass_store.insert(e, m);
+        try rad_store.insert(e, rad);
+        const components = Component.combine(.{Component.asteroid,
+            Component.position,
+            Component.velocity,
+            Component.rotation,
+            Component.mass,
+            Component.radius });
+
+        try entities.add_component(e, components);
+        return e;
+    } else {
+        return null;
     }
 }
