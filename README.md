@@ -26,7 +26,7 @@ Languages:
 - C. Control group for performance. **Done**.
 - ATS2. Low level FP language with dependent typing that will allow mutation in place, redundant checks elimination and zero cost abstractions. **On hold**.
 - D. Curious to test it with GC and without GC. Not started yet.
-- Zig. Low level alternative to pure C. Curious in performance and if it easy to bind to C libraries. **In progress**.
+- Zig. Low level alternative to pure C. Curious in performance and if it easy to bind to C libraries. **Done**.
 - Rust. Curious in performance and expressive power comparing to Haskell. **Done**.
 
 # Results
@@ -50,5 +50,9 @@ There is smooth gameplay. Some drops can be explained by interference of other s
 ![C FPS](./c/asteroids/fps.png)
 
 ### Rust
-Smooth gameplay. I consider the Rust implementation as most satisfying in terms of performance/time spent ratio.
+Smooth gameplay. It was quite easy to implement the game and get high performance from first try.
 ![C FPS](./rust/fps.png)
+
+### Zig
+The most stable frame rate. Feels like insane upgrade over C in development experience and performance.
+![C FPS](./zig/asteroids/fps.png)
