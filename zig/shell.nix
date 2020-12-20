@@ -14,5 +14,7 @@ stdenv.mkDerivation rec {
     zig
     SDL2
     SDL2_mixer
+    valgrind
+    kdeApplications.kcachegrind
   ];
 }

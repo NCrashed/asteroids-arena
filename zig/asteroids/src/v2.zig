@@ -1,3 +1,6 @@
+const math = @import("math.zig");
+const sincosf = math.sincosf;
+
 // 2D vector of floats
 pub const Vec2 = struct {
     x: f32,
@@ -19,8 +22,11 @@ pub const Vec2 = struct {
 
     /// Rotate the vector around 0 to given angle
     pub inline fn rotate(self: *Vec2, angle: f32) *Vec2 {
-        const x = self.x * @cos(angle) - self.y * @sin(angle);
-        const y = self.x * @sin(angle) + self.y * @cos(angle);
+        var sina: f32 = undefined;
+        var cosa: f32 = undefined;
+        sincosf(angle, &sina, &cosa);
+        const x = self.x * cosa - self.y * sina;
+        const y = self.x * sina + self.y * cosa;
         self.x = x;
         self.y = y;
         return self;

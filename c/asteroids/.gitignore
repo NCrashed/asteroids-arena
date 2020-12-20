@@ -1,3 +1,4 @@
 asteroids
 !*asteroids/
 fps.out
+callgrind.out*

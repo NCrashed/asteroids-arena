@@ -1,3 +1,4 @@
 zig-cache
 fps.out
 SDL2.dll
+callgrind.out*

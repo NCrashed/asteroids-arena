@@ -23,6 +23,13 @@ pub fn build(b: *Builder) void {
         exe.addLibPath("C:\\SDL2-2.0.12\\lib\\x64");
     }
 
+    exe.addIncludeDir("./include");
+    // lib.addCSourceFile("src/lib.c", &[_][]const u8{
+    //     "-Wall",
+    //     "-Wextra",
+    //     "-Werror",
+    // });
+
     exe.linkSystemLibrary("SDL2");
     exe.linkSystemLibrary("c");
     exe.install();

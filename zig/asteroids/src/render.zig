@@ -6,6 +6,9 @@ const v2 = @import("v2.zig");
 const Vec2 = v2.Vec2;
 const debug = @import("std").debug;
 
+const math = @import("math.zig");
+const sincosf = math.sincosf;
+
 const player_dx = 0.5 * player.render_width;
 const player_dy = 0.5 * player.render_height;
 
@@ -25,7 +28,7 @@ inline fn render_line(renderer: *c.SDL_Renderer, pos: Vec2, rot: f32, p1: *Vec2,
     _ = c.SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 }
 
-inline fn render_lines(renderer: *c.SDL_Renderer, comptime n: usize, k: usize, vs: [n]Vec2) void {
+fn render_lines(renderer: *c.SDL_Renderer, comptime n: usize, k: usize, vs: [n]Vec2) void {
     var points : [n]c.SDL_Point = undefined;
     var i: usize = 0;
     while (i < k) {
@@ -37,7 +40,7 @@ inline fn render_lines(renderer: *c.SDL_Renderer, comptime n: usize, k: usize, v
     _ = c.SDL_RenderDrawLines(renderer, &points, @intCast(c_int, k));
 }
 
-inline fn transform_vecs(pos: Vec2, rot: f32, comptime n: usize, k: usize, vs: *[n]Vec2) void {
+fn transform_vecs(pos: Vec2, rot: f32, comptime n: usize, k: usize, vs: *[n]Vec2) void {
     var i: usize = 0;
     while (i < k) {
         _ = vs[i].rotate(rot).add(pos);
@@ -72,11 +75,14 @@ pub fn render_player(renderer: *c.SDL_Renderer, pl: player.Player, pos: Vec2, ro
     }
 }
 
-inline fn circloid_point(i: i32, n: i32, r: f32) Vec2 {
+fn circloid_point(i: i32, n: i32, r: f32) Vec2 {
     const a = @intToFloat(f32, i) * (2 * std.math.pi / @intToFloat(f32, n));
+    var sina: f32 = undefined;
+    var cosa: f32 = undefined;
+    sincosf(a, &sina, &cosa);
     return Vec2 {
-        .x = r * (1 + @sin(a) * 0.3) * @cos(a),
-        .y = r * (1 + @cos(a) * 0.3) * @sin(a),
+        .x = r * (1 + sina * 0.3) * cosa,
+        .y = r * (1 + cosa * 0.3) * sina,
     };
 }
 

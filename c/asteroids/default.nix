@@ -1,11 +1,11 @@
-{ stdenv, pkg-config, SDL2, SDL2_mixer, elfkickers }:
+{ stdenv, pkg-config, SDL2, SDL2_mixer, elfkickers, valgrind, kdeApplications }:
 
 stdenv.mkDerivation rec {
   pname = "asteroids";
   version = "0.1";
 
   src = ./.;
-  nativeBuildInputs = [ pkg-config elfkickers ];
+  nativeBuildInputs = [ pkg-config elfkickers valgrind kdeApplications.kcachegrind];
   buildInputs = [ SDL2 SDL2_mixer ];
 
   installPhase = ''
