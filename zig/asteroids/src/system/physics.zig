@@ -30,6 +30,9 @@ pub fn step(entities: *Entities,
         // Collisions for asteroids
         try process_asteroids(entities, pos_store, vel_store, rot_store,
             rad_store, asteroid_store, bullet_store, player_store, ws, i);
+        // Collisions for bullets
+        try process_bullets(entities, pos_store, vel_store, rot_store,
+            rad_store, asteroid_store, bullet_store, player_store, ws, i);
     }
 }
 
@@ -119,6 +122,37 @@ fn process_asteroids(entities: *Entities,
                 try bullet_collision(entities, pos_store, vel_store,
                     rot_store, rad_store, asteroid_store, bullet_store, ws,
                     be, e);
+            }
+            k += 1;
+        }
+    }
+}
+
+// Process collisions with asteroid
+fn process_bullets(entities: *Entities,
+    pos_store: *position.Storage,
+    vel_store: *velocity.Storage,
+    rot_store: *rotation.Storage,
+    rad_store: *radius.Storage,
+    asteroid_store: *asteroid.Storage,
+    bullet_store: *bullet.Storage,
+    player_store: *player.Storage,
+    ws: size.WorldSize,
+    i: usize,
+    ) !void
+{
+    const be = entities.alive.items[i];
+    comptime const bc = Component.combine(.{Component.bullet, Component.position});
+    if (try entities.alive_has(i, bc)) {
+        // Collision with asteroids
+        var k: usize = i+1;
+        while (k < entities.alive.items.len) {
+            const ae = entities.alive.items[k];
+            comptime const ac = Component.combine(.{Component.asteroid, Component.position, Component.radius});
+            if (try entities.alive_has(k, ac)) {
+                try bullet_collision(entities, pos_store, vel_store,
+                    rot_store, rad_store, asteroid_store, bullet_store, ws,
+                    be, ae);
             }
             k += 1;
         }
