@@ -7,6 +7,7 @@ const radius = @import("../component/radius.zig");
 const mass = @import("../component/mass.zig");
 const size = @import("../component/size.zig");
 const rotation = @import("../component/rotation.zig");
+const sound = @import("../component/sound.zig");
 const entity = @import("../entity.zig");
 const v2 = @import("../v2.zig");
 const Component = @import("../component.zig").Component;
@@ -28,6 +29,7 @@ pub fn step(entities: *Entities,
     mass_store: *mass.Storage,
     rot_store: *rotation.Storage,
     bullet_store: *bullet.Storage,
+    sound_store: *sound.Storage,
     ws: size.WorldSize,
     dt: f64) !void
 {
@@ -36,10 +38,12 @@ pub fn step(entities: *Entities,
         try process_movement(entities, pos_store, vel_store, ws, i, dt);
         // Collisions for asteroids
         try process_asteroids(entities, rng, pos_store, vel_store, rot_store,
-            rad_store, mass_store, asteroid_store, bullet_store, player_store, ws, i);
+            rad_store, mass_store, asteroid_store, bullet_store, player_store,
+            sound_store, ws, i);
         // Collisions for bullets
         try process_bullets(entities, rng, pos_store, vel_store, rot_store,
-            rad_store, mass_store, asteroid_store, bullet_store, player_store, ws, i);
+            rad_store, mass_store, asteroid_store, bullet_store, player_store,
+            sound_store, ws, i);
     }
 }
 
@@ -92,6 +96,7 @@ fn process_asteroids(entities: *Entities,
     asteroid_store: *asteroid.Storage,
     bullet_store: *bullet.Storage,
     player_store: *player.Storage,
+    sound_store: *sound.Storage,
     ws: size.WorldSize,
     i: usize,
     ) !void
@@ -129,8 +134,8 @@ fn process_asteroids(entities: *Entities,
             });
             if (try entities.alive_has(k, bc)) {
                 try bullet_collision(entities, rng, pos_store, vel_store,
-                    rot_store, rad_store, mass_store, asteroid_store, bullet_store, ws,
-                    be, e);
+                    rot_store, rad_store, mass_store, asteroid_store, bullet_store,
+                    sound_store, ws, be, e);
             }
             k += 1;
         }
@@ -148,6 +153,7 @@ fn process_bullets(entities: *Entities,
     asteroid_store: *asteroid.Storage,
     bullet_store: *bullet.Storage,
     player_store: *player.Storage,
+    sound_store: *sound.Storage,
     ws: size.WorldSize,
     i: usize,
     ) !void
@@ -162,8 +168,8 @@ fn process_bullets(entities: *Entities,
             comptime const ac = Component.combine(.{Component.asteroid, Component.position, Component.radius});
             if (try entities.alive_has(k, ac)) {
                 try bullet_collision(entities, rng, pos_store, vel_store,
-                    rot_store, rad_store, mass_store, asteroid_store, bullet_store, ws,
-                    be, ae);
+                    rot_store, rad_store, mass_store, asteroid_store, bullet_store,
+                    sound_store, ws, be, ae);
             }
             k += 1;
         }
@@ -181,6 +187,7 @@ fn bullet_collision(entities: *Entities,
     mass_store: *mass.Storage,
     asteroid_store: *asteroid.Storage,
     bullet_store: *bullet.Storage,
+    sound_store: *sound.Storage,
     ws: size.WorldSize,
     be: Entity, ae: Entity
     ) !void
@@ -199,6 +206,7 @@ fn bullet_collision(entities: *Entities,
             rad_store, mass_store, asteroid_store, apos, avel, arot, arad);
         _ = try spawn_shard(entities, rng, pos_store, vel_store, rot_store,
             rad_store, mass_store, asteroid_store, apos, avel, arot, arad);
+        sound_store.global.play(sound.Sound.bang_medium);
     }
 }
 

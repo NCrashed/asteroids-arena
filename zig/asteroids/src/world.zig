@@ -95,7 +95,8 @@ pub const World = struct {
     pub fn step(self: *World, dt: f64, events: *const input.Events) !void {
         player_sys.step(&self.player, &self.rotation, &self.velocity, &self.mass, dt);
         try physics_sys.step(&self.entities, &self.rng, &self.position, &self.velocity,
-            &self.asteroid, &self.player, &self.radius, &self.mass, &self.rotation, &self.bullet, self.size.global, dt);
+            &self.asteroid, &self.player, &self.radius, &self.mass, &self.rotation,
+            &self.bullet, &self.sound, self.size.global, dt);
         try bullet_sys.step(&self.bullet, &self.entities, dt);
         try self.apply_events(dt, events);
         self.sound.global.update_cooldowns(dt);
@@ -166,6 +167,7 @@ pub const World = struct {
                 var vel = self.velocity.get(e) orelse unreachable;
                 _ = try self.spawn_bullet(pos, rot, vel);
                 self.player.unique.?.fire_cooldown = player.fire_cooldown;
+                self.sound.global.play(Sound.fire);
             }
         }
     }
