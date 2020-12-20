@@ -3,37 +3,57 @@ const std = @import("std");
 const st = @import("../storage/global.zig");
 
 const Allocator = std.mem.Allocator;
+const TypeId = std.builtin.TypeId;
 
-/// Maximum amount of used channels
-pub const channels: usize = 3;
+/// Sound tag, all known sounds by the game.
+pub const Sound = packed enum(u16) {
+    bang_medium,
+    fire,
+    thrust
+};
 
-/// Cooldown for bang sound
-pub const bang_cooldown: f32 = 0.4;
-/// Cooldown for fire sound
-pub const fire_cooldown: f32 = 0.2;
-/// Cooldown for thrust sound
-pub const thrust_cooldown: f32 = 0.2;
+/// Maximum amount of used sounds
+pub const sounds_count: usize = std.meta.fields(Sound).len;
+
+/// Get unique cooldown time for a sound
+pub fn sound_cooldown(s: Sound) f32 {
+    return switch (s) {
+        .bang_medium => 0.4,
+        .fire => 0.2,
+        .thrust => 0.2,
+    };
+}
+
+/// Get unique filename for a sound relative to sounds dir
+pub fn sound_file(s: Sound) []const u8 {
+    return switch (s) {
+        .bang_medium => "bangMedium.wav",
+        .fire => "fire.wav",
+        .thrust => "thrust.wav",
+    };
+}
 
 /// Global component that holds sound files and cooldowns for them
 pub const SoundResources = struct {
-    bang_medium: *c.Mix_Chunk,
-    fire: *c.Mix_Chunk,
-    thrust: *c.Mix_Chunk,
+    sounds: [sounds_count] *c.Mix_Chunk,
+    cooldowns: [sounds_count]f32,
     allocator: *Allocator,
-    cooldowns: [channels]f32,
 
     /// Load sound resources
     pub fn init(allocator: *Allocator, dir: []const u8) !SoundResources {
-        _ = c.Mix_AllocateChannels(channels);
+        _ = c.Mix_AllocateChannels(sounds_count);
         _ = c.Mix_Volume(-1, 50);
 
-        const bang_medium = try load_wav(allocator, dir, "bangMedium.wav");
+        var sounds: [sounds_count] *c.Mix_Chunk = undefined;
+        inline for (std.meta.fields(Sound)) |efield| {
+            const s = @intToEnum(Sound, efield.value);
+            sounds[@intCast(usize, efield.value)] = try load_wav(allocator, dir, sound_file(s));
+        }
+
         return SoundResources {
-            .bang_medium = bang_medium,
-            .fire = try load_wav(allocator, dir, "fire.wav"),
-            .thrust = try load_wav(allocator, dir, "thrust.wav"),
+            .sounds = sounds,
+            .cooldowns = [_]f32{0} ** sounds_count,
             .allocator = allocator,
-            .cooldowns = [_]f32{0} ** channels,
         };
     }
 
@@ -58,9 +78,21 @@ pub const SoundResources = struct {
 
     /// Free sound resources
     pub fn deinit(self: *SoundResources) void {
-        _ = c.Mix_FreeChunk(self.bang_medium);
-        _ = c.Mix_FreeChunk(self.fire);
-        _ = c.Mix_FreeChunk(self.thrust);
+        for (self.sounds) |s| {
+            _ = c.Mix_FreeChunk(s);
+        }
+    }
+
+    /// Update cooldown for sound channels
+    pub fn update_cooldowns(self: *SoundResources, dt: f64) void {
+        for (self.cooldowns) |*c| {
+            if (c.* > 0) {
+                c.* -= dt;
+                if (c.* < 0) {
+                    c.* = 0;
+                }
+            }
+        }
     }
 };
 
