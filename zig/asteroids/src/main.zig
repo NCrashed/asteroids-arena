@@ -139,7 +139,7 @@ pub fn main() !void {
         i += 1;
         if (@mod(i, 1000) == 0) {
             c.SDL_Log("%f", fps);
-            fps_file.writer().print("{}\n", .{fps}) catch |_| {
+            fps_file.writer().print("{},{}\n", .{i,fps}) catch |_| {
                 c.SDL_Log("Failed to dump FPS to file");
                 return error.FpsWriteError;
             };

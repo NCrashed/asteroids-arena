@@ -19,6 +19,10 @@ import Game.Asteroids.Render
 import Game.Asteroids.World.Event
 import Game.Asteroids.World.Audio
 
+-- | Report average FPS every N frames
+fpsReportN :: Int
+fpsReportN = 100
+
 renderLoop :: forall world . (WorldRender IO world, Has world IO AudioState)
   => world -> ([InputEvent] -> world -> IO world) -> IO ()
 renderLoop w0 nextWorld = do
@@ -79,8 +83,8 @@ renderLoop w0 nextWorld = do
           t2 <- ticks
           let fps :: Int
               fps = round $ recip $ fromIntegral (t2 - t1) * 0.001
-          hPutStrLn fpsFile $ show fps
-          when (i `mod` 1000 == 0) $ putStrLn $ "FPS " <> show fps
+          hPutStrLn fpsFile $ show i <> "," <> show fps
+          when (i `mod` fpsReportN == 0) $ putStrLn $ "FPS " <> show fps
           unless exitEvent (loop (i+1) w')
         {-# INLINABLE loop #-}
     loop 0 w0

@@ -123,11 +123,11 @@ fn calc_fps(frame_begin: Instant, i: &mut i32, file: &mut File) -> Result<DeltaT
     let frame_end = Instant::now();
     let dt = frame_end.duration_since(frame_begin);
     let fps = 1.0 / dt.as_secs_f64();
-    if *i == 0 {
+    if *i % 1000 == 0 {
         println!("{} FPS", fps);
-        write!(file, "{}\n", fps).map_err(|x| format!("{}", x))?;
+        write!(file, "{},{}\n", i, fps).map_err(|x| format!("{}", x))?;
     }
-    *i = (*i + 1) % 2000;
+    *i = *i + 1;
     Ok(DeltaTime(dt))
 }
 

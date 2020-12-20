@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
     }
     clock_t ptick1 = clock();
     if (i % 1000 == 0 && fps_file) {
-      fprintf(fps_file, "%f\n", fps);
+      fprintf(fps_file, "%i,%f\n", i, fps);
     }
     clock_t ptick2 = clock();
     lastTick += ptick2 - ptick1;

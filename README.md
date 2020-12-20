@@ -37,9 +37,13 @@ Languages:
 
 FPS plots are built with [haskell utility](./haskell/plotting). Like:
 ```
-cabal new-run plotting -- fps.out
+cabal new-run plotting -- single fps.out
+# or
+cabak new-run plotting -- multiple Haskell ./fps_haskell.out Rust ./fps_rust.out Zig ./fps_zig.out
 ```
 In haskell nix-shell.
+
+![FPS](./fps_all.png)
 
 ### Haskell
 FPS now stable 40-100, smooth gameplay, but there are noticable freezes at, possibly, major GCs.
