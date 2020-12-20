@@ -93,7 +93,7 @@ pub const World = struct {
             &self.asteroid, &self.player, &self.radius, &self.rotation, self.size.global, dt);
         try bullet_sys.step(&self.bullet, &self.entities, dt);
         try self.apply_events(dt, events);
-
+        self.entities.maintain();
     }
 
     /// Render world in current frame

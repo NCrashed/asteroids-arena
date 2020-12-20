@@ -14,8 +14,7 @@ pub fn step(bullet_store: *bullet.Storage
             var b = bullet_store.get_ptr(e) orelse unreachable;
             b.time -= @floatCast(f32, dt);
             if (b.time < 0) {
-                _ = entities.destroy(e);
-                return; // one bullet at time
+                _ = try entities.destroy(e);
             }
         }
         i += 1;

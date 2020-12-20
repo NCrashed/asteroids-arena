@@ -46,19 +46,34 @@ pub const Entities = struct {
         return e;
     }
 
-    /// Remove entity from alive entities. Returns false if
-    /// the entity has been dead already.
-    pub fn destroy(self: *Entities, e: Entity) bool {
-        var i: usize = 0;
-        while (i < self.alive.items.len) {
-            if (self.alive.items[i] == e) {
+    /// Remove entity from alive entities. Marks them as
+    /// dead. They are deleted at end of frame with call
+    /// to maintain method.
+    pub fn destroy(self: *Entities, e: Entity) !void {
+        try self.deleted.append(e);
+    }
+
+    /// Remove entity from alive entity. Pefrom destruction
+    /// at the current moment, so alive entities change their
+    /// ids. Don't use it when iterating over alive entities.
+    pub fn destroy_now(self: *Entities, e: Entity) void {
+        for (self.alive.items) |ae, i| {
+            if (ae == e) {
                 _ = self.alive.swapRemove(i);
                 _ = self.tags.swapRemove(i);
-                return true;
+                return;
             }
-            i += 1;
         }
-        return false;
+    }
+
+    /// Finalize removal of entities that was lazy deleted.
+    /// After the operation indecies of alive entities are
+    /// changed. The operation is designed to be called at
+    /// end of frame.
+    pub fn maintain(self: *Entities) void {
+        for (self.deleted.items) |e| {
+            self.destroy_now(e);
+        }
     }
 
     /// Mark that entity has given components
