@@ -90,7 +90,7 @@ pub const World = struct {
     pub fn step(self: *World, dt: f64, events: *const input.Events) !void {
         player_sys.step(&self.player, &self.rotation, &self.velocity, &self.mass, dt);
         try physics_sys.step(&self.entities, &self.position, &self.velocity,
-            &self.asteroid, &self.player, &self.radius, &self.rotation, self.size.global, dt);
+            &self.asteroid, &self.player, &self.radius, &self.rotation, &self.bullet, self.size.global, dt);
         try bullet_sys.step(&self.bullet, &self.entities, dt);
         try self.apply_events(dt, events);
         self.entities.maintain();
