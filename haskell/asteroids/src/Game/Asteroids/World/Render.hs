@@ -49,12 +49,16 @@ drawCircloid (Renderer rd) n a0 (V2 x0 y0) r = {-# SCC "drawCircloid" #-} liftIO
     int y0 = $(int y0);
     SDL_Renderer *renderer = (SDL_Renderer *)$(void *rd);
     int n = $(int n);
+    static SDL_Point points[100];
     for(int i=0; i <= n-1; i++) {
-      int x1, y1, x2, y2;
-      circloid_point(i,   n, r, a0, &x1, &y1);
-      circloid_point(i+1, n, r, a0, &x2, &y2);
-      SDL_RenderDrawLine(renderer, x0 + x1, y0 + y1, x0 + x2, y0 + y2);
+      circloid_point(i,   n, r, a0, &points[i*2].x, &points[i*2].y);
+      circloid_point(i+1, n, r, a0, &points[i*2+1].x, &points[i*2+1].y);
+      points[i*2].x += x0;
+      points[i*2].y += y0;
+      points[i*2+1].x += x0;
+      points[i*2+1].y += y0;
     }
+    SDL_RenderDrawLines(renderer, (SDL_Point*)&points, n*2);
   } |]
 {-# INLINE drawCircloid #-}
 
