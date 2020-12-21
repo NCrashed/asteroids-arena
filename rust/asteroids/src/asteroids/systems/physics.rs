@@ -1,6 +1,7 @@
 use glam::Vec2;
 use shrev::EventChannel;
 use specs::prelude::*;
+use std::sync::mpsc::*;
 
 use super::super::components::asteroid::*;
 use super::super::components::bullet::*;
@@ -44,36 +45,45 @@ impl<'a> System<'a> for SysPhysics {
         ): Self::SystemData,
     ) {
         let dt = delta.0.as_secs_f32();
-        for (pos, vel) in (&mut pos, &vel).join() {
+        (&mut pos, &vel).par_join()
+            .for_each(|(pos, vel)| {
             // Apply all velocities
             pos.0 += vel.0 * dt;
             // Wrap space
             wrap_space(&wsize, pos);
-        }
+        });
+
+
         // Check collisions between bullet and asteroids
-        'outer1: for (_, bpos, be) in (&bullet, &pos, &entities).join() {
-            for (asteroid, apos, ae) in (&asteroid, &pos, &entities).join() {
+        let (asender, areceiver) = channel();
+        (&bullet, &pos, &entities).par_join().for_each_with(asender, |asender, (_, bpos, be)| {
+            (&asteroid, &pos, &entities).join().for_each(|(asteroid, apos, ae)| {
                 if asteroid_collide_point(asteroid, apos.0, bpos.0) {
-                    asteroid_chan.single_write(AsteroidBreak(ae));
+                    asender.send(AsteroidBreak(ae)).unwrap();
                     match entities.delete(be).stringify() {
                         Err(msg) => println!("Failed to delete bullet {:?}: {}", be, msg),
                         _ => (),
                     }
-                    break 'outer1;
                 }
-            }
+            });
+        });
+        for event in areceiver.iter() {
+            asteroid_chan.single_write(event);
         }
         // Check collision between player and asteroids
-        'outer2: for (asteroid, apos, ae) in (&asteroid, &pos, &entities).join() {
-            for (_, ppos, pe) in (&player, &pos, &entities).join() {
+        let (psender, preceiver) = channel();
+        (&asteroid, &pos, &entities).par_join().for_each_with(psender, |psender, (asteroid, apos, ae)| {
+            (&player, &pos, &entities).join().for_each(|(_, ppos, pe)| {
                 if asteroid_collide_radius(asteroid, apos.0, ppos.0, PLAYER_COLLIDE_RADIUS) {
-                    player_chan.single_write(PlayerCollide {
+                    psender.send(PlayerCollide {
                         player: pe,
                         obstacle: ae,
-                    });
-                    break 'outer2;
+                    }).unwrap();
                 }
-            }
+            });
+        });
+        for event in preceiver.iter() {
+            player_chan.single_write(event);
         }
     }
 }
