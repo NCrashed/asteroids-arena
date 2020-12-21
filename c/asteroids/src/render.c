@@ -3,11 +3,25 @@
 #define PLAYER_DX (0.5 * PLAYER_RENDER_WIDTH)
 #define PLAYER_DY (0.5 * PLAYER_RENDER_HEIGHT)
 
+struct SDL_Point lines_i[2 * ASTEROID_EDGES_MAX];
+struct v2f lines_f[2 * ASTEROID_EDGES_MAX];
+
 void render_line(SDL_Renderer *renderer, struct v2f pos, float rotation, struct v2f p1, struct v2f p2) {
   v2f_rotate(&p1, rotation);
   v2f_rotate(&p2, rotation);
   SDL_RenderDrawLine(renderer, pos.x + p1.x, pos.y + p1.y
                              , pos.x + p2.x, pos.y + p2.y);
+}
+
+void render_lines(SDL_Renderer *renderer, struct v2f pos, float rotation, const struct v2f *ps, int n) {
+  for(int i=0; i<n; i++) {
+    struct v2f p = ps[i];
+    v2f_rotate(&p, rotation);
+    v2f_set_add(&p, pos);
+    lines_i[i].x = (int)p.x;
+    lines_i[i].y = (int)p.y;
+  }
+  SDL_RenderDrawLines(renderer, (SDL_Point *)&lines_i, n);
 }
 
 struct v2f circloid_point(int i, int n, float r) {
@@ -20,8 +34,10 @@ struct v2f circloid_point(int i, int n, float r) {
 
 void render_circloid(SDL_Renderer *renderer, int n, float a0, struct v2f pos, float r) {
   for(int i=0; i <= n-1; i++) {
-    render_line(renderer, pos, a0, circloid_point(i, n, r), circloid_point(i+1, n, r));
+    lines_f[2*i] = circloid_point(i, n, r);
+    lines_f[2*i+1] = circloid_point(i+1, n, r);
   }
+  render_lines(renderer, pos, a0, (struct v2f *)&lines_f, 2*n);
 }
 
 void render_asteroid(SDL_Renderer *renderer, struct asteroid_component asteroid, struct v2f pos, float rotation, float radius) {
