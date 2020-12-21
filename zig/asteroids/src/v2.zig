@@ -36,7 +36,7 @@ pub const Vec2 = struct {
     pub inline fn dist_squared(self: Vec2, v: Vec2) f32 {
         const x = self.x - v.x;
         const y = self.y - v.y;
-        return x*x + y*y;
+        return x * x + y * y;
     }
 
     /// Scale given vector by scalar

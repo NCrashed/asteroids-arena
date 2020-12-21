@@ -3,10 +3,7 @@ const entity = @import("../entity.zig");
 const Component = @import("../component.zig").Component;
 
 /// Destroy bullets when their life time comes to end
-pub fn step(bullet_store: *bullet.Storage
-    , entities: *entity.Entities
-    , dt: f64) !void
-{
+pub fn step(bullet_store: *bullet.Storage, entities: *entity.Entities, dt: f64) !void {
     var i: usize = 0;
     while (i < entities.alive.items.len) {
         const e = entities.alive.items[i];

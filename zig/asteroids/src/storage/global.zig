@@ -11,7 +11,7 @@ pub fn GlobalStorage(comptime T: type, comptime deinit: fn (*T) void) type {
 
         /// Initialize the storage with default value for global component
         pub fn init(value: T) Self {
-            return Self {
+            return Self{
                 .global = value,
             };
         }

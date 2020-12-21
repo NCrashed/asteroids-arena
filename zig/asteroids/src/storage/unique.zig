@@ -14,16 +14,14 @@ pub fn UniqueStorage(comptime T: type) type {
 
         /// Initialize the storage with 0 components
         pub fn init() Self {
-            return Self {
+            return Self{
                 .unique = null,
                 .owner = entity.global,
             };
         }
 
         /// Deallocate memory of the storage
-        pub fn deinit(self: *Self) void {
-
-        }
+        pub fn deinit(self: *Self) void {}
 
         /// Insert component inside the storage.
         pub fn insert(self: *Self, e: Entity, c: T) void {

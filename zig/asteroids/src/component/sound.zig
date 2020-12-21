@@ -7,9 +7,7 @@ const TypeId = std.builtin.TypeId;
 
 /// Sound tag, all known sounds by the game.
 pub const Sound = packed enum(u16) {
-    bang_medium,
-    fire,
-    thrust
+    bang_medium, fire, thrust
 };
 
 /// Maximum amount of used sounds
@@ -35,7 +33,7 @@ pub fn sound_file(s: Sound) []const u8 {
 
 /// Global component that holds sound files and cooldowns for them
 pub const SoundResources = struct {
-    sounds: [sounds_count] *c.Mix_Chunk,
+    sounds: [sounds_count]*c.Mix_Chunk,
     cooldowns: [sounds_count]f32,
     allocator: *Allocator,
 
@@ -44,13 +42,13 @@ pub const SoundResources = struct {
         _ = c.Mix_AllocateChannels(sounds_count);
         _ = c.Mix_Volume(-1, 50);
 
-        var sounds: [sounds_count] *c.Mix_Chunk = undefined;
+        var sounds: [sounds_count]*c.Mix_Chunk = undefined;
         inline for (std.meta.fields(Sound)) |efield| {
             const s = @intToEnum(Sound, efield.value);
             sounds[@intCast(usize, efield.value)] = try load_wav(allocator, dir, sound_file(s));
         }
 
-        return SoundResources {
+        return SoundResources{
             .sounds = sounds,
             .cooldowns = [_]f32{0} ** sounds_count,
             .allocator = allocator,
@@ -59,7 +57,7 @@ pub const SoundResources = struct {
 
     /// Load wav file from given directory, caller owns the result.
     fn load_wav(allocator: *Allocator, dir: []const u8, file: []const u8) !*c.Mix_Chunk {
-        const a = [_][]const u8 { dir, file };
+        const a = [_][]const u8{ dir, file };
         const file_path = try std.fs.path.join(allocator, &a);
         defer allocator.free(file_path);
 

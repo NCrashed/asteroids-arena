@@ -8,7 +8,7 @@ pub const Entity = u32;
 
 /// Special shortcut to context where there is only one meaningfull value
 /// for entity ID.
-pub const global : Entity = 0;
+pub const global: Entity = 0;
 
 /// Special storage of world that tracks alive entities and their components.
 pub const Entities = struct {
@@ -23,7 +23,7 @@ pub const Entities = struct {
 
     /// Initialize the storage with 0 entities
     pub fn init(allocator: *Allocator) Entities {
-        return Entities {
+        return Entities{
             .entity_counter = 0,
             .alive = std.ArrayList(Entity).init(allocator),
             .tags = std.ArrayList(Component).init(allocator),

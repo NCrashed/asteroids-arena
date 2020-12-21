@@ -12,7 +12,7 @@ pub fn VecStorage(comptime T: type) type {
 
         /// Initialize the storage with 0 components
         pub fn init(allocator: *Allocator) Self {
-            return Self {
+            return Self{
                 .components = std.ArrayList(T).init(allocator),
             };
         }
@@ -25,7 +25,7 @@ pub fn VecStorage(comptime T: type) type {
         /// Insert component inside the storage.
         pub fn insert(self: *Self, e: Entity, c: T) !void {
             if (self.components.items.len <= e) {
-                try self.components.resize(e+1);
+                try self.components.resize(e + 1);
             }
             self.components.items[e] = c;
         }

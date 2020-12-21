@@ -29,7 +29,7 @@ inline fn render_line(renderer: *c.SDL_Renderer, pos: Vec2, rot: f32, p1: *Vec2,
 }
 
 fn render_lines(renderer: *c.SDL_Renderer, comptime n: usize, k: usize, vs: [n]Vec2) void {
-    var points : [n]c.SDL_Point = undefined;
+    var points: [n]c.SDL_Point = undefined;
     var i: usize = 0;
     while (i < k) {
         points[i].x = @floatToInt(c_int, vs[i].x);
@@ -53,24 +53,24 @@ pub fn render_bullet(renderer: *c.SDL_Renderer, pos: Vec2) void {
 }
 
 pub fn render_player(renderer: *c.SDL_Renderer, pl: player.Player, pos: Vec2, rot: f32) void {
-    var p1 = Vec2 { .x =  player_dx, .y =  0 };
-    var p2 = Vec2 { .x = -player_dx, .y = -player_dy };
+    var p1 = Vec2{ .x = player_dx, .y = 0 };
+    var p2 = Vec2{ .x = -player_dx, .y = -player_dy };
     render_line(renderer, pos, rot, &p1, &p2);
 
-    p1 = Vec2 { .x =  player_dx, .y =  0 };
-    p2 = Vec2 { .x = -player_dx, .y =  player_dy};
+    p1 = Vec2{ .x = player_dx, .y = 0 };
+    p2 = Vec2{ .x = -player_dx, .y = player_dy };
     render_line(renderer, pos, rot, &p1, &p2);
 
-    p1 = Vec2 { .x = -player_dx, .y = -player_dy };
-    p2 = Vec2 { .x = -player_dx, .y =  player_dy};
+    p1 = Vec2{ .x = -player_dx, .y = -player_dy };
+    p2 = Vec2{ .x = -player_dx, .y = player_dy };
     render_line(renderer, pos, rot, &p1, &p2);
 
     if (pl.thrust) {
-        p1 = Vec2 { .x = -player_dx   , .y = -0.5*player_dy };
-        p2 = Vec2 { .x = -player_dx-10, .y =  0};
+        p1 = Vec2{ .x = -player_dx, .y = -0.5 * player_dy };
+        p2 = Vec2{ .x = -player_dx - 10, .y = 0 };
         render_line(renderer, pos, rot, &p1, &p2);
-        p1 = Vec2 { .x = -player_dx   , .y =  0.5*player_dy };
-        p2 = Vec2 { .x = -player_dx-10, .y =  0};
+        p1 = Vec2{ .x = -player_dx, .y = 0.5 * player_dy };
+        p2 = Vec2{ .x = -player_dx - 10, .y = 0 };
         render_line(renderer, pos, rot, &p1, &p2);
     }
 }
@@ -80,7 +80,7 @@ fn circloid_point(i: i32, n: i32, r: f32) Vec2 {
     var sina: f32 = undefined;
     var cosa: f32 = undefined;
     sincosf(a, &sina, &cosa);
-    return Vec2 {
+    return Vec2{
         .x = r * (1 + sina * 0.3) * cosa,
         .y = r * (1 + cosa * 0.3) * sina,
     };
@@ -90,13 +90,13 @@ pub fn render_asteroid(renderer: *c.SDL_Renderer, a: asteroid.Asteroid, pos: Vec
     var i: usize = 0;
     const n = a.edges;
     const maxn = asteroid.edges_max * 2;
-    var ps : [maxn]Vec2 = undefined;
-    while (i <= n-1) {
-        ps[2*i] = circloid_point(@intCast(i32, i), n, rad);
-        ps[2*i+1] = circloid_point(@intCast(i32, i+1), n, rad);
+    var ps: [maxn]Vec2 = undefined;
+    while (i <= n - 1) {
+        ps[2 * i] = circloid_point(@intCast(i32, i), n, rad);
+        ps[2 * i + 1] = circloid_point(@intCast(i32, i + 1), n, rad);
         i += 1;
     }
-    const k = @intCast(usize, 2*n);
+    const k = @intCast(usize, 2 * n);
     transform_vecs(pos, rot, maxn, k, &ps);
     render_lines(renderer, maxn, k, ps);
 }

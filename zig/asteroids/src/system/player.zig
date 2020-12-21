@@ -3,12 +3,7 @@ const rotation = @import("../component/rotation.zig");
 const mass = @import("../component/mass.zig");
 const velocity = @import("../component/velocity.zig");
 
-pub fn step(player_store: *player.Storage
-    , rot_store: *const rotation.Storage
-    , vel_store: *velocity.Storage
-    , mass_store: *const mass.Storage
-    , dt: f64) void
-{
+pub fn step(player_store: *player.Storage, rot_store: *const rotation.Storage, vel_store: *velocity.Storage, mass_store: *const mass.Storage, dt: f64) void {
     if (player_store.unique) |p| {
         const e = player_store.owner;
 

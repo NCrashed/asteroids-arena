@@ -104,7 +104,7 @@ pub fn main() !void {
     };
     defer w.deinit();
 
-    var fps_file = std.fs.cwd().createFile("fps.out", std.fs.File.CreateFlags {}) catch |err| {
+    var fps_file = std.fs.cwd().createFile("fps.out", std.fs.File.CreateFlags{}) catch |err| {
         c.SDL_Log("Unable to open file fps.out for writing");
         return err;
     };
@@ -114,7 +114,7 @@ pub fn main() !void {
         c.SDL_Log("Unable to start timer");
         return error.TimerInitFail;
     };
-    var i : i32 = 1;
+    var i: i32 = 1;
     var quit = false;
     var input_events = input.Events.init();
     while (!quit) {
@@ -139,7 +139,7 @@ pub fn main() !void {
         i += 1;
         if (@mod(i, 1000) == 0) {
             c.SDL_Log("%f", fps);
-            fps_file.writer().print("{},{}\n", .{i,fps}) catch |_| {
+            fps_file.writer().print("{},{}\n", .{ i, fps }) catch |_| {
                 c.SDL_Log("Failed to dump FPS to file");
                 return error.FpsWriteError;
             };

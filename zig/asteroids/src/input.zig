@@ -8,7 +8,7 @@ pub const Events = struct {
 
     /// Setup default values for input events
     pub fn init() Events {
-        return Events {
+        return Events{
             .ship_left = false,
             .ship_right = false,
             .ship_thrust = false,

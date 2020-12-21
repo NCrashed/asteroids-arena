@@ -57,7 +57,7 @@ pub const World = struct {
         try std.os.getrandom(buf[0..]);
         const seed = std.mem.readIntLittle(u64, buf[0..8]);
 
-        var w = World {
+        var w = World{
             .rng = std.rand.DefaultPrng.init(seed),
             .entities = entity.Entities.init(allocator),
             .position = position.Storage.init(allocator),
@@ -94,9 +94,7 @@ pub const World = struct {
     ///  Make one tick of world simulation with given inputs. Return non zero if failed.
     pub fn step(self: *World, dt: f64, events: *const input.Events) !void {
         player_sys.step(&self.player, &self.rotation, &self.velocity, &self.mass, dt);
-        try physics_sys.step(&self.entities, &self.rng, &self.position, &self.velocity,
-            &self.asteroid, &self.player, &self.radius, &self.mass, &self.rotation,
-            &self.bullet, &self.sound, self.size.global, dt);
+        try physics_sys.step(&self.entities, &self.rng, &self.position, &self.velocity, &self.asteroid, &self.player, &self.radius, &self.mass, &self.rotation, &self.bullet, &self.sound, self.size.global, dt);
         try bullet_sys.step(&self.bullet, &self.entities, dt);
         try self.apply_events(dt, events);
         self.sound.global.update_cooldowns(dt);
@@ -177,25 +175,27 @@ pub const World = struct {
         const x = @intToFloat(f32, self.size.global.width) * 0.5;
         const y = @intToFloat(f32, self.size.global.height) * 0.5;
         const e = try self.entities.new();
-        self.player.insert(e, player.Player { .thrust = false, .fire_cooldown = 0 });
-        try self.position.insert(e, Vec2 { .x = x, .y = y });
-        try self.velocity.insert(e, Vec2 { .x = 0, .y = 0 });
+        self.player.insert(e, player.Player{ .thrust = false, .fire_cooldown = 0 });
+        try self.position.insert(e, Vec2{ .x = x, .y = y });
+        try self.velocity.insert(e, Vec2{ .x = 0, .y = 0 });
         try self.rotation.insert(e, 0);
         try self.mass.insert(e, player.mass);
         try self.radius.insert(e, player.collision_radius);
-        const components = Component.combine(.{Component.player,
+        const components = Component.combine(.{
+            Component.player,
             Component.position,
             Component.velocity,
             Component.rotation,
             Component.mass,
-            Component.radius });
+            Component.radius,
+        });
         try self.entities.add_component(e, components);
         return e;
     }
 
     /// Spawn all asteroids
     fn spawn_asteroids(self: *World) !void {
-        var i : usize = 0;
+        var i: usize = 0;
         while (i < asteroid.amount) {
             _ = try spawn_asteroid(self);
             i += 1;
@@ -215,18 +215,20 @@ pub const World = struct {
         const m = std.math.pi * rad * rad * asteroid.density;
 
         const e = try self.entities.new();
-        try self.asteroid.insert(e, asteroid.Asteroid { .edges = edges });
-        try self.position.insert(e, Vec2 { .x = x, .y = y });
-        try self.velocity.insert(e, Vec2 { .x = vx, .y = vy });
+        try self.asteroid.insert(e, asteroid.Asteroid{ .edges = edges });
+        try self.position.insert(e, Vec2{ .x = x, .y = y });
+        try self.velocity.insert(e, Vec2{ .x = vx, .y = vy });
         try self.rotation.insert(e, rot);
         try self.mass.insert(e, m);
         try self.radius.insert(e, rad);
-        const components = Component.combine(.{Component.asteroid,
+        const components = Component.combine(.{
+            Component.asteroid,
             Component.position,
             Component.velocity,
             Component.rotation,
             Component.mass,
-            Component.radius });
+            Component.radius,
+        });
 
         try self.entities.add_component(e, components);
         return e;
@@ -234,11 +236,11 @@ pub const World = struct {
 
     /// Spawn bullet at given position and direction with inherited velocity
     fn spawn_bullet(self: *World, p: Vec2, a: f32, v: Vec2) !Entity {
-        var bvel = Vec2 { .x = bullet.speed * @cos(a), .y = bullet.speed * @sin(a) };
+        var bvel = Vec2{ .x = bullet.speed * @cos(a), .y = bullet.speed * @sin(a) };
         _ = bvel.add(v);
 
         const e = try self.entities.new();
-        try self.bullet.insert(e, bullet.Bullet { .time = bullet.life_time });
+        try self.bullet.insert(e, bullet.Bullet{ .time = bullet.life_time });
         try self.position.insert(e, p);
         try self.velocity.insert(e, bvel);
         const components = Component.combine(.{

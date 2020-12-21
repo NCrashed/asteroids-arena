@@ -13,20 +13,20 @@ pub const Player = struct {
 pub const Storage = st.UniqueStorage(Player);
 
 /// Mass of player ship in kg
-pub const mass : f32 = 100000;
+pub const mass: f32 = 100000;
 
 /// Player collision radius in meters
-pub const collision_radius : f32 = 15;
+pub const collision_radius: f32 = 15;
 
 /// Player rotation speed in radians per second
-pub const rotation_speed : f32 = std.math.pi;
+pub const rotation_speed: f32 = std.math.pi;
 
 /// Player thrust in newtons
-pub const thrust : f32 = 20000000;
+pub const thrust: f32 = 20000000;
 
 /// Visual X size of ship in meters
-pub const render_width : f32 = 30.0;
+pub const render_width: f32 = 30.0;
 /// Visual Y size of ship in meters
-pub const render_height : f32 = 25.0;
+pub const render_height: f32 = 25.0;
 /// Amount of time between two bullets
-pub const fire_cooldown : f32 = 0.3;
+pub const fire_cooldown: f32 = 0.3;
