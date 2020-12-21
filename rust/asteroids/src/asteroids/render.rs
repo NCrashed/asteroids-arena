@@ -94,10 +94,11 @@ fn render_asteroid(
     pos: &Pos,
     rot: &Rot,
 ) -> Result<(), String> {
-    for i in 0..asteroid.edges {
-        let p1 = circloid_point(i, asteroid.edges, asteroid.radius, pos.0, rot.0);
-        let p2 = circloid_point(i + 1, asteroid.edges, asteroid.radius, pos.0, rot.0);
-        canvas.draw_line(p1, p2)?;
+    let mut points = [Point::new(0, 0); ASTEROID_EDGES_RANGE.1 as usize * 2];
+    for i in 0..asteroid.edges as usize {
+        points[2*i] = circloid_point(i as u32, asteroid.edges, asteroid.radius, pos.0, rot.0);
+        points[2*i+1] = circloid_point((i + 1) as u32, asteroid.edges, asteroid.radius, pos.0, rot.0);
     }
+    canvas.draw_lines(&points[0 .. asteroid.edges as usize * 2])?;
     Ok(())
 }
