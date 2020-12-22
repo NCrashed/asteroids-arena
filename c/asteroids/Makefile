@@ -6,7 +6,7 @@ all:
 	gcc -g ${CFLAGS} -o asteroids ${MODULES} ${LDFLAGS}
 
 opt:
-	gcc -O3 ${CFLAGS} -o asteroids ${MODULES} ${LDFLAGS}
+	gcc -O3 -ffast-math ${CFLAGS} -o asteroids ${MODULES} ${LDFLAGS}
 
 small:
 	gcc -Os ${CFLAGS} -o asteroids ${MODULES} ${LDFLAGS}
