@@ -2,6 +2,7 @@ with import ../nix/pkgs.nix {
     config = {
       packageOverrides = pkgs: {
         dmd = pkgs.callPackage ../nix/dmd {};
+        ldc = pkgs.callPackage ../nix/ldc {};
       };
     };
   };
@@ -12,6 +13,8 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     dmd
+    ldc
+    dub
     SDL2
     SDL2_mixer
     valgrind
