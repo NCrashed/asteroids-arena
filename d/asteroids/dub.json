@@ -6,14 +6,17 @@
 	"dependencies": {
 		"bindbc-sdl": "~>0.19.2"
 	},
+	"description": "Asteroids game for asteroids-arena benchmarks",
+	"libs": [
+		"SDL2",
+		"SDL2_mixer"
+	],
+	"license": "MIT",
+	"name": "asteroids",
 	"subConfigurations": {
-	    "bindbc-sdl": "static"
+		"bindbc-sdl": "static"
 	},
 	"versions": [
-	    "SDL_Mixer"
-	],
-	"libs": ["SDL2", "SDL2_mixer"],
-	"description": "Asteroids game for asteroids-arena benchmarks",
-	"license": "MIT",
-	"name": "asteroids"
+		"SDL_Mixer"
+	]
 }
