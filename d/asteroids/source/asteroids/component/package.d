@@ -49,6 +49,14 @@ template Components(T...) {
     }
     mixin Inner!(T);
   }
+
+  /// Return false if some components from $(B U) are not in $(B T)
+  template hasAll(U...) {
+    private template inComponents(C) {
+      enum inComponents = staticIndexOf!(C, T) != -1;
+    }
+    enum hasAll = allSatisfy!(inComponents, U);
+  }
 }
 
 unittest {
@@ -77,4 +85,14 @@ unittest {
   static assert(__traits(compiles, position));
   static assert(__traits(isSame, typeof(rotation), Rotation.Storage));
   static assert(!__traits(compiles, mass));
+}
+
+unittest {
+  alias CS = Components!(Position, Rotation, Velocity, Radius);
+  static assert(CS.hasAll!(Position));
+  static assert(CS.hasAll!(Velocity, Radius));
+  static assert(CS.hasAll!(Position, Rotation, Velocity, Radius));
+  static assert(!CS.hasAll!(Mass));
+  static assert(!CS.hasAll!(Rotation, Mass, Radius));
+  static assert(!CS.hasAll!(Rotation, Mass));
 }

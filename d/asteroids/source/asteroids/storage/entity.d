@@ -58,6 +58,45 @@ struct Entities(T...) {
     }
     deleted.clear();
   }
+
+  /// Mark that entity has given components
+  void addComponents(C...)(Entity e) {
+    static assert(CS.hasAll!C, "Some components " ~ C.stringof
+      ~ " is not known in world ones " ~ T.stringof);
+    immutable i = alive_index(e);
+    assert(i >= 0, "Entity " ~ e.stringof ~ " is dead!");
+    tags[i] = tags[i] | CS.join!C;
+  }
+
+  /// Mark that entity doesn't have given components
+  void removeComponents(C...)(Entity e) {
+    static assert(CS.hasAll!C, "Some components " ~ C.stringof
+      ~ " is not known in world ones " ~ T.stringof);
+    immutable i = alive_index(e);
+    assert(i >= 0, "Entity " ~ e.stringof ~ " is dead!");
+    tags[i] = tags[i] & ~CS.join!C;
+  }
+
+  /// Return $(B true) if given alive entity (defined by index in alive array)
+  /// has given components. Designed to be used acros iteration over all
+  /// alive entities.
+  bool aliveHas(C...)(size_t i) {
+    static assert(CS.hasAll!C, "Some components " ~ C.stringof
+      ~ " is not known in world ones " ~ T.stringof);
+    return (tags[i] & CS.join!C) == tags[i];
+  }
+
+  /// Iteration over alive entities
+  int opApply(scope int delegate(size_t, Entity) dg) {
+    int result = 0;
+
+    foreach (i, e; alive)
+    {
+        result = dg(i, e);
+        if (result) break;
+    }
+    return result;
+  }
 }
 
 /// Remove an element from array and swap last element to the hole
