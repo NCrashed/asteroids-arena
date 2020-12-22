@@ -60,3 +60,12 @@ Smooth gameplay. It was quite easy to implement the game and get high performanc
 ### Zig
 The most stable frame rate. Feels like insane upgrade over C in development experience and performance.
 ![C FPS](./zig/asteroids/fps.png)
+
+### My machine
+
+It is important that all measurements of performance are done in equal environment. So, FPS benchmarks are executed on my personal PC that has:
+* RTX 2080 Ti
+* AMD Ryzen 9 3950X
+* NixOS x86_64  
+* SSD
+* 64 GiB RAM
