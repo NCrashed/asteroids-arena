@@ -11,11 +11,17 @@ you die. Asteroid breaks into two smaller ones on collision with bullet, but if 
 don't collide with the ship. Asteroids are randomly distributed across world on start. You win if you kill all asteroids, you loose when
 you die.
 
+Important gameplay feature that bullets has relative speed to the ship when spawned, so if you shoot backward, you can get bullet that doesn't move relative to
+the world. There should be three supported sound effects. First, thrust sound when ship accelerates. Second, fire sound. Finally, bangs on asteroid destruction and player death. For simplicity player respawns in center of world on death.
+
 # Implementation restrictions
 
-* Implement entity-component-system design.
-* Separate world simulation from rendering to benchmark TPS between languages.
+* Implement entity-component-system design. If language design is not suited well for the pattern, it is acceptable to choose another design.
+* Asteroids have [circloid shape](./c/asteroids/src/render.c#L35) and you should not memorize asteroid lines. That restriction allows to see how language backend
+deals with heavy load of 2D rendering (trigonometry e.x.). But you can batch all rendering calls.
+* Measure FPS of full frame with world step and rendering.
 * Use SDL for rendering.
+* Concurrency is allowed.
 
 # Languages
 
@@ -25,7 +31,7 @@ Languages:
 - Haskell. My major language. The goal to test pressure of GC on performance and if it really more comfortable for game developing. **Done**.
 - C. Control group for performance. **Done**.
 - ATS2. Low level FP language with dependent typing that will allow mutation in place, redundant checks elimination and zero cost abstractions. **On hold**.
-- D. Curious to test it with GC and without GC. Not started yet.
+- D. Curious to test it with GC and without GC. **In progress**.
 - Zig. Low level alternative to pure C. Curious in performance and if it easy to bind to C libraries. **Done**.
 - Rust. Curious in performance and expressive power comparing to Haskell. **Done**.
 
