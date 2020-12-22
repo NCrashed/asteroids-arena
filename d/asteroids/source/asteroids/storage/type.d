@@ -1,0 +1,1 @@
+module asteroids.storage.type;

@@ -1,7 +1,9 @@
 module asteroids.componet;
 
-import std.meta;
 import std.algorithm.iteration;
+import std.meta;
+import std.traits;
+import std.typecons;
 
 public import asteroids.component.primitive;
 public import asteroids.component.size;
@@ -29,6 +31,20 @@ template Components(T...) {
     }
     enum join = foldTags([staticMap!(tag, U)]);
   }
+
+  /// Inserts storages for all components into scope. All components must have
+  // defined name and Storage alias.
+  mixin template Storages() {
+    private mixin template Inner(U...) {
+      static if (U.length == 0) {}
+      else {
+        import std.traits;
+        mixin(fullyQualifiedName!(U[0].Storage) ~ " " ~ U[0].name ~ ";");
+        mixin Inner!(U[1 .. $]);
+      }
+    }
+    mixin Inner!(T);
+  }
 }
 
 @safe unittest {
@@ -48,4 +64,13 @@ template Components(T...) {
   static assert(CS.join!(Position, Radius) == 0b1001);
   static assert(CS.join!(Radius) == 0b1000);
   static assert(CS.join!() == 0);
+}
+
+@safe unittest {
+  alias CS = Components!(Position, Rotation, Velocity, Radius);
+  mixin CS.Storages;
+
+  static assert(__trait(compiles, position));
+  static assert(__trait(isSame, typeof(rotation), Rotation.Storage));
+  static assert(!__trait(compiles, mass));
 }

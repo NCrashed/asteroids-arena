@@ -1,6 +1,6 @@
-import std.stdio;
 import bindbc.sdl;
 import core.time;
+import std.stdio;
 
 import asteroids.world;
 import asteroids.input;
@@ -81,14 +81,23 @@ void main()
 	}
 	scope(exit) SDL_DestroyRenderer(renderer);
 
-	auto w = new World("./sounds");
+	// Here we define which components are supported by the world
+	auto w = new World!(
+			WorldSize,
+			Position,
+			Velocity,
+			Rotation,
+			Radius,
+			Mass,
+		)("./sounds");
+
 	auto fps_file = File("fps.out", "w");
 	auto i = 1;
 	auto quit = false;
 	auto input_events = InputEvents();
 	while (!quit) {
 		immutable t1 = MonoTime.currTime();
-		quit = process_events(input_events, w.size);
+		quit = process_events(input_events, w.worldSize.global);
 
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
