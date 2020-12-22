@@ -89,6 +89,7 @@ void main()
 			Rotation,
 			Radius,
 			Mass,
+			Player,
 		)("./sounds");
 
 	auto fps_file = File("fps.out", "w");
@@ -108,7 +109,8 @@ void main()
 		immutable t2 = MonoTime.currTime();
 		immutable dt = cast(float)(t2 - t1).total!"usecs"() / 1000_000;
 		w.step(dt, input_events);
-
+		w.maintain();
+	
 		immutable fps = 1 / dt;
 		i += 1;
 		if (i % 1000 == 0) {

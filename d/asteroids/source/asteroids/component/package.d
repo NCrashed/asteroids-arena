@@ -1,10 +1,11 @@
-module asteroids.componet;
+module asteroids.component;
 
 import std.algorithm.iteration;
 import std.meta;
 import std.traits;
 import std.typecons;
 
+public import asteroids.component.player;
 public import asteroids.component.primitive;
 public import asteroids.component.size;
 
@@ -13,6 +14,9 @@ public import asteroids.component.size;
 /// unique bit in the tag, so we can use bit masking for fast
 /// checking whether entity has given set of components.
 alias ComponentTag = uint;
+
+/// Special tag that indicates that entity doesn't have any components
+immutable ComponentTag none = 0;
 
 /// Defines operations with components packed together.
 template Components(T...) {
@@ -47,7 +51,7 @@ template Components(T...) {
   }
 }
 
-@safe unittest {
+unittest {
   alias CS = Components!(Position, Rotation, Velocity, Radius);
   static assert(CS.tag!Position == 1);
   static assert(CS.tag!Rotation == 2);
@@ -56,7 +60,7 @@ template Components(T...) {
   static assert(CS.tag!Mass == 0);
 }
 
-@safe unittest {
+unittest {
   alias CS = Components!(Position, Rotation, Velocity, Radius);
   static assert(CS.join!(Position) == 1);
   static assert(CS.join!(Position, Rotation) == 0b11);
@@ -66,11 +70,11 @@ template Components(T...) {
   static assert(CS.join!() == 0);
 }
 
-@safe unittest {
+unittest {
   alias CS = Components!(Position, Rotation, Velocity, Radius);
   mixin CS.Storages;
 
-  static assert(__trait(compiles, position));
-  static assert(__trait(isSame, typeof(rotation), Rotation.Storage));
-  static assert(!__trait(compiles, mass));
+  static assert(__traits(compiles, position));
+  static assert(__traits(isSame, typeof(rotation), Rotation.Storage));
+  static assert(!__traits(compiles, mass));
 }

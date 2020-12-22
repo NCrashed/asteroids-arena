@@ -3,6 +3,7 @@ module asteroids.world;
 public import asteroids.component;
 
 import asteroids.input;
+import asteroids.storage.entity;
 import bindbc.sdl;
 import std.experimental.allocator;
 
@@ -18,6 +19,8 @@ immutable initial_height = WorldSize().height;
 ///
 /// Type argument is components that are supported by the world type.
 class World(T...) {
+  /// Here we track alive/dead entities
+  Entities!T entities;
   // Embed all storages for each component type
   mixin Components!T.Storages;
 
@@ -29,6 +32,11 @@ class World(T...) {
   ///  Make one tick of world simulation with given inputs. Return non zero if failed.
   void step(float dt, in InputEvents events) {
 
+  }
+
+  /// Maintain world delayed actions
+  void maintain() {
+    entities.maintain();
   }
 
   /// Render world in current frame
