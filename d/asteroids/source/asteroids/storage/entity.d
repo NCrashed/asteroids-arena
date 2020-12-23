@@ -12,11 +12,8 @@ struct Entities {
     /// Name of component. By the identificator you can get entities storage in
     /// mixined code.
     enum name = "entities";
-    /// Mark that we have partially applied storage type and that we need to pass
-    /// all components to the storage.
-    enum isRegistry = true;
     /// Partially applied storage.
-    alias Storage = EntitiesStorage;
+    alias Storage = EntitiesStorage!AllComponents;
 }
 
 /// Special storage of world that tracks alive entities and their components.

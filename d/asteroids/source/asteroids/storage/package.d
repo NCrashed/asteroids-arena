@@ -10,6 +10,6 @@ import asteroids.component;
 
 /// Special kind of tuple with all storages for specified components that you
 /// can access by their names.
-struct Storages(T...) {
-  mixin Components!T.Storages;
+struct Storages(U...) {
+  mixin Components!U.Storages;
 }

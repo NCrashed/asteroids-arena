@@ -1,8 +1,9 @@
 /// Defines simple components for position, rotation, radius and etc
 module asteroids.component.primitive;
 
+public import asteroids.v2;
+
 import asteroids.storage.vector;
-import asteroids.v2;
 import std.typecons;
 
 /// Position component of each entity in world.

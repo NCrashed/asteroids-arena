@@ -82,17 +82,7 @@ void main()
 	scope(exit) SDL_DestroyRenderer(renderer);
 
 	// Here we define which components are supported by the world
-	auto w = new World!(
-			Entities,
-			WorldSize,
-			Rng,
-			Position,
-			Velocity,
-			Rotation,
-			Radius,
-			Mass,
-			Player,
-		)("./sounds");
+	auto w = new World("./sounds");
 
 	auto fps_file = File("fps.out", "w");
 	auto i = 1;
