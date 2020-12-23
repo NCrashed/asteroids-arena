@@ -38,7 +38,10 @@ template Components(T...) {
   }
 
   /// Inserts storages for all components into scope. All components must have
-  // defined name and Storage alias.
+  /// defined name and Storage alias.
+  ///
+  /// Note: We expect that in mixin place you call the template list of components
+  /// as T.
   mixin template Storages() {
     private mixin template Inner(U...) {
       static if (U.length == 0) {}
@@ -47,7 +50,6 @@ template Components(T...) {
         import std.traits;
         static if (__traits(compiles, U[0].isRegistry) && U[0].isRegistry) {
           alias RegistryStorage = U[0].Storage!T;
-          // pragma(msg, fullyQualifiedName!RegistryStorage ~ "!" ~ fullyQualifiedName!([T]) ~ " " ~ U[0].name ~ ";");
           mixin(fullyQualifiedName!RegistryStorage ~ "!T " ~ U[0].name ~ ";");
         } else {
           mixin(fullyQualifiedName!(U[0].Storage) ~ " " ~ U[0].name ~ ";");
