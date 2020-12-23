@@ -84,7 +84,7 @@ class EntitiesStorage(T...) {
   void addComponents(C...)(Entity e) {
     static assert(CS.hasAll!C, "Some components " ~ C.stringof
       ~ " is not known in world ones " ~ T.stringof);
-    immutable i = alive_index(e);
+    immutable i = aliveIndex(e);
     assert(i >= 0, "Entity " ~ e.stringof ~ " is dead!");
     tags[i] = tags[i] | CS.join!C;
   }
@@ -93,7 +93,7 @@ class EntitiesStorage(T...) {
   void removeComponents(C...)(Entity e) {
     static assert(CS.hasAll!C, "Some components " ~ C.stringof
       ~ " is not known in world ones " ~ T.stringof);
-    immutable i = alive_index(e);
+    immutable i = aliveIndex(e);
     assert(i >= 0, "Entity " ~ e.stringof ~ " is dead!");
     tags[i] = tags[i] & ~CS.join!C;
   }
@@ -117,6 +117,15 @@ class EntitiesStorage(T...) {
         if (result) break;
     }
     return result;
+  }
+
+  /// Get index in alive array for given entity. Returns -1 if it is not alive.
+  size_t aliveIndex(Entity e) {
+    foreach (i, ae; alive[].enumerate)
+    {
+        if (ae == e) return i;
+    }
+    return -1;
   }
 }
 

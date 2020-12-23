@@ -22,7 +22,7 @@ class VecStorage(T) : IStorage!T {
     if (items.length <= e) {
       immutable n = e - items.length + 1;
       items.reserve(n);
-      items.insertBack(T.init.repeat().take(n-1));
+      items.insertBack(T.init.repeat().take(n));
     }
     items[e] = c;
   }

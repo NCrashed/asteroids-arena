@@ -16,6 +16,11 @@ struct Player {
   enum name = "player";
   /// Storage type for player. We have only one entity that has the component.
   alias Storage = UniqueStorage!Player;
+
+  /// Mass of player in kgs
+  enum float mass = 100000;
+  /// Collision radius of player in meters
+  enum float radius = 15;
 }
 
 /// Shorthand for enumeration of components that player entity has
@@ -24,5 +29,6 @@ alias PlayerComponents = AliasSeq!(
   Position,
   Velocity,
   Rotation,
+  Radius,
   Mass
 );
