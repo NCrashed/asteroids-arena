@@ -1,6 +1,9 @@
 module asteroids.component.player;
 
+public import asteroids.component.primitive;
+
 import asteroids.storage.unique;
+import std.meta;
 
 /// Player component that is unique per world
 struct Player {
@@ -14,3 +17,12 @@ struct Player {
   /// Storage type for player. We have only one entity that has the component.
   alias Storage = UniqueStorage!Player;
 }
+
+/// Shorthand for enumeration of components that player entity has
+alias PlayerComponents = AliasSeq!(
+  Player,
+  Position,
+  Velocity,
+  Rotation,
+  Mass
+);

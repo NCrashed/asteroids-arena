@@ -7,6 +7,7 @@ import std.typecons;
 
 public import asteroids.component.player;
 public import asteroids.component.primitive;
+public import asteroids.component.rand;
 public import asteroids.component.size;
 
 /// Component tag that is used for fast calclutation whether
@@ -42,8 +43,15 @@ template Components(T...) {
     private mixin template Inner(U...) {
       static if (U.length == 0) {}
       else {
+        import std.meta;
         import std.traits;
-        mixin(fullyQualifiedName!(U[0].Storage) ~ " " ~ U[0].name ~ ";");
+        static if (__traits(compiles, U[0].isRegistry) && U[0].isRegistry) {
+          alias RegistryStorage = U[0].Storage!T;
+          // pragma(msg, fullyQualifiedName!RegistryStorage ~ "!" ~ fullyQualifiedName!([T]) ~ " " ~ U[0].name ~ ";");
+          mixin(fullyQualifiedName!RegistryStorage ~ "!T " ~ U[0].name ~ ";");
+        } else {
+          mixin(fullyQualifiedName!(U[0].Storage) ~ " " ~ U[0].name ~ ";");
+        }
         mixin Inner!(U[1 .. $]);
       }
     }

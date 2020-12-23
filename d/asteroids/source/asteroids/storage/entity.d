@@ -4,17 +4,33 @@ import asteroids.component;
 import asteroids.entity;
 import std.algorithm;
 import std.container.array;
+import std.range;
+
+/// Pseudo component that has 'EntitiesStorage' storage type. The component
+/// is special case.
+struct Entities {
+    /// Name of component. By the identificator you can get entities storage in
+    /// mixined code.
+    enum name = "entities";
+    /// Mark that we have partially applied storage type and that we need to pass
+    /// all components to the storage.
+    enum isRegistry = true;
+    /// Partially applied storage.
+    alias Storage = EntitiesStorage;
+}
 
 /// Special storage of world that tracks alive entities and their components.
 ///
 /// Template arguments are all supported entities.
-struct Entities(T...) {
+struct EntitiesStorage(T...) {
   /// Next free entity ID
   size_t entityCounter = 0;
   /// Collection of alive entities
   Array!Entity alive;
   /// Components tags for iteration
   Array!ComponentTag tags;
+  /// Entities that are marked for deletion
+  Array!Entity deleted;
 
   /// Shorthand for components utilities
   private alias CS = Components!T;
@@ -39,7 +55,7 @@ struct Entities(T...) {
   /// at the current moment, so alive entities change their
   /// ids. Don't use it when iterating over alive entities.
   void destroyNow(Entity e) {
-    foreach(i, ae; alive[]) {
+    foreach(i, ae; alive[].enumerate) {
       if (ae == e) {
         alive.swapRemove(i);
         tags.swapRemove(i);
@@ -90,7 +106,7 @@ struct Entities(T...) {
   int opApply(scope int delegate(size_t, Entity) dg) {
     int result = 0;
 
-    foreach (i, e; alive)
+    foreach (i, e; alive[].enumerate)
     {
         result = dg(i, e);
         if (result) break;

@@ -83,7 +83,9 @@ void main()
 
 	// Here we define which components are supported by the world
 	auto w = new World!(
+			Entities,
 			WorldSize,
+			Rng,
 			Position,
 			Velocity,
 			Rotation,
@@ -110,7 +112,7 @@ void main()
 		immutable dt = cast(float)(t2 - t1).total!"usecs"() / 1000_000;
 		w.step(dt, input_events);
 		w.maintain();
-	
+
 		immutable fps = 1 / dt;
 		i += 1;
 		if (i % 1000 == 0) {
