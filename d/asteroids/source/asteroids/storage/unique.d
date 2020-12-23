@@ -8,10 +8,16 @@ import asteroids.storage.type;
 /// single entity can have the component.
 class UniqueStorage(T): IStorage!T {
   Nullable!T unique;
-  Entity owner;
+  Entity owner = global;
 
   /// Stored element type
   alias Elem = T;
+
+  /// Initialize storage
+  this() {
+    unique.nullify();
+    owner = global;
+  }
 
   /// Insert component for entity
   void insert(Entity e, T c) {

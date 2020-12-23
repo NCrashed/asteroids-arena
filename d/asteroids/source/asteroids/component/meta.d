@@ -69,6 +69,17 @@ template Components(T...) {
     }
     return "Storages!"~U.stringof~"(" ~ acc.dropBack(2) ~ ")";
   }
+
+  /// Make expressions that call init method for all storages
+  string initStorages() {
+    import std.meta;
+
+    string acc;
+    static foreach(i, C; T) {
+      acc ~= C.name ~ "= new " ~ fullyQualifiedName!(C.Storage) ~ "();\n";
+    }
+    return acc;
+  }
 }
 
 unittest {

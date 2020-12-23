@@ -24,6 +24,7 @@ class World {
 
   /// Intialize internal storage, allocates memory for them
   this(string sounds_dir) {
+    mixin(CS.initStorages());
     spawn_player(mixin(CS.collect!(Entities, WorldSize, PlayerComponents)()));
   }
 

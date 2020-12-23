@@ -19,7 +19,7 @@ struct Entities {
 /// Special storage of world that tracks alive entities and their components.
 ///
 /// Template arguments are all supported entities.
-struct EntitiesStorage(T...) {
+class EntitiesStorage(T...) {
   /// Next free entity ID
   size_t entityCounter = 0;
   /// Collection of alive entities
@@ -31,6 +31,14 @@ struct EntitiesStorage(T...) {
 
   /// Shorthand for components utilities
   private alias CS = Components!T;
+
+  /// Initialize storage
+  this() {
+    entityCounter = 0;
+    alive = Array!Entity();
+    tags = Array!ComponentTag();
+    deleted = Array!Entity();
+  }
 
   /// Create and registry new entity
   Entity create() {

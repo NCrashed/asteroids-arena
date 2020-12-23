@@ -12,6 +12,11 @@ class VecStorage(T) : IStorage!T {
   /// Stored element type
   alias Elem = T;
 
+  /// Initialize storage
+  this() {
+    items = Array!T();
+  }
+
   /// Insert component for entity
   void insert(Entity e, T c) {
     if (items.length <= e) {
