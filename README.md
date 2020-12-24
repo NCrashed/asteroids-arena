@@ -52,7 +52,7 @@ In haskell nix-shell.
 ![FPS](./fps_many.png)
 
 ### Haskell
-FPS now stable 40-100, smooth gameplay, but there are noticable freezes at, possibly, major GCs.
+FPS now stable 40-100, smooth gameplay, but there are noticeable freezes at, possibly, major GCs.
 ![Haskell FPS](./haskell/fps.png)
 
 ### C
@@ -61,11 +61,20 @@ There is smooth gameplay. Some drops can be explained by interference of other s
 
 ### Rust
 Smooth gameplay. It was quite easy to implement the game and get high performance from first try.
-![C FPS](./rust/fps.png)
+![Rust FPS](./rust/fps.png)
 
 ### Zig
-The most stable frame rate. Feels like insane upgrade over C in development experience and performance.
-![C FPS](./zig/asteroids/fps.png)
+Very stable frame rate. Feels like great upgrade over C in development experience and performance.
+![Zig FPS](./zig/asteroids/fps.png)
+
+### D
+There are two different compilers. First, DMD is original implementation of language. Second, LDC is
+LLVM based implementation. DMD is usually slower than LDC, but in the particular case it's not. I have
+no idea why DMD generates code that is FASTER for rendering dozens of asteroids than rendering empty screen.
+LDC behaves like other LLVM based languages (stable constant FPS), but FPS slightly higher than the closest competitor (Zig).
+I implemented custom ECS in the implementation and it feels like the closest to the "production" state.
+
+![D FPS](./zig/asteroids/fps.png)
 
 ### My machine
 
