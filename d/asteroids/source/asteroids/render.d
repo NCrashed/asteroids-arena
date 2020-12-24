@@ -1,15 +1,18 @@
 module asteroids.render;
 
 import asteroids.component;
+import asteroids.math;
 import asteroids.v2;
 import bindbc.sdl;
 import std.math;
 
-void transform(v2f[] arr, v2f pos, float rot, SDL_Point[] points) {
-  foreach(i, v; arr) {
-    immutable tv = v.rotate(rot) + pos;
-    points[i] = SDL_Point(cast(int)tv.x, cast(int)tv.y);
-  }
+@nogc void transformVecs(v2f[] arr, v2f pos, float rot, SDL_Point[] points) {
+  foreach(i, v; arr) points[i] = v.transform(pos, rot);
+}
+
+@nogc SDL_Point transform(v2f v, v2f pos, float rot)  {
+  immutable tv = v.rotate(rot) + pos;
+  return SDL_Point(cast(int)tv.x, cast(int)tv.y);
 }
 
 void renderPlayer(SDL_Renderer* renderer, Player player, v2f pos, float rot) {
@@ -32,30 +35,29 @@ void renderPlayer(SDL_Renderer* renderer, Player player, v2f pos, float rot) {
     v2f(-dx-10, 0),
   ];
   static SDL_Point[] points = new SDL_Point[playerModel.length];
-  playerModel.transform(pos, rot, points);
+  playerModel.transformVecs(pos, rot, points);
   immutable n = player.thrust ? playerModel.length : playerModel.length-4;
   SDL_RenderDrawLines(renderer, &points[0], n);
 }
 
-void renderAsteroid(SDL_Renderer* renderer, Asteroid asteroid, v2f pos, float rot, float rad) {
+@nogc void renderAsteroid(SDL_Renderer* renderer, Asteroid asteroid, v2f pos, float rot, float rad) {
   immutable n = asteroid.edges;
   enum maxn = Asteroid.edgesRange[1] * 2;
-  static v2f[] points = new v2f[maxn];
+  static SDL_Point[] points = new SDL_Point[maxn];
   for(int i=0; i <= n-1; i++) {
-    points[2*i] = circloidPoint(i, n, rad);
-    points[2*i+1] = circloidPoint(i+1, n, rad);
+    points[2*i] = circloidPoint(i, n, rad).transform(pos, rot);
+    points[2*i+1] = circloidPoint(i+1, n, rad).transform(pos, rot);
   }
 
   immutable k = 2*n;
-  static SDL_Point[] pixPoints = new SDL_Point[maxn];
-  points.transform(pos, rot, pixPoints);
-  SDL_RenderDrawLines(renderer, &pixPoints[0], k);
+  SDL_RenderDrawLines(renderer, &points[0], k);
 }
 
-private v2f circloidPoint(int i, int n, float r) {
+@nogc private v2f circloidPoint(int i, int n, float r) {
   immutable a = cast(float)i * (2 * PI / cast(float)n);
-  immutable sina = sin(a);
-  immutable cosa = cos(a);
+  float sina = void;
+  float cosa = void;
+  sincos(a, sina, cosa);
   immutable x = r * (1 + sina * 0.3) * cosa;
   immutable y = r * (1 + cosa * 0.3) * sina;
   return v2f(x, y);

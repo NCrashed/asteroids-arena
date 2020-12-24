@@ -1,5 +1,6 @@
 module asteroids.v2;
 
+import asteroids.math;
 import std.math;
 import std.random;
 
@@ -39,8 +40,14 @@ struct vec2(T) {
 
   /// Define rotation around 0 to given angle
   vec2!T rotate(T angle) inout {
-    immutable sina = sin(angle);
-    immutable cosa = cos(angle);
+    static if(__traits(isSame, T, float)) {
+      float sina = void;
+      float cosa = void;
+      sincos(angle, sina, cosa);
+    } else {
+      immutable sina = sin(angle);
+      immutable cosa = cos(angle);
+    }
     immutable x = this.x * cosa - this.y * sina;
     immutable y = this.x * sina + this.y * cosa;
     return vec2!T(x, y);
