@@ -14,3 +14,4 @@ asteroids-test-*
 *.obj
 *.lst
 fps.out
+callgrind.out*
