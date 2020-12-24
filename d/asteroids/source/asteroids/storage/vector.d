@@ -34,10 +34,10 @@ class VecStorage(T) {
   }
 
   /// Get mutable component for the entity
-  ref T get_ref(Entity e) {
+  T* getRef(Entity e) {
     assert(e < items.length, "Getting component for entity outside of range, asked: "
       ~ e.stringof ~ ", but has only: " ~ items.length.stringof);
-    return items[e];
+    return &items[e];
   }
 
   /// Apply given function to component of the given entity.

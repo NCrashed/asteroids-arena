@@ -20,8 +20,8 @@ class GlobalStorage(T) {
   }
 
   /// Get mutable component for the entity
-  ref T get_ref(Entity e) {
-    return global;
+  T* getRef(Entity e) {
+    return &global;
   }
 
   /// Apply given function to component of the given entity.

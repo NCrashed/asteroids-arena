@@ -33,11 +33,11 @@ class UniqueStorage(T) {
   }
 
   /// Get mutable component for the entity
-  ref T get_ref(Entity e) {
+  T* getRef(Entity e) {
     assert(e == owner, "Getting component for entity that doesn't have unique component, asked: "
       ~ e.stringof ~ ", but unique owned by: " ~ owner.stringof);
     assert(!unique.isNull, "Getting not existing unique component!");
-    return unique.get;
+    return &unique.get();
   }
 
   /// Apply given function to component of the given entity.
