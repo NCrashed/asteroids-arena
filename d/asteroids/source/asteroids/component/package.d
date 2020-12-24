@@ -1,6 +1,7 @@
 module asteroids.component;
 
 public import asteroids.component.asteroid;
+public import asteroids.component.audio;
 public import asteroids.component.bullet;
 public import asteroids.component.delta;
 public import asteroids.component.player;
@@ -19,6 +20,7 @@ alias AllComponents = AliasSeq!(
   WorldSize,
   Rng,
   DeltaTime,
+  Audio,
   Position,
   Velocity,
   Rotation,
