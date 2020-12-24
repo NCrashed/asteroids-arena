@@ -14,3 +14,10 @@ Entity spawnBullet(Storages!(Entities, BulletComponents) storages, v2f pos, floa
     );
   return e;
 }
+
+/// Update life timers for bullet and destroy them if needed
+void updateBullet(Storages!(Entities, Bullet) storages, size_t i, Entity e, float dt) {
+  if(storages.entities.aliveHas!Bullet(i)) {
+    storages.bullet.modify(e, (a) { a.time -= dt; return a; });
+  }
+}

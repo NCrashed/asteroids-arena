@@ -34,7 +34,10 @@ class World {
     storages.deltaTime.global = dt;
     updatePlayer(storages.player, dt);
     applyEvents(dt, events);
-    physicsSystem(storages);
+    foreach(i, e; storages.entities) {
+      physicsSystem(storages, i, e);
+      updateBullet(storages.sub!(Entities, Bullet), i, e, dt);
+    }
   }
 
   /// Maintain world delayed actions
