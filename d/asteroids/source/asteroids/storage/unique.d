@@ -18,6 +18,8 @@ class UniqueStorage(T) {
     owner = global;
   }
 
+  final:
+  
   /// Insert component for entity
   void insert(Entity e, T c) {
     unique = c;

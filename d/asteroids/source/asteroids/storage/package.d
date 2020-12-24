@@ -29,7 +29,7 @@ struct Storages(U...) {
   }
 
   /// Read tuple of components for given entity. Throws if entity doesn't have one of them.
-  Tuple!C get(C...)(Entity e)
+  Tuple!(Named!C) get(C...)(Entity e)
     if(C.length > 1)
   {
     static foreach(c; C) {
@@ -39,12 +39,18 @@ struct Storages(U...) {
     string collect() {
       string acc = "";
       static foreach(c; C) {
-        acc ~= c.name ~ ".get(e), ";
+        acc ~= "cast(" ~ c.stringof ~ ")(" ~ c.name ~ ".get(e)), ";
       }
       return acc;
     }
-
-    return mixin("tuple(" ~ collect() ~")");
+    string names() {
+      string acc = "";
+      static foreach(c; C) {
+        acc ~= "\"" ~ c.name ~ "\", ";
+      }
+      return acc;
+    }
+    return mixin("tuple!(" ~ names() ~ ")(" ~ collect() ~")");
   }
 
   /// Set components $(B C) for given entity and registry them in entities storage
@@ -66,4 +72,11 @@ struct Storages(U...) {
 /// Helper that defines that component C is across components T
 template hasComponent(C, T...) {
   enum hasComponent = staticIndexOf!(C, T) >= 0;
+}
+
+/// Generates from (Component1, Component2, ...) list (Component1, Component1.name, Component2, Component2.name, ...)
+template Named(T...) {
+  static if(T.length == 0) alias Named = void;
+  else static if (T.length == 1) alias Named = AliasSeq!(T[0], T[0].name);
+  else alias Named = AliasSeq!(T[0], T[0].name, Named!(T[1 .. $]));
 }

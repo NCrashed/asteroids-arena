@@ -16,6 +16,8 @@ class VecStorage(T) {
     items = Array!T();
   }
 
+  final:
+
   /// Insert component for entity
   void insert(Entity e, T c) {
     if (items.length <= e) {

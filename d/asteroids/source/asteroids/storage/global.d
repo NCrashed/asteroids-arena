@@ -9,6 +9,8 @@ class GlobalStorage(T) {
   /// Stored element type
   alias Elem = T;
 
+  final:
+  
   /// Insert component for entity
   void insert(Entity e, T c) {
     global = c;

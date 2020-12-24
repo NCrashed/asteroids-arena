@@ -77,7 +77,7 @@ class World {
           velocity.modify(e, a => a + v2f.fromAngle(rot) * Player.thrustForce * dt / m);
         }
         if(shipFire && player.unique.get.fireTimer <= 0) {
-          spawnBullet(sub!(Entities, BulletComponents), position.get(e), rotation.get(e));
+          spawnBullet(sub!(Entities, BulletComponents), position.get(e), rotation.get(e), velocity.get(e));
           player.unique.get.fireTimer = Player.fireCooldown;
         }
       }
