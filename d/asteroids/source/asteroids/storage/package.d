@@ -8,6 +8,7 @@ public import asteroids.storage.vector;
 import asteroids.component;
 import asteroids.entity;
 import std.meta;
+import std.typecons;
 
 /// Special kind of tuple with all storages for specified components that you
 /// can access by their names.
@@ -20,9 +21,34 @@ struct Storages(U...) {
     mixin(Components!U.initStorages);
   }
 
+  /// Read single component from the storages. Throws if entity doesn't have it.
+  C get(C)(Entity e)
+    if(hasComponent!(C, U))
+  {
+    return cast(C)mixin(C.name).get(e);
+  }
+
+  /// Read tuple of components for given entity. Throws if entity doesn't have one of them.
+  Tuple!C get(C...)(Entity e)
+    if(C.length > 1)
+  {
+    static foreach(c; C) {
+      static assert(hasComponent!(c, U), "Storages.get require "~c.stringof~" component within components: " ~ U.stringof);
+    }
+
+    string collect() {
+      string acc = "";
+      static foreach(c; C) {
+        acc ~= c.name ~ ".get(e), ";
+      }
+      return acc;
+    }
+
+    return mixin("tuple(" ~ collect() ~")");
+  }
+
   /// Set components $(B C) for given entity and registry them in entities storage
   void set(C...)(Entity e, C cs)
-    // if (hasComponent!(Entities, U))
   {
     static assert(hasComponent!(Entities, U), "Storages.set require Entities component within components: " ~ U.stringof);
     static foreach(c; cs) {

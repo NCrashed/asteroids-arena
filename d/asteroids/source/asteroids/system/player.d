@@ -21,3 +21,8 @@ Entity spawnPlayer(Storages!(Entities, WorldSize, PlayerComponents) storages) {
     );
   return e;
 }
+
+void killPlayer(Storages!(Entities, WorldSize, PlayerComponents) storages, Entity e) {
+  storages.entities.remove(e);
+  spawnPlayer(storages);
+}

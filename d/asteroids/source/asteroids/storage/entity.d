@@ -52,14 +52,14 @@ class EntitiesStorage(T...) {
   /// Remove entity from alive entities. Marks them as
   /// dead. They are deleted at end of frame with call
   /// to maintain method.
-  void destory(Entity e) {
+  void remove(Entity e) {
     deleted.insertBack(e);
   }
 
   /// Remove entity from alive entity. Pefrom destruction
   /// at the current moment, so alive entities change their
   /// ids. Don't use it when iterating over alive entities.
-  void destroyNow(Entity e) {
+  void removeNow(Entity e) {
     foreach(i, ae; alive[].enumerate) {
       if (ae == e) {
         alive.swapRemove(i);
@@ -75,7 +75,7 @@ class EntitiesStorage(T...) {
   /// end of frame.
   void maintain() {
     foreach(e; deleted[]) {
-      destroyNow(e);
+      removeNow(e);
     }
     deleted.clear();
   }
