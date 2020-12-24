@@ -7,7 +7,7 @@ import asteroids.input;
 import asteroids.render;
 import asteroids.system;
 import bindbc.sdl;
-import std.experimental.allocator;
+import std.random;
 
 /// Initial world width in pixels
 immutable initial_width = WorldSize().width;
@@ -25,6 +25,7 @@ class World {
   /// Intialize internal storage, allocates memory for them
   this(string sounds_dir) {
     storages.init();
+    storages.rng.global = Rng(Random(unpredictableSeed)); // seeding random number generator
     spawnPlayer(storages.sub!(Entities, WorldSize, PlayerComponents));
     spawnAsteroids(storages.sub!(Entities, Rng, WorldSize, AsteroidComponents));
   }
