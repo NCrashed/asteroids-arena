@@ -25,7 +25,8 @@ class World {
   /// Intialize internal storage, allocates memory for them
   this(string sounds_dir) {
     storages.init();
-    spawn_player(storages.sub!(Entities, WorldSize, PlayerComponents));
+    spawnPlayer(storages.sub!(Entities, WorldSize, PlayerComponents));
+    spawnAsteroids(storages.sub!(Entities, Rng, WorldSize, AsteroidComponents));
   }
 
   ///  Make one tick of world simulation with given inputs. Return non zero if failed.
@@ -42,9 +43,16 @@ class World {
 
   /// Render world in current frame
   void render(SDL_Renderer* renderer) {
-    with(storages) if(!player.unique.isNull) {
-      immutable e = player.owner;
-      renderPlayer(renderer, player.unique.get, position.get(e), rotation.get(e));
+    with(storages) {
+      if(!player.unique.isNull) {
+        immutable e = player.owner;
+        renderPlayer(renderer, player.unique.get, position.get(e), rotation.get(e));
+      }
+      foreach(i, e; entities) {
+        if(entities.aliveHas!AsteroidComponents(i)) {
+          renderAsteroid(renderer, asteroid.get(e), position.get(e), rotation.get(e), radius.get(e));
+        }
+      }
     }
   }
 

@@ -1,6 +1,7 @@
 module asteroids.v2;
 
 import std.math;
+import std.random;
 
 /// Shorthand for most common vector in components
 alias v2f = vec2!float;
@@ -13,6 +14,13 @@ struct vec2(T) {
   /// Get unit vector corresponding to the angle in radians
   static vec2!T fromAngle(float angle) {
     return vec2!T(cos(angle), sin(angle));
+  }
+
+  /// Generate random vector with components in given range
+  static vec2!T uniform(T minv, T maxv, Random rng) {
+    immutable x = std.random.uniform(minv, maxv, rng);
+    immutable y = std.random.uniform(minv, maxv, rng);
+    return vec2!T(x, y);
   }
 
   /// Define operations per component
