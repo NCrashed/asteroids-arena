@@ -6,34 +6,34 @@ import asteroids.world;
 import asteroids.input;
 
 /// Iterate through user input and window events
-bool process_events(ref InputEvents events, ref WorldSize world_size) {
+bool process_events(ref InputEvents events, ref WorldSize worldSize) {
 	SDL_Event event = void;
 	while (SDL_PollEvent(&event) != 0) {
 		switch (event.type) {
 			case SDL_QUIT: return true;
 			case SDL_KEYDOWN: switch (event.key.keysym.sym) {
 				case SDLK_ESCAPE: return true;
-				case SDLK_UP: events.ship_thrust = true; break;
-				case SDLK_LEFT: events.ship_left = true; break;
-				case SDLK_RIGHT: events.ship_right = true; break;
-				case SDLK_SPACE: events.ship_fire = true; break;
+				case SDLK_UP: events.shipThrust = true; break;
+				case SDLK_LEFT: events.shipLeft = true; break;
+				case SDLK_RIGHT: events.shipRight = true; break;
+				case SDLK_SPACE: events.shipFire = true; break;
 				default: {}
 			} break;
 			case SDL_KEYUP: switch (event.key.keysym.sym) {
-				case SDLK_UP: events.ship_thrust = false; break;
-				case SDLK_LEFT: events.ship_left = false; break;
-				case SDLK_RIGHT: events.ship_right = false; break;
-				case SDLK_SPACE: events.ship_fire = false; break;
+				case SDLK_UP: events.shipThrust = false; break;
+				case SDLK_LEFT: events.shipLeft = false; break;
+				case SDLK_RIGHT: events.shipRight = false; break;
+				case SDLK_SPACE: events.shipFire = false; break;
 				default: {}
 			} break;
 			case SDL_WINDOWEVENT: switch (event.window.event) {
 				case SDL_WINDOWEVENT_RESIZED:
-					world_size.width = event.window.data1;
-					world_size.height = event.window.data2;
+					worldSize.width = event.window.data1;
+					worldSize.height = event.window.data2;
 					break;
 				case SDL_WINDOWEVENT_SIZE_CHANGED:
-					world_size.width = event.window.data1;
-					world_size.height = event.window.data2;
+					worldSize.width = event.window.data1;
+					worldSize.height = event.window.data2;
 					break;
 				default: {}
 			} break;

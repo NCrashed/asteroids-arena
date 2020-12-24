@@ -1,12 +1,11 @@
 module asteroids.storage.unique;
 
-import std.typecons;
 import asteroids.entity;
-import asteroids.storage.type;
+import std.typecons;
 
 /// Storage of component that can contain maximum 1 instance of component. Only
 /// single entity can have the component.
-class UniqueStorage(T): IStorage!T {
+class UniqueStorage(T) {
   Nullable!T unique;
   Entity owner = global;
 
@@ -39,5 +38,15 @@ class UniqueStorage(T): IStorage!T {
       ~ e.stringof ~ ", but unique owned by: " ~ owner.stringof);
     assert(!unique.isNull, "Getting not existing unique component!");
     return unique.get;
+  }
+
+  /// Apply given function to component of the given entity.
+  void modify(Entity e, T delegate(T) fun)
+  {
+    assert(e == owner, "Modifying component for entity that doesn't have unique component, asked: "
+      ~ e.stringof ~ ", but unique owned by: " ~ owner.stringof);
+    assert(!unique.isNull, "Modifying unique component that doesn't exists!");
+    T res = fun(unique.get);
+    unique = res;
   }
 }

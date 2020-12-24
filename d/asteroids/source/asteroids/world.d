@@ -4,6 +4,7 @@ public import asteroids.component;
 public import asteroids.storage;
 
 import asteroids.input;
+import asteroids.render;
 import asteroids.system.player;
 import bindbc.sdl;
 import std.experimental.allocator;
@@ -30,7 +31,7 @@ class World {
 
   ///  Make one tick of world simulation with given inputs. Return non zero if failed.
   void step(float dt, in InputEvents events) {
-
+    applyEvents(dt, events);
   }
 
   /// Maintain world delayed actions
@@ -40,6 +41,21 @@ class World {
 
   /// Render world in current frame
   void render(SDL_Renderer* renderer) {
+    if(!player.unique.isNull) {
+      immutable e = player.owner;
+      renderPlayer(renderer, player.unique.get, position.get(e), rotation.get(e));
+    }
+  }
 
+  /// Apply player input to ship components
+  private void applyEvents(float dt, InputEvents inputs) {
+    if(!player.unique.isNull) {
+      immutable e = player.owner;
+      with(inputs) {
+        if(shipLeft) rotation.modify(e, a => a - Player.rotationSpeed * dt);
+        if(shipRight) rotation.modify(e, a => a + Player.rotationSpeed * dt);
+        player.modify(e, (a) { a.thrust = shipThrust; return a; });
+      }
+    }
   }
 }

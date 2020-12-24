@@ -13,7 +13,7 @@ struct vec2(T) {
   /// Define operations per component
   vec2!T opBinary(string op)(vec2!T other) inout {
     immutable x = mixin("this.x " ~ op ~ " other.x");
-    immutable y = miyin("this.y " ~ op ~ " other.y");
+    immutable y = mixin("this.y " ~ op ~ " other.y");
     return vec2!T(x, y);
   }
 

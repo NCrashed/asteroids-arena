@@ -1,10 +1,9 @@
 module asteroids.storage.global;
 
 import asteroids.entity;
-import asteroids.storage.type;
 
 /// Storage of single component
-class GlobalStorage(T): IStorage!T {
+class GlobalStorage(T) {
   T global;
 
   /// Stored element type
@@ -23,5 +22,11 @@ class GlobalStorage(T): IStorage!T {
   /// Get mutable component for the entity
   ref T get_ref(Entity e) {
     return global;
+  }
+
+  /// Apply given function to component of the given entity.
+  void modify(Entity e, T delegate(T) fun)
+  {
+    global = fun(global);
   }
 }

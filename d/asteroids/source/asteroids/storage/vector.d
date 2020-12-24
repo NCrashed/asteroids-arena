@@ -1,12 +1,11 @@
 module asteroids.storage.vector;
 
 import asteroids.entity;
-import asteroids.storage.type;
 import std.container.array;
 import std.range;
 
 /// Storage of components that is based on growing array
-class VecStorage(T) : IStorage!T {
+class VecStorage(T) {
   Array!T items;
 
   /// Stored element type
@@ -39,5 +38,13 @@ class VecStorage(T) : IStorage!T {
     assert(e < items.length, "Getting component for entity outside of range, asked: "
       ~ e.stringof ~ ", but has only: " ~ items.length.stringof);
     return items[e];
+  }
+
+  /// Apply given function to component of the given entity.
+  void modify(Entity e, T delegate(T) fun)
+  {
+    assert(e < items.length, "Modify component for entity outside of range, asked: "
+      ~ e.stringof ~ ", but has only: " ~ items.length.stringof);
+    items[e] = fun(items[e]);
   }
 }
