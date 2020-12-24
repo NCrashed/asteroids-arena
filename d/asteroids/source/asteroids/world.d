@@ -52,9 +52,13 @@ class World {
     if(!player.unique.isNull) {
       immutable e = player.owner;
       with(inputs) {
+        player.modify(e, (a) { a.thrust = shipThrust; return a; });
         if(shipLeft) rotation.modify(e, a => a - Player.rotationSpeed * dt);
         if(shipRight) rotation.modify(e, a => a + Player.rotationSpeed * dt);
-        player.modify(e, (a) { a.thrust = shipThrust; return a; });
+        if(shipThrust) {
+          immutable rot = rotation.get(e);
+          velocity.modify(e, a => a + v2f.fromAngle(rot) * Player.thrustForce * dt);
+        }
       }
     }
   }

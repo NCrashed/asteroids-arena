@@ -10,10 +10,22 @@ struct vec2(T) {
   T x;
   T y;
 
+  /// Get unit vector corresponding to the angle in radians
+  static vec2!T fromAngle(float angle) {
+    return vec2!T(cos(angle), sin(angle));
+  }
+
   /// Define operations per component
   vec2!T opBinary(string op)(vec2!T other) inout {
     immutable x = mixin("this.x " ~ op ~ " other.x");
     immutable y = mixin("this.y " ~ op ~ " other.y");
+    return vec2!T(x, y);
+  }
+
+  /// Another way to scale or add or subtract scalar
+  vec2!T opBinary(string op)(T scalar) inout {
+    immutable x = mixin("this.x " ~ op ~ " scalar");
+    immutable y = mixin("this.y " ~ op ~ " scalar");
     return vec2!T(x, y);
   }
 

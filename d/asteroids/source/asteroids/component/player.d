@@ -28,6 +28,8 @@ struct Player {
 
   /// Rotation speed of ship in radians per second
   enum float rotationSpeed = PI;
+  /// Player thrust in newtons
+  enum float thrustForce = 20000000;
 }
 
 /// Shorthand for enumeration of components that player entity has
