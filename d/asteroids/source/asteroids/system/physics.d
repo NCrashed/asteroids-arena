@@ -3,6 +3,7 @@ module asteroids.system.physics;
 import asteroids.component;
 import asteroids.storage;
 import asteroids.system.player;
+import asteroids.system.asteroid;
 
 /// System that iterates over all alive entities and process movement and collisions
 void physicsSystem(Storages!AllComponents storages, size_t i, Entity e) {
@@ -40,12 +41,14 @@ void physicsSystem(Storages!AllComponents storages, size_t i, Entity e) {
 
 /// Check collision between asteroid and bullet
 private void checkAsteroidHit(Storages!(Entities, Rng, WorldSize, AsteroidComponents) storages, Entity astEnt, Entity bullEnt) {
-  immutable ac = storages.get!(Position, Radius)(astEnt);
+  immutable ac = storages.get!(Asteroid, Position, Velocity, Rotation, Radius)(astEnt);
   immutable bpos = storages.get!Position(bullEnt);
   immutable r = ac.radius + Bullet.radius;
   if(ac.position.distSquared(bpos) <= r*r) {
     storages.entities.remove(astEnt);
     storages.entities.remove(bullEnt);
+    spawnShard(storages.sub!(Entities, Rng, AsteroidComponents), ac.asteroid, ac.position, ac.velocity, ac.rotation, ac.radius);
+    spawnShard(storages.sub!(Entities, Rng, AsteroidComponents), ac.asteroid, ac.position, ac.velocity, ac.rotation, ac.radius);
   }
 }
 

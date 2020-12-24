@@ -18,7 +18,7 @@ struct vec2(T) {
   }
 
   /// Generate random vector with components in given range
-  static vec2!T uniform(T minv, T maxv, Random rng) {
+  static vec2!T uniform(T minv, T maxv, ref Random rng) {
     immutable x = std.random.uniform(minv, maxv, rng);
     immutable y = std.random.uniform(minv, maxv, rng);
     return vec2!T(x, y);

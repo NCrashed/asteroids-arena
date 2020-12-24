@@ -3,6 +3,7 @@ module asteroids.system.asteroid;
 import asteroids.component;
 import asteroids.storage;
 import std.math;
+import std.typecons;
 import std.random;
 
 /// Spawn all asteroids withing world with randomized parameters
@@ -33,4 +34,24 @@ private Entity spawnAsteroid(Storages!(Entities, Rng, WorldSize, AsteroidCompone
     );
   storages.rng.global = rng;
   return e;
+}
+
+/// Spawn new asteroid shard if asteroid has enough radius
+Nullable!Entity spawnShard(Storages!(Entities, Rng, AsteroidComponents) storages, Asteroid past, v2f ppos, v2f pvel, float prot, float prad) {
+  immutable r = prad * 0.5;
+  if (r < Asteroid.sizeRange[0]) return Nullable!Entity();
+
+  immutable e = storages.entities.create();
+  immutable vel = v2f.uniform(Asteroid.velocityRange[0], Asteroid.velocityRange[1], storages.rng.global);
+
+  storages.set!AsteroidComponents(e,
+    past,
+    Position(ppos),
+    Velocity(pvel + vel),
+    Rotation(prot),
+    Radius(r),
+    Mass(PI * r * r * Asteroid.density),
+    );
+
+  return Nullable!Entity(e);
 }
