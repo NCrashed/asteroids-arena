@@ -1,10 +1,12 @@
 module asteroids.component;
 
+public import asteroids.component.delta;
 public import asteroids.component.player;
 public import asteroids.component.primitive;
 public import asteroids.component.rand;
 public import asteroids.component.size;
 public import asteroids.component.meta;
+public import asteroids.entity;
 
 import asteroids.storage.entity;
 import std.meta;
@@ -14,6 +16,7 @@ alias AllComponents = AliasSeq!(
   Entities,
   WorldSize,
   Rng,
+  DeltaTime,
   Position,
   Velocity,
   Rotation,

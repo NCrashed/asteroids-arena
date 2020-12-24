@@ -90,7 +90,7 @@ void main()
 	auto input_events = InputEvents();
 	while (!quit) {
 		immutable t1 = MonoTime.currTime();
-		quit = process_events(input_events, w.worldSize.global);
+		quit = process_events(input_events, w.storages.worldSize.global);
 
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);

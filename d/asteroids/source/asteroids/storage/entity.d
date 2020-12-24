@@ -104,7 +104,7 @@ class EntitiesStorage(T...) {
   bool aliveHas(C...)(size_t i) {
     static assert(CS.hasAll!C, "Some components " ~ C.stringof
       ~ " is not known in world ones " ~ T.stringof);
-    return (tags[i] & CS.join!C) == tags[i];
+    return (tags[i] & CS.join!C) == CS.join!C;
   }
 
   /// Iteration over alive entities

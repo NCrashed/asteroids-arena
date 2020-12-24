@@ -5,7 +5,7 @@ public import asteroids.storage;
 
 import asteroids.input;
 import asteroids.render;
-import asteroids.system.player;
+import asteroids.system;
 import bindbc.sdl;
 import std.experimental.allocator;
 
@@ -19,29 +19,30 @@ immutable initial_height = WorldSize().height;
 /// in structure-of-arrays style and an entity is a simple integer that points
 /// to the arrays.
 class World {
-  alias CS = Components!AllComponents;
-  // Embed all storages for each component type
-  mixin CS.Storages;
+  /// Container for all storages of the world supported.
+  Storages!AllComponents storages;
 
   /// Intialize internal storage, allocates memory for them
   this(string sounds_dir) {
-    mixin(CS.initStorages());
-    spawn_player(mixin(CS.collect!(Entities, WorldSize, PlayerComponents)()));
+    storages.init();
+    spawn_player(storages.sub!(Entities, WorldSize, PlayerComponents));
   }
 
   ///  Make one tick of world simulation with given inputs. Return non zero if failed.
   void step(float dt, in InputEvents events) {
+    storages.deltaTime.global = dt;
     applyEvents(dt, events);
+    physicsSystem(storages);
   }
 
   /// Maintain world delayed actions
   void maintain() {
-    entities.maintain();
+    storages.entities.maintain();
   }
 
   /// Render world in current frame
   void render(SDL_Renderer* renderer) {
-    if(!player.unique.isNull) {
+    with(storages) if(!player.unique.isNull) {
       immutable e = player.owner;
       renderPlayer(renderer, player.unique.get, position.get(e), rotation.get(e));
     }
@@ -49,7 +50,7 @@ class World {
 
   /// Apply player input to ship components
   private void applyEvents(float dt, InputEvents inputs) {
-    if(!player.unique.isNull) {
+    with(storages) if(!player.unique.isNull) {
       immutable e = player.owner;
       with(inputs) {
         player.modify(e, (a) { a.thrust = shipThrust; return a; });
@@ -57,7 +58,8 @@ class World {
         if(shipRight) rotation.modify(e, a => a + Player.rotationSpeed * dt);
         if(shipThrust) {
           immutable rot = rotation.get(e);
-          velocity.modify(e, a => a + v2f.fromAngle(rot) * Player.thrustForce * dt);
+          immutable m = mass.get(e);
+          velocity.modify(e, a => a + v2f.fromAngle(rot) * Player.thrustForce * dt / m);
         }
       }
     }
