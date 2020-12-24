@@ -32,6 +32,7 @@ class World {
   ///  Make one tick of world simulation with given inputs. Return non zero if failed.
   void step(float dt, in InputEvents events) {
     storages.deltaTime.global = dt;
+    updatePlayer(storages.player, dt);
     applyEvents(dt, events);
     physicsSystem(storages);
   }
@@ -51,6 +52,8 @@ class World {
       foreach(i, e; entities) {
         if(entities.aliveHas!AsteroidComponents(i)) {
           renderAsteroid(renderer, asteroid.get(e), position.get(e), rotation.get(e), radius.get(e));
+        } else if (entities.aliveHas!BulletComponents(i)) {
+          renderBullet(renderer, position.get(e));
         }
       }
     }
@@ -68,6 +71,10 @@ class World {
           immutable rot = rotation.get(e);
           immutable m = mass.get(e);
           velocity.modify(e, a => a + v2f.fromAngle(rot) * Player.thrustForce * dt / m);
+        }
+        if(shipFire && player.unique.get.fireTimer <= 0) {
+          spawnBullet(sub!(Entities, BulletComponents), position.get(e), rotation.get(e));
+          player.unique.get.fireTimer = Player.fireCooldown;
         }
       }
     }

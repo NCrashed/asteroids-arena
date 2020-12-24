@@ -1,6 +1,7 @@
 module asteroids.component;
 
 public import asteroids.component.asteroid;
+public import asteroids.component.bullet;
 public import asteroids.component.delta;
 public import asteroids.component.player;
 public import asteroids.component.primitive;
@@ -25,6 +26,7 @@ alias AllComponents = AliasSeq!(
   Mass,
   Player,
   Asteroid,
+  Bullet,
   );
 
 /// Short name for subset of components for systems

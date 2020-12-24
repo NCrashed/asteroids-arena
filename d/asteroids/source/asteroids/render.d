@@ -60,3 +60,7 @@ private v2f circloidPoint(int i, int n, float r) {
   immutable y = r * (1 + cosa * 0.3) * sina;
   return v2f(x, y);
 }
+
+void renderBullet(SDL_Renderer* renderer, v2f pos) {
+  SDL_RenderDrawPoint(renderer, cast(int)pos.x, cast(int)pos.y);
+}

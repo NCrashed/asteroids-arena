@@ -9,9 +9,9 @@ import std.meta;
 /// Player component that is unique per world
 struct Player {
   /// Whether player ship is accelerating at the moment
-  bool thrust;
+  bool thrust = false;
   /// Counts until moment when player can emit a new bullet
-  float fire_cooldown;
+  float fireTimer = fireCooldown;
 
   /// Name of player component
   enum name = "player";
@@ -30,6 +30,8 @@ struct Player {
   enum float rotationSpeed = PI;
   /// Player thrust in newtons
   enum float thrustForce = 20000000;
+  /// Time between two bullets
+  enum float fireCooldown = 0.3;
 }
 
 /// Shorthand for enumeration of components that player entity has

@@ -26,3 +26,11 @@ void killPlayer(Storages!(Entities, WorldSize, PlayerComponents) storages, Entit
   storages.entities.remove(e);
   spawnPlayer(storages);
 }
+
+void updatePlayer(Player.Storage player, float dt) {
+  if (!player.unique.isNull) {
+    if (player.unique.get.fireTimer > 0) {
+      player.unique.get.fireTimer -= dt;
+    }
+  }
+}
