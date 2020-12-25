@@ -15,3 +15,5 @@ asteroids-test-*
 *.lst
 fps.out*
 callgrind.out*
+profile.raw
+profile.data
