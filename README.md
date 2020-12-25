@@ -76,7 +76,7 @@ I implemented custom ECS in the implementation and it feels like the closest to 
 
 Also I used LLVM PGO (Profiling Guided Optimizations) for LDC, that makes DMD and LDC results near identical.
 
-![D FPS](./zig/asteroids/fps.png)
+![D FPS](./zig/asteroids/fps_many.png)
 
 ## Line of Code
 
