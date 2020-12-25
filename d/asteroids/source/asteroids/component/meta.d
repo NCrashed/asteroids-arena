@@ -27,7 +27,7 @@ template Components(T...) {
   /// return entities with all components enumerated as arguments.
   template join(U...) {
     private ComponentTag foldTags(ComponentTag[] xs) {
-      return xs.fold!((a, b) => a | b)(0);
+      return xs.fold!((a, b) => a | b)(cast(ComponentTag)0u);
     }
     enum join = foldTags([staticMap!(tag, U)]);
   }
