@@ -21,26 +21,27 @@ void physicsSystem(Storages!AllComponents storages, size_t i, Entity e) {
       immutable r = prad + arad;
       if(apos.distSquared(ppos) <= r*r) {
         killPlayer(storages.sub!(Entities, WorldSize, PlayerComponents), pe);
+        storages.audio.global.play(Sound.bang);
       }
     }
     for(size_t j=i+1; j<storages.entities.alive.length; j++) {
       if(storages.entities.aliveHas!(Bullet, Position)(j)) {
         immutable be = storages.entities.alive[j];
-        checkAsteroidHit(storages.sub!(Entities, Rng, WorldSize, AsteroidComponents), e, be);
+        checkAsteroidHit(storages.sub!(Entities, Rng, Audio, WorldSize, AsteroidComponents), e, be);
       }
     }
   } else if (storages.entities.aliveHas!(Bullet, Position)(i)) {
     for(size_t j=i+1; j<storages.entities.alive.length; j++) {
       if(storages.entities.aliveHas!(Asteroid, Position, Radius)(j)) {
         immutable ae = storages.entities.alive[j];
-        checkAsteroidHit(storages.sub!(Entities, Rng, WorldSize, AsteroidComponents), ae, e);
+        checkAsteroidHit(storages.sub!(Entities, Rng, Audio, WorldSize, AsteroidComponents), ae, e);
       }
     }
   }
 }
 
 /// Check collision between asteroid and bullet
-private void checkAsteroidHit(Storages!(Entities, Rng, WorldSize, AsteroidComponents) storages, Entity astEnt, Entity bullEnt) {
+private void checkAsteroidHit(Storages!(Entities, Rng, Audio, WorldSize, AsteroidComponents) storages, Entity astEnt, Entity bullEnt) {
   immutable ac = storages.get!(Asteroid, Position, Velocity, Rotation, Radius)(astEnt);
   immutable bpos = storages.get!Position(bullEnt);
   immutable r = ac.radius + Bullet.radius;
@@ -49,6 +50,7 @@ private void checkAsteroidHit(Storages!(Entities, Rng, WorldSize, AsteroidCompon
     storages.entities.remove(bullEnt);
     spawnShard(storages.sub!(Entities, Rng, AsteroidComponents), ac.asteroid, ac.position, ac.velocity, ac.rotation, ac.radius);
     spawnShard(storages.sub!(Entities, Rng, AsteroidComponents), ac.asteroid, ac.position, ac.velocity, ac.rotation, ac.radius);
+    storages.audio.global.play(Sound.bang);
   }
 }
 
