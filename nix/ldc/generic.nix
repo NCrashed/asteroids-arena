@@ -1,5 +1,5 @@
 { version, ldcSha256 }:
-{ stdenv, fetchurl, cmake, ninja, llvm_11, curl, tzdata
+{ stdenv, fetchurl, cmake, ninja, llvm_11, llvmPackages_11, curl, tzdata
 , libconfig, lit, gdb, unzip, darwin, bash
 , callPackage, makeWrapper, runCommand, targetPackages
 , ldcBootstrap ? callPackage ./bootstrap.nix { }
@@ -50,13 +50,14 @@ stdenv.mkDerivation rec {
   ''
   + stdenv.lib.optionalString stdenv.hostPlatform.isLinux ''
       substituteInPlace runtime/phobos/std/socket.d --replace "assert(ih.addrList[0] == 0x7F_00_00_01);" ""
+      substituteInPlace CMakeLists.txt --replace 'set(llvm_lib_path ''${LLVM_LIBRARY_DIRS}/clang/''${LLVM_VERSION_BASE_STRING}/lib/''${llvm_lib_name}' 'set(llvm_lib_path ${llvmPackages_11.compiler-rt}/lib/''${llvm_lib_name}'
   ''
   + stdenv.lib.optionalString stdenv.hostPlatform.isDarwin ''
       substituteInPlace runtime/phobos/std/socket.d --replace "foreach (name; names)" "names = []; foreach (name; names)"
   '';
 
   nativeBuildInputs = [
-    cmake ldcBootstrap lit lit.python llvm_11 makeWrapper ninja unzip
+    cmake ldcBootstrap lit lit.python llvm_11 llvmPackages_11.compiler-rt makeWrapper ninja unzip
   ]
   ++ stdenv.lib.optionals stdenv.hostPlatform.isDarwin [
     darwin.apple_sdk.frameworks.Foundation
@@ -70,6 +71,7 @@ stdenv.mkDerivation rec {
 
   cmakeFlags = [
     "-DD_FLAGS=-d-version=TZDatabaseDir;-d-version=LibcurlPath;-J${pathConfig}"
+    "-DLDC_INSTALL_LLVM_RUNTIME_LIBS=ON"
     "-DCMAKE_BUILD_TYPE=Release"
   ];
 

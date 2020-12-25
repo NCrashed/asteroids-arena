@@ -74,6 +74,8 @@ no idea why DMD generates code that is FASTER for rendering dozens of asteroids 
 LDC behaves like other LLVM based languages (stable constant FPS), but FPS slightly higher than the closest competitor (Zig).
 I implemented custom ECS in the implementation and it feels like the closest to the "production" state.
 
+Also I used LLVM PGO (Profiling Guided Optimizations) for LDC, that makes DMD and LDC results near identical.
+ 
 ![D FPS](./zig/asteroids/fps.png)
 
 ### My machine
