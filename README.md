@@ -31,7 +31,7 @@ Languages:
 - Haskell. My major language. The goal to test pressure of GC on performance and if it really more comfortable for game developing. **Done**.
 - C. Control group for performance. **Done**.
 - ATS2. Low level FP language with dependent typing that will allow mutation in place, redundant checks elimination and zero cost abstractions. **On hold**.
-- D. Curious to test it with GC and without GC. **In progress**.
+- D. Curious to test it with GC and without GC. **Done**.
 - Zig. Low level alternative to pure C. Curious in performance and if it easy to bind to C libraries. **Done**.
 - Rust. Curious in performance and expressive power comparing to Haskell. **Done**.
 
@@ -75,7 +75,7 @@ LDC behaves like other LLVM based languages (stable constant FPS), but FPS sligh
 I implemented custom ECS in the implementation and it feels like the closest to the "production" state.
 
 Also I used LLVM PGO (Profiling Guided Optimizations) for LDC, that makes DMD and LDC results near identical.
- 
+
 ![D FPS](./zig/asteroids/fps.png)
 
 ### My machine
