@@ -10,8 +10,8 @@ loadSamples :: FilePath -> IO [(Double,Double)]
 loadSamples name = do
   cnt <- readFile name
   let ys = ((\(a, b) -> (read a, read $ drop 1 b))  . break (',' ==)) <$> lines cnt
-  let fpsAvg = sum (snd <$> ys) / fromIntegral (length ys)
-  pure $ first (/ fpsAvg) <$> ys
+  let maxTick = fst $ last ys
+  pure $ first (/ maxTick) <$> ys
 
 drawSingle :: FilePath -> IO ()
 drawSingle path = do
@@ -29,6 +29,7 @@ drawMultiple pairs = do
   (toFile def "fps_many.png" :: EC (Layout Double Double) () -> IO ()) $ do
     layout_title .= "Frame per seconds"
     layout_y_axis . laxis_override .= axisGridHide
+    layout_x_axis . laxis_title .= "Relative session time"
     for_ samples $ \(title, vs) -> plot (line title [ vs ])
 
 makePairs :: [a] -> [(a, a)]
