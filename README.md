@@ -93,6 +93,20 @@ D                               27            192            183           1003
 
 ![Line of Codes](./code_lines.png)
 
+## Memory
+
+Measured with `command time -v <exe>`:
+
+| Language | Max memory Kb |
+|----------|---------------|
+| C        | 82760         |
+| Zig      | 65984         |
+| Haskell  | 83628         |
+| Rust     | 67464         |
+| D        | 68688         |
+
+![Line of Codes](./memory.png)
+
 ## My machine
 
 It is important that all measurements of performance are done in equal environment. So, FPS benchmarks are executed on my personal PC that has:

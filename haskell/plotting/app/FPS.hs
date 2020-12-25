@@ -32,11 +32,11 @@ drawMultiple pairs = do
     layout_x_axis . laxis_title .= "Relative session time"
     for_ samples $ \(title, vs) -> plot (line title [ vs ])
 
-drawBars :: [(String, Int)] -> IO ()
-drawBars pairs = toFile def "bars.png" $ do
-  layout_title .= "Lines of code"
+drawBars :: String -> String -> [(String, Int)] -> IO ()
+drawBars descr title pairs = toFile def "bars.png" $ do
+  layout_title .= descr
   layout_x_axis . laxis_generate .= autoIndexAxis (map fst pairs)
-  plot $ fmap plotBars $ bars ["Lines"] (addIndexes (map (pure . snd) pairs))
+  plot $ fmap plotBars $ bars [title] (addIndexes (map (pure . snd) pairs))
 
 makePairs :: [a] -> [(a, a)]
 makePairs (x1:x2:xs) = (x1, x2) : makePairs xs
@@ -49,5 +49,6 @@ main = do
   case args of
     ["single", path] -> drawSingle path
     "multiple" : pairs -> drawMultiple $ makePairs pairs
-    "code" : pairs -> drawBars $ fmap (second read) $ makePairs pairs
+    "code" : pairs -> drawBars "Lines of code" "Lines" $ fmap (second read) $ makePairs pairs
+    "memory" : pairs -> drawBars "Maximum residence memory" "Kilobytes" $ fmap (second read) $ makePairs pairs
     _ -> help
