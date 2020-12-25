@@ -78,7 +78,22 @@ Also I used LLVM PGO (Profiling Guided Optimizations) for LDC, that makes DMD an
 
 ![D FPS](./zig/asteroids/fps.png)
 
-### My machine
+## Line of Code
+
+```
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+C                               19            163              3           1159
+Zig                             23            165            149           1097
+Haskell                         25            157             37           1033
+Rust                            23            123             78           1027
+D                               27            192            183           1003
+```
+
+![Line of Codes](./code_lines.png)
+
+## My machine
 
 It is important that all measurements of performance are done in equal environment. So, FPS benchmarks are executed on my personal PC that has:
 * RTX 2080 Ti
