@@ -1,7 +1,6 @@
 module decs.storage.join;
 
-/// Special kind of tuple with all storages for specified components that you
-/// can access by their names.
+/// Mixin that generates `Storages` type for the
 mixin template MakeStorages() {
   import decs.component.primitive;
   import decs.component.meta;
@@ -9,6 +8,8 @@ mixin template MakeStorages() {
   import std.meta;
   import std.typecons;
 
+  /// Special kind of tuple with all storages for specified components that you
+  /// can access by their names.
   struct Storages(U...) {
     mixin(Components!U.storages!U);
 
