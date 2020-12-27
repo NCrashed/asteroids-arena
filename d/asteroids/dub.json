@@ -4,7 +4,8 @@
 	],
 	"copyright": "Copyright © 2020, Anton Gushcha",
 	"dependencies": {
-		"bindbc-sdl": "~>0.19.2"
+		"bindbc-sdl": "~>0.19.2",
+		"asteroids:decs": "*",
 	},
 	"description": "Asteroids game for asteroids-arena benchmarks",
 	"libs": [
@@ -18,5 +19,8 @@
 	},
 	"versions": [
 		"SDL_Mixer"
-	]
+	],
+	"subPackages": [
+		"../decs"
+	],
 }

@@ -2,7 +2,7 @@ module asteroids.component.bullet;
 
 public import asteroids.component.primitive;
 
-import asteroids.storage.vector;
+import decs.storage.vector;
 import std.meta;
 
 /// Tags bullet entities and contains timer when bullet should despawn

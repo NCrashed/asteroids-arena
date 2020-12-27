@@ -1,0 +1,9 @@
+{
+	"authors": [
+		"NCrashed"
+	],
+	"copyright": "Copyright © 2020, Anton Gushcha",
+	"description": "Entity Component System (ECS) library for gamedev.",
+	"license": "MIT",
+	"name": "decs"
+}

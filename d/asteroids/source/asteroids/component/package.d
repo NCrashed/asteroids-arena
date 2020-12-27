@@ -8,15 +8,12 @@ public import asteroids.component.player;
 public import asteroids.component.primitive;
 public import asteroids.component.rand;
 public import asteroids.component.size;
-public import asteroids.component.meta;
-public import asteroids.entity;
 
-import asteroids.storage.entity;
+public import decs;
 import std.meta;
 
-/// Here we define all components that are used
-alias AllComponents = AliasSeq!(
-  Entities,
+// Also injects AllComponents alias to the list
+mixin DeclareComponents!(
   WorldSize,
   Rng,
   DeltaTime,
@@ -30,6 +27,3 @@ alias AllComponents = AliasSeq!(
   Asteroid,
   Bullet,
   );
-
-/// Short name for subset of components for systems
-alias Storages(T) = Components!AllComponents.Storages(T);

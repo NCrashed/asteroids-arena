@@ -1,4 +1,4 @@
-module asteroids.entity;
+module decs.entity;
 
 /// Entity is simple ID that has associated components
 alias Entity = size_t;

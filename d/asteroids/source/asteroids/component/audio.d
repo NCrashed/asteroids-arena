@@ -1,6 +1,6 @@
 module asteroids.component.audio;
 
-import asteroids.storage.global;
+import decs.storage.global;
 import bindbc.sdl;
 import std.array;
 import std.exception;
@@ -68,7 +68,7 @@ struct Audio {
     cooldowns[] = 0;
 
     Mix_AllocateChannels(soundsCount);
-    Mix_Volume(-1, 50);
+    Mix_Volume(-1, 10);
 
     foreach(i, ref chunk; sounds) {
       chunk = loadWav(chainPath(dir, soundFile(cast(Sound)i)).array);
