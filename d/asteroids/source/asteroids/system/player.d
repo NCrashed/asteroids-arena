@@ -1,9 +1,6 @@
 module asteroids.system.player;
 
 import asteroids.component;
-import asteroids.entity;
-import asteroids.storage;
-
 import std.stdio;
 
 Entity spawnPlayer(Storages!(Entities, WorldSize, PlayerComponents) storages) {

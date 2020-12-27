@@ -1,7 +1,6 @@
 module asteroids.world;
 
 public import asteroids.component;
-public import asteroids.storage;
 
 import asteroids.input;
 import asteroids.render;

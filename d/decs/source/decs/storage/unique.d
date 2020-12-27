@@ -1,6 +1,6 @@
-module asteroids.storage.unique;
+module decs.storage.unique;
 
-import asteroids.entity;
+import decs.entity;
 import std.typecons;
 
 /// Storage of component that can contain maximum 1 instance of component. Only
@@ -19,7 +19,7 @@ class UniqueStorage(T) {
   }
 
   final:
-  
+
   /// Insert component for entity
   void insert(Entity e, T c) {
     unique = c;

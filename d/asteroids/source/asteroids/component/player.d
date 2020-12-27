@@ -2,7 +2,7 @@ module asteroids.component.player;
 
 public import asteroids.component.primitive;
 
-import asteroids.storage.unique;
+import decs.storage.unique;
 import std.math;
 import std.meta;
 

@@ -1,6 +1,6 @@
 module asteroids.component.delta;
 
-import asteroids.storage.global;
+import decs.storage.global;
 
 /// Delta time between current frame and previous
 struct DeltaTime {

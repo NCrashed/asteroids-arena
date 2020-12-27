@@ -1,7 +1,6 @@
 module asteroids.system.asteroid;
 
 import asteroids.component;
-import asteroids.storage;
 import std.math;
 import std.typecons;
 import std.random;

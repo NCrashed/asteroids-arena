@@ -1,6 +1,6 @@
-module asteroids.storage.global;
+module decs.storage.global;
 
-import asteroids.entity;
+import decs.entity;
 
 /// Storage of single component
 class GlobalStorage(T) {
@@ -10,7 +10,7 @@ class GlobalStorage(T) {
   alias Elem = T;
 
   final:
-  
+
   /// Insert component for entity
   void insert(Entity e, T c) {
     global = c;

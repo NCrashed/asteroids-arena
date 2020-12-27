@@ -2,7 +2,7 @@ module asteroids.component.asteroid;
 
 public import asteroids.component.primitive;
 
-import asteroids.storage.vector;
+import decs.storage.vector;
 import std.math;
 import std.meta;
 import std.typecons;

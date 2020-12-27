@@ -1,0 +1,17 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/decs
+decs.so
+decs.dylib
+decs.dll
+decs.a
+decs.lib
+decs-test-*
+*.exe
+*.o
+*.obj
+*.lst
+*.a
+*.so

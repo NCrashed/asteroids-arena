@@ -1,7 +1,6 @@
 module asteroids.system.physics;
 
 import asteroids.component;
-import asteroids.storage;
 import asteroids.system.player;
 import asteroids.system.asteroid;
 

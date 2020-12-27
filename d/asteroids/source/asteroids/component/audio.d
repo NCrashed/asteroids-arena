@@ -1,6 +1,6 @@
 module asteroids.component.audio;
 
-import asteroids.storage.global;
+import decs.storage.global;
 import bindbc.sdl;
 import std.array;
 import std.exception;

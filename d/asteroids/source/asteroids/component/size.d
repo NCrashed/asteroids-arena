@@ -1,6 +1,6 @@
 module asteroids.component.size;
 
-import asteroids.storage.global;
+import decs.storage.global;
 
 /// World size is current size of rendering window in pixels
 struct WorldSize {

@@ -1,4 +1,4 @@
-module asteroids.component.meta;
+module decs.component.meta;
 
 import std.algorithm.iteration;
 import std.meta;
@@ -32,23 +32,14 @@ template Components(T...) {
     enum join = foldTags([staticMap!(tag, U)]);
   }
 
-  /// Inserts storages for all components into scope. All components must have
+  /// Generate code that inserts storages for components from $(B T) into scope. All components must have
   /// defined name and Storage alias.
-  ///
-  /// Note: We expect that in mixin place you call the template list of components
-  /// as T.
-  mixin template Storages() {
-    private mixin template Inner(U...) {
-      static if (U.length == 0) {}
-      else {
-        import std.meta;
-        import std.traits;
-
-        mixin(fullyQualifiedName!(U[0].Storage) ~ " " ~ U[0].name ~ ";");
-        mixin Inner!(U[1 .. $]);
-      }
+  string storages(T...)() {
+    string acc = "";
+    static foreach(t; T) {
+      acc ~= fullyQualifiedName!(t.Storage) ~ " " ~ t.name ~ ";\n";
     }
-    mixin Inner!(T);
+    return acc;
   }
 
   /// Return false if some components from $(B U) are not in $(B T)
@@ -82,8 +73,16 @@ template Components(T...) {
   }
 }
 
+version(unittest) {
+  import decs.component.primitive;
+  alias Position = PrimComponent!(float[2], "position");
+  alias Velocity = PrimComponent!(float[2], "velocity");
+  alias Rotation = PrimComponent!(float, "rotation");
+  alias Radius = PrimComponent!(float, "radius");
+  alias Mass = PrimComponent!(float, "mass");
+}
+
 unittest {
-  import asteroids.component.primitive;
   alias CS = Components!(Position, Rotation, Velocity, Radius);
   static assert(CS.tag!Position == 1);
   static assert(CS.tag!Rotation == 2);
@@ -93,7 +92,6 @@ unittest {
 }
 
 unittest {
-  import asteroids.component.primitive;
   alias CS = Components!(Position, Rotation, Velocity, Radius);
   static assert(CS.join!(Position) == 1);
   static assert(CS.join!(Position, Rotation) == 0b11);
@@ -104,7 +102,6 @@ unittest {
 }
 
 unittest {
-  import asteroids.component.primitive;
   alias CS = Components!(Position, Rotation, Velocity, Radius);
   mixin CS.Storages;
 
@@ -114,7 +111,6 @@ unittest {
 }
 
 unittest {
-  import asteroids.component.primitive;
   alias CS = Components!(Position, Rotation, Velocity, Radius);
   static assert(CS.hasAll!(Position));
   static assert(CS.hasAll!(Velocity, Radius));

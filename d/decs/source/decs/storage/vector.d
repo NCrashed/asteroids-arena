@@ -1,6 +1,6 @@
-module asteroids.storage.vector;
+module decs.storage.vector;
 
-import asteroids.entity;
+import decs.entity;
 import std.container.array;
 import std.range;
 

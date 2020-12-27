@@ -1,6 +1,6 @@
 module asteroids.component.rand;
 
-import asteroids.storage.global;
+import decs.storage.global;
 import std.random;
 
 /// World wide random number generator
