@@ -10,7 +10,11 @@
 struct v2f {
   float x;
   float y;
-} __attribute__((__packed__));
+}
+#ifndef _MSC_VER
+__attribute__((__packed__))
+#endif
+;
 
 /// Add components of second vector to the firsts one
 void v2f_set_add(struct v2f *dest, struct v2f other);
