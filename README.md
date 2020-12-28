@@ -61,7 +61,15 @@ There is smooth gameplay. Some drops can be explained by interference of other s
 
 ### Rust
 Smooth gameplay. It was quite easy to implement the game and get high performance from first try.
+
 ![Rust FPS](./rust/fps.png)
+
+I used specs as first implementation and than rewrote to legion for more cleaner code. Amount of code
+and memory usage is dropped significantly. Also, I disabled legion multithreading as performance
+with it drops to maximum 6000 FPS as the major time game sit in work stealer inside legion schedule system.
+In single thread mode both ECS have near identical performance.
+
+![ECS Compare](./rust/ecs_compare.png)
 
 ### Zig
 Very stable frame rate. Feels like great upgrade over C in development experience and performance.
@@ -87,8 +95,8 @@ Language                     files          blank        comment           code
 C                               19            163              3           1159
 Zig                             23            165            149           1097
 Haskell                         25            157             37           1033
-Rust                            23            123             78           1027
-D                               27            192            183           1003
+D                               32            194            184           1015
+Rust                            23            113             74            842
 ```
 
 ![Line of Codes](./code_lines.png)

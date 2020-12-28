@@ -1,31 +1,24 @@
 #![feature(default_free_fn)]
 
+extern crate crossbeam;
 extern crate glam;
-extern crate sdl2;
-extern crate specs;
-#[macro_use]
-extern crate specs_derive;
+extern crate legion;
 extern crate rand;
-extern crate shrev;
+extern crate sdl2;
 
 use asteroids::components::player::*;
 use asteroids::components::size::*;
 use asteroids::components::time::DeltaTime;
-use asteroids::render::render_world;
-use asteroids::systems::audio::*;
-use asteroids::systems::init_systems;
+use asteroids::systems::*;
 use asteroids::world::init_world;
+use legion::*;
 use sdl2::event::Event;
 use sdl2::event::WindowEvent::SizeChanged;
+use sdl2::EventPump;
 use sdl2::keyboard::Keycode;
 use sdl2::mixer::{InitFlag, AUDIO_S16LSB, DEFAULT_CHANNELS};
 use sdl2::pixels::Color;
 use sdl2::render::WindowCanvas;
-use sdl2::EventPump;
-use specs::Dispatcher;
-use specs::System;
-use specs::World;
-use specs::WorldExt;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::Write;
@@ -34,7 +27,7 @@ use std::time::Instant;
 mod asteroids;
 
 /// Itialize graphic pipeline, event processing and game logic.
-fn initialize<'a, 'b>() -> Result<(WindowCanvas, EventPump, World, Dispatcher<'a, 'b>), String> {
+fn initialize<'a, 'b>() -> Result<(WindowCanvas, EventPump), String> {
     // Initialize libraries
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
@@ -46,10 +39,6 @@ fn initialize<'a, 'b>() -> Result<(WindowCanvas, EventPump, World, Dispatcher<'a
     // Number of mixing channels available for sound effect `Chunk`s to play
     // simultaneously.
     sdl2::mixer::allocate_channels(20);
-
-    // Initialize world
-    let mut world = init_world();
-    let dispatcher: Dispatcher<'a, 'b> = init_systems(&mut world)?;
 
     // Initialize window systems
     let window = video_subsystem
@@ -70,15 +59,13 @@ fn initialize<'a, 'b>() -> Result<(WindowCanvas, EventPump, World, Dispatcher<'a
 
     let event_pump = sdl_context.event_pump()?;
 
-    Ok((canvas, event_pump, world, dispatcher))
+    Ok((canvas, event_pump))
 }
 
 /// Main game loop where game runs 99% of time. It does processing of input events, rendering and execution of game logic.
 fn game_loop<'a, 'b>(
-    mut canvas: WindowCanvas,
+    canvas: WindowCanvas,
     mut event_pump: EventPump,
-    mut world: World,
-    mut dispatcher: Dispatcher<'a, 'b>,
 ) -> Result<(), String> {
     // Initialize audio here, as audio device will be deallocated if we initialize it outside the function.
     let frequency = 44_100;
@@ -87,9 +74,13 @@ fn game_loop<'a, 'b>(
     let chunk_size = 1_024;
     sdl2::mixer::open_audio(frequency, format, channels, chunk_size)?;
 
-    // Audio system is somewhat special, it should be thread local and must be initialized after
-    // audio device is opened.
-    let mut audio_sys = SysAudio::new(&mut world)?;
+    // Initialize world
+    let (mut world, mut resources) = init_world();
+    let mut schedule: Schedule = init_systems()?;
+
+    // Set canvas here as we move it to resources. Rendering system is embedded as thread local system.
+    resources.insert(canvas);
+
     let mut i = 0; // counter for fps reporting
     let mut file = File::create("fps.out").map_err(|x| format!("{}", x))?; // fps reporting file
     'running: loop {
@@ -97,23 +88,15 @@ fn game_loop<'a, 'b>(
         let frame_begin = Instant::now();
 
         // Process all events, if function returns true
-        if process_events(&mut world, &mut event_pump)? {
+        if process_events(&mut resources, &mut event_pump)? {
             break 'running Ok(());
         }
 
         // Execute all game logic
-        dispatcher.dispatch(&world);
-        world.maintain();
-
-        // Play sounds
-        audio_sys.run(world.system_data());
-
-        // Render all
-        render_world(&mut canvas, world.system_data())?;
+        schedule.execute(&mut world, &mut resources);
 
         // Write delta time and report FPS
-        let mut delta = world.write_resource::<DeltaTime>();
-        *delta = calc_fps(frame_begin, &mut i, &mut file)?;
+        resources.insert(calc_fps(frame_begin, &mut i, &mut file)?);
     }
 }
 
@@ -132,9 +115,9 @@ fn calc_fps(frame_begin: Instant, i: &mut i32, file: &mut File) -> Result<DeltaT
 }
 
 /// Iterate over all occured events from system and user and feed them inside game logic
-fn process_events(world: &mut World, event_pump: &mut EventPump) -> Result<bool, String> {
-    let mut wsize = world.write_resource::<WorldSize>();
-    let mut pinput = world.write_resource::<HashSet<PlayerInput>>();
+fn process_events(resources: &mut Resources, event_pump: &mut EventPump) -> Result<bool, String> {
+    let mut wsize = resources.get_mut::<WorldSize>().unwrap();
+    let mut pinput = resources.get_mut::<HashSet<PlayerInput>>().unwrap();
 
     for event in event_pump.poll_iter() {
         match event {
@@ -187,6 +170,6 @@ fn process_events(world: &mut World, event_pump: &mut EventPump) -> Result<bool,
 }
 
 pub fn main() -> Result<(), String> {
-    let (canvas, event_pump, world, dispatcher) = initialize()?;
-    game_loop(canvas, event_pump, world, dispatcher)
+    let (canvas, event_pump) = initialize()?;
+    game_loop(canvas, event_pump)
 }

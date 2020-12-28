@@ -1,5 +1,2 @@
-use specs::prelude::*;
-
-#[derive(Component, Copy, Clone, Debug, Default)]
-#[storage(VecStorage)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Mass(pub f32);

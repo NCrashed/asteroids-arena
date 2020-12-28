@@ -1,2 +1,3 @@
 target
-fps.out
+fps.out*
+callgrind.out*
