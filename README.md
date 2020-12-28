@@ -69,7 +69,7 @@ and memory usage is dropped significantly. Also, I disabled legion multithreadin
 with it drops to maximum 6000 FPS as the major time game sit in work stealer inside legion schedule system.
 In single thread mode both ECS have near identical performance.
 
-![ECS Compare](./rust/ecs_compare.png)
+![ECS Compare](./rust/asteroids/ecs_compare.png)
 
 ### Zig
 Very stable frame rate. Feels like great upgrade over C in development experience and performance.
