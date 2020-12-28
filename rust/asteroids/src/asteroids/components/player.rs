@@ -1,5 +1,5 @@
 use glam::Vec2;
-use specs::prelude::*;
+use legion::*;
 use std::f32::consts::PI;
 
 use super::mass::*;
@@ -9,8 +9,7 @@ use super::size::*;
 use super::vel::*;
 
 /// Player component that has thrust engine flag (`true` for on) and bullet cooldown time left.
-#[derive(Component, Copy, Clone, Debug, Default)]
-#[storage(HashMapStorage)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Player(pub bool, pub f32);
 
 /// Player size in pixels
@@ -48,17 +47,16 @@ pub struct PlayerCollide {
 }
 
 /// Allocate components for the player
-pub fn create_player(w: &mut World) -> Entity {
-    let ws: WorldSize = *w.read_resource::<WorldSize>();
-    return w
-        .create_entity()
-        .with(Player(false, PLAYER_FIRE_COOLDOWN))
-        .with(Mass(PLAYER_MASS))
-        .with(Pos(Vec2 {
+pub fn create_player(resources: &mut Resources, w: &mut World) -> Entity {
+    let ws: WorldSize = *resources.get::<WorldSize>().unwrap();
+    w.push((
+        Player(false, PLAYER_FIRE_COOLDOWN),
+        Mass(PLAYER_MASS),
+        Pos(Vec2 {
             x: ws.0 as f32 * 0.5,
             y: ws.1 as f32 * 0.5,
-        }))
-        .with(Rot(0.0))
-        .with(Vel(Vec2 { x: 0.0, y: 0.0 }))
-        .build();
+        }),
+        Rot(0.0),
+        Vel(Vec2 { x: 0.0, y: 0.0 }),
+    ))
 }

@@ -1,10 +1,8 @@
 use glam::Vec2;
-use specs::prelude::*;
 
 use super::rot::*;
 
-#[derive(Component, Copy, Clone, Debug, Default)]
-#[storage(VecStorage)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Vel(pub Vec2);
 
 /// Add velocity to direction the rotation has

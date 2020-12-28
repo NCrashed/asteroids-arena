@@ -1,9 +1,7 @@
 use glam::Vec2;
-use specs::prelude::*;
 
 /// Bullet component contains time to live for that bullet
-#[derive(Component, Copy, Clone, Debug, Default)]
-#[storage(VecStorage)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Bullet(pub f32);
 
 /// Bullet speed meter per second

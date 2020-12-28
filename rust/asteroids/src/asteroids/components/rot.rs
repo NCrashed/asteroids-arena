@@ -1,9 +1,7 @@
 use glam::Vec2;
-use specs::prelude::*;
 use std::f32::consts::PI;
 
-#[derive(Component, Copy, Clone, Debug, Default)]
-#[storage(VecStorage)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Rot(pub f32);
 
 /// Increase rotation of the component by given amount of radians

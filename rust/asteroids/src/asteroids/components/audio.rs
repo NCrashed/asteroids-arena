@@ -1,5 +1,11 @@
-use sdl2::mixer::Chunk;
+use sdl2::mixer::*;
 use std::path::Path;
+
+/// Default search path for sounds
+pub const SOUNDS_PATH: &str = "./sounds";
+
+/// Default volume level for all channels
+pub const DEFAULT_VOLUME_PERCENT: i32 = 50;
 
 /// Resource with all sound files loaded in memory.
 pub struct AudioReses {
@@ -20,6 +26,14 @@ pub enum PlayAudio {
     BangSound,
     FireSound,
     ThrustSound,
+}
+
+impl AudioReses {
+    pub fn init() -> Result<Self, String> {
+        let sounds = load_audio_chunks(Path::new(SOUNDS_PATH))?;
+        Channel::all().set_volume(DEFAULT_VOLUME_PERCENT);
+        Ok(sounds)
+    }
 }
 
 impl CooledChunk {

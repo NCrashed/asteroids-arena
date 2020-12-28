@@ -9,5 +9,7 @@ stdenv.mkDerivation rec {
     rust-analyzer
     SDL2
     SDL2_mixer
+    valgrind
+    kdeApplications.kcachegrind
   ];
 }
