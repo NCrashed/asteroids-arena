@@ -110,7 +110,7 @@ Measured with `command time -v <exe>`:
 | C        | 82760         |
 | Zig      | 65984         |
 | Haskell  | 83628         |
-| Rust     | 67464         |
+| Rust     | 45616         |
 | D        | 68688         |
 
 ![Line of Codes](./memory.png)
