@@ -38,7 +38,7 @@ Languages:
 
 # Contributors
 
-- @egorpugin developed C++ version.
+- [@egorpugin](https://github.com/egorpugin) developed C++ version.
 
 # Results
 
@@ -93,7 +93,7 @@ Also I used LLVM PGO (Profiling Guided Optimizations) for LDC, that makes DMD an
 
 ### C++
 
-Based on C implementation and [entt](https://github.com/skypjack/entt) library. Implementation provided by @egorpugin.
+Based on C implementation and [entt](https://github.com/skypjack/entt) library. Implementation provided by [@egorpugin](https://github.com/egorpugin).
 
 ![CPP FPS](./cpp/asteroids/fps_many.png)
 
