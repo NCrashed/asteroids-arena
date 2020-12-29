@@ -95,7 +95,7 @@ Also I used LLVM PGO (Profiling Guided Optimizations) for LDC, that makes DMD an
 
 Based on C implementation and [entt](https://github.com/skypjack/entt) library. Implementation provided by [@egorpugin](https://github.com/egorpugin).
 
-![CPP FPS](./cpp/asteroids/fps_many.png)
+![CPP FPS](./cpp/asteroids/fps.png)
 
 ## Line of Code
 
