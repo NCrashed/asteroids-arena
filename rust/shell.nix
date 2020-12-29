@@ -11,5 +11,6 @@ stdenv.mkDerivation rec {
     SDL2_mixer
     valgrind
     kdeApplications.kcachegrind
+    llvm_11
   ];
 }
