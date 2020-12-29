@@ -13,7 +13,7 @@ sound_resources::sound_resources(const std::filesystem::path &p)
   , fire(p / "fire.wav")
   , thrust(p / "thrust.wav") {
   Mix_AllocateChannels(channel_count);
-  Mix_Volume(-1, 50);
+  Mix_Volume(-1, 1);
 }
 
 void sound_resources::update_sound_cooldowns(float dt) {

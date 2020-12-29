@@ -31,9 +31,14 @@ Languages:
 - Haskell. My major language. The goal to test pressure of GC on performance and if it really more comfortable for game developing. **Done**.
 - C. Control group for performance. **Done**.
 - ATS2. Low level FP language with dependent typing that will allow mutation in place, redundant checks elimination and zero cost abstractions. **On hold**.
-- D. Curious to test it with GC and without GC. **Done**.
+- D. Curious to test it with GC and without GC. Use custom library with meta programming for boilerplate generation **Done**.
 - Zig. Low level alternative to pure C. Curious in performance and if it easy to bind to C libraries. **Done**.
 - Rust. Curious in performance and expressive power comparing to Haskell. **Done**.
+- С++. Widely used in game development. First implementation is unoptimized translation of C version with [entt](https://github.com/skypjack/entt) library **Done**.
+
+# Contributors
+
+- @egorpugin developed C++ version.
 
 # Results
 
@@ -86,17 +91,42 @@ Also I used LLVM PGO (Profiling Guided Optimizations) for LDC, that makes DMD an
 
 ![D FPS](./d/asteroids/fps_many.png)
 
+### C++
+
+Based on C implementation and [entt](https://github.com/skypjack/entt) library. Implementation provided by @egorpugin.
+
+![CPP FPS](./cpp/asteroids/fps_many.png)
+
 ## Line of Code
 
+Libraries for ECS are not included in the LoC metric unless they are not embedded in the implementation:
+```
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+Zig                             23            165            149           1097
+Haskell                         25            157             37           1033
+Rust                            23            113             74            842
+D                               32            194            184            638
+```
+
+Output for C implementation as `cloc` mixes C++ and C:
 ```
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
 C                               19            163              3           1159
-Zig                             23            165            149           1097
-Haskell                         25            157             37           1033
-D                               32            194            184           1015
-Rust                            23            113             74            842
+C/C++ Header                    18            114            129            370
+
+```
+
+Output for C++ implementation as `cloc` mixes C++ and C:
+```
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+C++                              5             61             11            398
+C/C++ Header                     4             29             16             98
 ```
 
 ![Line of Codes](./code_lines.png)
@@ -112,6 +142,7 @@ Measured with `command time -v <exe>`:
 | Haskell  | 83628         |
 | Rust     | 45616         |
 | D        | 68688         |
+| C++      | 44188         |
 
 ![Line of Codes](./memory.png)
 

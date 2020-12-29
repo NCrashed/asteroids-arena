@@ -6,9 +6,7 @@ all:
 	g++ -g ${CPPFLAGS} -o asteroids ${MODULES} ${LDFLAGS}
 
 opt:
-	# g++ -O3 -ffast-math -march=native ${CPPFLAGS} -o asteroids ${MODULES} ${LDFLAGS}
-	# g++ -O3 -fno-math-errno ${CPPFLAGS} -o asteroids ${MODULES} ${LDFLAGS}
-	g++ -O3 -fno-math-errno -ffast-math -march=native ${CPPFLAGS} -o asteroids ${MODULES} ${LDFLAGS}
+	g++ -O3 ${CPPFLAGS} -o asteroids ${MODULES} ${LDFLAGS}
 
 small:
 	g++ -Os ${CPPFLAGS} -o asteroids ${MODULES} ${LDFLAGS}
