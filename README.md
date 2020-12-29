@@ -137,7 +137,7 @@ Measured with `command time -v <exe>`:
 | D        | 68688         | 155.45               |
 | C++      | 44188         | 100.00               |
 
-![Line of Codes](./memory.png)
+![Memory table](./memory.png)
 
 ## My machine
 
