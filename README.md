@@ -38,7 +38,7 @@ Languages:
 
 # Contributors
 
-- [@egorpugin](https://github.com/egorpugin) developed C++ version.
+- [@egorpugin](https://github.com/egorpugin) ported C version to C++ using [entt](https://github.com/skypjack/entt) library.
 
 # Results
 
@@ -110,7 +110,7 @@ Rust                            23            113             74            842
 D                               32            194            184            638
 ```
 
-Output for C implementation as `cloc` mixes C++ and C:
+As `cloc` mixes results for C and C++, here output for C implementation:
 ```
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
@@ -120,7 +120,7 @@ C/C++ Header                    18            114            129            370
 
 ```
 
-Output for C++ implementation as `cloc` mixes C++ and C:
+And output for C++ implementation:
 ```
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
