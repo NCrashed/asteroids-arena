@@ -4,7 +4,7 @@
 int init_sound_resources(struct sound_resources *resources, const char* path)
 {
   Mix_AllocateChannels(CHANNEL_COUNT);
-  Mix_Volume(-1, 50);
+  Mix_Volume(-1, 10);
   char buff[1024];
   memset(resources, 0, sizeof(struct sound_resources));
 

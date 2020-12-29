@@ -1,0 +1,5 @@
+.sw
+*.lnk
+.editorconfig
+*.out
+fps.out*
