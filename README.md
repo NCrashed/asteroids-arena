@@ -104,12 +104,12 @@ Libraries for ECS are not included in the LoC metric unless they are not embedde
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-C                               19            163              3           1529
+C                               37            277            132           1529
 Zig                             23            165            149           1097
 Haskell                         25            157             37           1033
 Rust                            23            113             74            842
 D                               32            194            184            638
-C++                              5             61             11            496
+C++                              9             90             27            496
 ```
 
 ![Line of Codes](./code_lines.png)
