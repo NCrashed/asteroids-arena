@@ -128,14 +128,14 @@ C++                              9             90             27            496
 
 Measured with `command time -v <exe>`:
 
-| Language | Max memory Kb |
-|----------|---------------|
-| C        | 82760         |
-| Zig      | 65984         |
-| Haskell  | 83628         |
-| Rust     | 45616         |
-| D        | 68688         |
-| C++      | 44188         |
+| Language | Max memory Kb | Max memory to best % |
+|----------|---------------|----------------------|
+| C        | 82760         | 187.29               |
+| Zig      | 65984         | 149.33               |
+| Haskell  | 83628         | 189.26               |
+| Rust     | 45616         | 103.23               |
+| D        | 68688         | 155.45               |
+| C++      | 44188         | 100.00               |
 
 ![Line of Codes](./memory.png)
 
