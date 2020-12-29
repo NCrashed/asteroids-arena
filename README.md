@@ -46,6 +46,16 @@ Languages:
 
 ## FPS
 
+| Value           | Haskell | C     | Zig   | Rust  | D     | C++   |
+|-----------------|---------|-------|-------|-------|-------|-------|
+| Max FPS         | 500     | 25000 | 25078 | 24057 | 27778 | 24494 |
+| Min FPS         | 3       | 3521  | 4031  | 2775  | 1376  | 3969  |
+| Avg FPS         | 115     | 21482 | 21634 | 19809 | 22559 | 20875 |
+| Avg to best (%) | 0.5     | 95.23 | 95.90 | 87.81 | 100   | 92.54 |
+| Mean FPS        | 91      | 21739 | 21712 | 20695 | 22727 | 20777 |
+| FPS dispersion  | 87      | 965   | 970   | 2445  | 2481  | 1439  |
+| Dispersion %    | 75      | 4     | 4     | 12    | 11    | 7     |
+
 FPS plots are built with [haskell utility](./haskell/plotting). Like:
 ```
 cabal new-run plotting -- single fps.out

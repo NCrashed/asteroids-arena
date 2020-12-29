@@ -1,5 +1,6 @@
 import Data.Bifunctor
 import Data.Foldable (for_)
+import Data.List (sort)
 import Data.Time.LocalTime
 import Data.Traversable (for)
 import Graphics.Rendering.Chart.Backend.Cairo
@@ -12,6 +13,26 @@ loadSamples name = do
   let ys = ((\(a, b) -> (read a, read $ drop 1 b))  . break (',' ==)) <$> lines cnt
   let maxTick = fst $ last ys
   pure $ first (/ maxTick) <$> ys
+
+printStats :: FilePath -> IO ()
+printStats path = do
+  samples <- loadSamples path
+  let fps = snd <$> samples
+  let maxFps = maximum fps
+      minFps = minimum fps
+      avgFps = sum fps / fromIntegral (length fps)
+      meanFps = head . drop ((length fps `div` 2) - 1) $ sort fps
+      sqdFps = sum ((^ 2) . (subtract avgFps) <$> fps) / fromIntegral (length fps - 1)
+      disFps = sqrt sqdFps
+      disFpsP = 100 * disFps / avgFps
+  putStrLn $ unlines [
+      "Maximum FPS:    " <> show (round maxFps :: Int)
+    , "Minimum FPS:    " <> show (round minFps :: Int)
+    , "Average FPS:    " <> show (round avgFps :: Int)
+    , "Mean FPS:       " <> show (round meanFps :: Int)
+    , "FPS dispertion: " <> show (round disFps :: Int)
+    , "Dispertion %:   " <> show (round disFpsP :: Int)
+    ]
 
 drawSingle :: FilePath -> IO ()
 drawSingle path = do
@@ -45,9 +66,17 @@ makePairs _ = []
 main :: IO ()
 main = do
   args <- getArgs
-  let help = fail "Expecting either 'single fps.out' or 'multiple Haskell fps1.out Rust fps2.out' for consolidated plot"
+  let help = fail $ unlines [
+        "Expecting either:",
+        "single fps.out",
+        "stats fps.out",
+        "multiple Haskell fps1.out Rust fps2.out",
+        "code Haskell 100 Rust 200",
+        "memory Haskell 100 Rust 200"
+        ]
   case args of
     ["single", path] -> drawSingle path
+    ["stats", path] -> printStats path
     "multiple" : pairs -> drawMultiple $ makePairs pairs
     "code" : pairs -> drawBars "Lines of code" "Lines" $ fmap (second read) $ makePairs pairs
     "memory" : pairs -> drawBars "Maximum residence memory" "Kilobytes" $ fmap (second read) $ makePairs pairs
