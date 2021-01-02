@@ -1,3 +1,4 @@
+{ liquidhaskell ? false }:
 let
   nixpkgs = import ../nix/pkgs.nix;
   project = import (import ../nix/project.nix) { inherit nixpkgs; };
@@ -7,17 +8,20 @@ in project rec {
     plotting = ./plotting;
   };
   shellHook = pkgs: ''
-    ${pkgs.addLiquidSolverHook}
+    ${if liquidhaskell then pkgs.addLiquidSolverHook else ""}
   '';
   shellTools = pkgs: with pkgs.haskellPackages; [
     cabal-install ghcid
     pkgs.cloc
   ];
-  overlays = [
+  overlays = (if liquidhaskell then [
       (import (import ../nix/liquidhaskell.nix) { inherit compiler; })
-      (import ../nix/haskell.nix { inherit compiler; })
+    ] else [])
+    ++
+    [
+      (import ../nix/haskell.nix { inherit compiler; useliquid = liquidhaskell; })
       (import ../nix/cloc-overlay.nix)
     ];
-  overlaysAfter = [ ((import ./solver.nix) { inherit compiler; }) ];
+  overlaysAfter = if liquidhaskell then [ ((import ./solver.nix) { inherit compiler; }) ] else [];
   compiler = "ghc8102";
 }
