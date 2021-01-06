@@ -1,0 +1,4 @@
+(executable
+ (name asteroids)
+ (libraries sdl2 unix)
+ (link_flags -cclib -lSDL2))

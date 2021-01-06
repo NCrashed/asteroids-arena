@@ -35,10 +35,12 @@ Languages:
 - Zig. Low level alternative to pure C. Curious in performance and if it easy to bind to C libraries. **Done**.
 - Rust. Curious in performance and expressive power comparing to Haskell. **Done**.
 - С++. Widely used in game development. First implementation is unoptimized translation of C version with [entt](https://github.com/skypjack/entt) library **Done**.
+- OCaml. FP language with C backend, should be fast enough and with FP expression power. **In Progress**. Current implementation is not optimized.
 
 # Contributors
 
 - [@egorpugin](https://github.com/egorpugin) ported C version to C++ using [entt](https://github.com/skypjack/entt) library.
+- [@Heimdell](https://github.com/Heimdell) ported C version to OCaml.
 
 # Results
 
@@ -106,6 +108,15 @@ Also I used LLVM PGO (Profiling Guided Optimizations) for LDC, that makes DMD an
 Based on C implementation and [entt](https://github.com/skypjack/entt) library. Implementation provided by [@egorpugin](https://github.com/egorpugin).
 
 ![CPP FPS](./cpp/asteroids/fps.png)
+
+### OCaml
+
+Based on C implementation. Implementation provided by [@Heimdell](https://github.com/Heimdell). FPS degrades linearly from count of ever created entities, need to be optimized further. Also, sounds are not implemented.
+
+![Ocaml FPS](./ocaml/fps_ocaml.png)
+
+Comparing to C:
+![Ocaml FPS](./ocaml/fps_compare.png)
 
 ## Line of Code
 

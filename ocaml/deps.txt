@@ -1,0 +1,5 @@
+You need to install:
+
+sudo apt install libdrm-dev
+sudo apt install libgbm-dev
+opam install OCamlSDL2
