@@ -9,6 +9,9 @@ in project rec {
   };
   shellHook = pkgs: ''
     ${if liquidhaskell then pkgs.addLiquidSolverHook else ""}
+    export PKG_CONFIG_PATH=${pkgs.SDL2.dev}/lib/pkgconfig:${pkgs.SDL2_mixer}/lib/pkgconfig
+    export C_INCLUDE_PATH=${pkgs.SDL2.dev}/include:${pkgs.SDL2_mixer}/include
+    export LIBRARY_PATH=${pkgs.SDL2}/lib:${pkgs.SDL2_mixer}/lib
   '';
   shellTools = pkgs: with pkgs.haskellPackages; [
     cabal-install ghcid
@@ -23,5 +26,5 @@ in project rec {
       (import ../nix/cloc-overlay.nix)
     ];
   overlaysAfter = if liquidhaskell then [ ((import ./solver.nix) { inherit compiler; }) ] else [];
-  compiler = "ghc8102";
+  compiler = "ghc8107";
 }

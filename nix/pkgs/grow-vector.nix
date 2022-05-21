@@ -1,23 +1,17 @@
-{ mkDerivation, base, liquid-base, liquid-vector, vector, liquidhaskell
-, primitive, quickcheck-instances, stdenv, tasty, tasty-discover
-, tasty-hspec, tasty-quickcheck, useliquid ? false
+{ mkDerivation, base, hspec, lib, primitive, quickcheck-instances
+, tasty, tasty-discover, tasty-hspec, tasty-quickcheck, vector
 }:
 mkDerivation {
   pname = "grow-vector";
-  version = "0.1.3.0";
-  sha256 = "afa93fd026cefbdc6886a2d48c2f792805b1127bc87294d4d3d31a0f9f2f678d";
-  configureFlags = if useliquid then [ "-fliquidhaskell" ] else [];
+  version = "0.1.5.0";
+  sha256 = "ab04cb21da9602f55744f641bac46da4b88553ed57693bb62911365b977ac6b6";
   enableSeparateDataOutput = true;
-  libraryHaskellDepends = if useliquid then [
-    liquid-base liquid-vector liquidhaskell primitive
-  ] else [
-    base primitive vector
-  ];
+  libraryHaskellDepends = [ base primitive vector ];
   testHaskellDepends = [
-    base primitive quickcheck-instances tasty tasty-discover
+    base hspec primitive quickcheck-instances tasty tasty-discover
     tasty-hspec tasty-quickcheck
   ];
   testToolDepends = [ tasty-discover ];
   description = "Mutable vector with efficient appends";
-  license = stdenv.lib.licenses.mit;
+  license = lib.licenses.mit;
 }

@@ -21,4 +21,5 @@ stdenv.mkDerivation rec {
     kdeApplications.kcachegrind
     pkg-config
   ];
+  LD_LIBRARY_PATH = "/run/opengl-driver/lib";
 }

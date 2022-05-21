@@ -1,5 +1,5 @@
-{ mkDerivation, base, bytestring, ghc-prim, hspec, Judy, QuickCheck
-, stdenv
+{ mkDerivation, base, bytestring, ghc-prim, hspec, Judy, lib
+, QuickCheck
 }:
 mkDerivation {
   pname = "judy";
@@ -10,5 +10,5 @@ mkDerivation {
   testHaskellDepends = [ base hspec QuickCheck ];
   homepage = "http://github.com/mwotton/judy";
   description = "Fast, scalable, mutable dynamic arrays, maps and hashes";
-  license = stdenv.lib.licenses.bsd3;
+  license = lib.licenses.bsd3;
 }

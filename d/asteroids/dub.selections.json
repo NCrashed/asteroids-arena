@@ -3,7 +3,6 @@
 	"versions": {
 		"bindbc-loader": "0.3.2",
 		"bindbc-sdl": "0.19.2",
-		"decs": "0.1.0",
 		"stribog": "1.4.0"
 	}
 }
