@@ -1,3 +1,4 @@
+{-# LANGUAGE NumericUnderscores #-}
 module Game.Asteroids.Window(
     renderLoop
   ) where
@@ -13,6 +14,7 @@ import Paths_asteroids
 import SDL
 import SDL.Mixer
 import System.IO
+import System.Clock
 
 import Game.Asteroids.Audio
 import Game.Asteroids.Render
@@ -44,7 +46,7 @@ renderLoop w0 nextWorld = do
     fireRef <- newIORef False
     let loop :: WorldRender IO world => Int -> world -> IO ()
         loop !i w = do
-          t1 <- ticks
+          t1 <- getTime Monotonic
           events <- pollEvents
           let isEventExit event =
                 case eventPayload event of
@@ -80,9 +82,9 @@ renderLoop w0 nextWorld = do
           runWith w $ {-# SCC "renderWorld" #-} render renderer w
           present renderer
           w' <- {-# SCC "nextWorld" #-} nextWorld worldEvents w
-          t2 <- ticks
+          t2 <- getTime Monotonic
           let fps :: Int
-              fps = round $ recip $ fromIntegral (t2 - t1) * 0.001
+              fps = round $ recip $ fromIntegral (toNanoSecs (t2 - t1)) / (1_000_000_000)
           hPutStrLn fpsFile $ show i <> "," <> show fps
           when (i `mod` fpsReportN == 0) $ putStrLn $ "FPS " <> show fps
           unless exitEvent (loop (i+1) w')
